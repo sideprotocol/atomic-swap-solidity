@@ -32,7 +32,7 @@ Guarantee of Desired Exchange: Users can trust that the contract ensures a fair 
 1. A maker creates an order transaction with selling tokens and the price. 
 2. The maker's sell tokens are sent to the escrow address owned by the contract. 
 3. The order is saved in contract.
-4. An order expiry will result in a refund of the escrowed tokens. (will be done by user contract won't automatically do it, we can reuse cancelswap operation for this)
+4. In the event of an order expiration, a refund of the tokens held in escrow will be initiated. However, it's important to note that the user must manually trigger this refund process through a "cancelswap" operation, as the contract does not automatically execute it.
 
 #### Taking a swap
 
@@ -47,10 +47,8 @@ Guarantee of Desired Exchange: Users can trust that the contract ensures a fair 
 1.  A maker cancels a previously created order. Expired orders can also be cancelled.
 2.  An Order can only be cancelled once. 
 3.  Tokens should be refunded when order is cancelled.
-4.  An order can be also cancelled even if there are unfinished bidding orders. 
-
-Question: What does this mean ? I think maker should not be able to accept as they already cancelled order
-5.  Maker can accept the bid order if the order has canceled.
+4.  An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it. 
+5.  Maker should not be able to accept a bid order if the order has been canceled.
 
 ### Data struct and types
 
@@ -110,7 +108,7 @@ interface CancelSwapMsg {
 
  - Anyone can bid for any open orders. if the order has specified desired recipient, then only he can bid for this old.
  - bid price should great than 0 and less than order price
-    - makers can set price limit for bids for their order. For example: minimum bid amount: 100
+    - makers can set price limit for bids for their order. For example: minimum price for token X: 100
  - bider should able to specified a duration for this offering. Maker can only accept the bid in that time window.
  - Don't support partial bid for now.
  - Unfinished bid order should be allowed to claim it's assets back
