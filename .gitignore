@@ -1,0 +1,22 @@
+# node module
+**/node_modules/
+ 
+# Node.js related
+node_modules/
+yarn-error.log
+
+# Environment variables
+.env
+
+# Editors, tools, OS related
+*.log
+*.swp
+*.swo
+*.DS_Store
+*.code-workspace
+.vscode/
+
+# Contract Tyupechains
+package/contract-typechain/abi
+package/contract-typechain/typechain
+package/contract-typechain/lib
