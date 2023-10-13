@@ -145,6 +145,15 @@ interface CancelBidMsg {
   bidder: string,
 }
 ```
+
+### Fees
+
+- Maker fee: 0.1%
+- Take fee: 0.12%
+- When a maker creates an order, calculate the maker fee based on the order's value.
+- When a taker executes a trade, calculate the taker fee based on the order's value.
+- Deducted fees will be sent to treasury account
+
 ### Escrow mechanism
 
  - Maker send tokens to contract and locked. 
