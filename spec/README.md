@@ -133,12 +133,11 @@ interface CancelSwapMsg {
 
 ** Process **
 
-- When the maker directly specifies a preferred taker, that taker can accept the order without competition. Otherwise, all other takers must participate in a bidding process.
 - Taker pick a order (he is interested),
-- Input a price and duration(should be equal or above minimum limit: if specified) and price will be less or same than buy price.
+- The taker enters their preferred price and duration, ensuring it's at least the specified minimum limit and that the entered amount does not exceed the buy token quantity.
 - Deposit required tokens
-- Submit the bider order.
-- Maker receive bider orders and decide if she/he want to accept the price.
+- The taker finalizes the process by submitting their bid order.
+- The maker then receives the bid orders and evaluates whether to accept the offered price.
 
 ```ts
 interface PlaceBidMsg {
