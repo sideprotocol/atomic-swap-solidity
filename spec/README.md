@@ -39,7 +39,7 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 
 1. A taker takes an order by sending a `TakeSwap` transaction.
 2. The taker's sell tokens are sent to the escrow address owned by the contract.
-3. # if the taker's price is equate to order's price ,the contract sending Maker's selling tokens to taker and sending Taker's selling Token to maker. otherwise reject the take transaction and refund the taker's token.
+3. If the taker's price is equate to order's price ,the contract sending Maker's selling tokens to taker and sending Taker's selling Token to maker. otherwise reject the take transaction and refund the taker's token.
 4. A taker takes an order by sending a `TakeSwap` transaction for a specific order.
 5. The taker's sell tokens are sent to the escrow address owned by the contract.
 6. If the taker's offered price matches the price specified in the order, the contract facilitates the exchange by transferring the maker's selling tokens to the taker and the taker's selling tokens to the maker. However, if the prices do not align, the contract will reject the "TakeSwap" transaction and promptly refund the taker's tokens.
@@ -47,12 +47,11 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 
 #### Cancelling a swap
 
-1.  A maker cancels a previously created order. Expired orders can also be cancelled.
-2.  # An Order can only be cancelled once.
-3.  An order can only be cancelled once.
-4.  Tokens should be refunded when order is cancelled.
-5.  An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
-6.  Maker should not be able to accept a bid order if the order has been canceled.
+1. A maker cancels a previously created order. Expired orders can also be cancelled.
+2. An Order can only be cancelled once.
+3. Tokens should be refunded when order is cancelled.
+4. An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
+5. Maker should not be able to accept a bid order if the order has been canceled.
 
 ### Data struct and types
 
@@ -125,38 +124,31 @@ interface CancelSwapMsg {
 ** Properties **:
 
 - Anyone can bid for any open orders. if the order has specified desired recipient, then only he can bid for this old.
-- bid price should great than `minBidAmount` and less than order price
-  - makers can set price limit for bids for their order. For example: minimum price for token X: 100
-- bider should able to specified a duration for this offering. Maker can only accept the bid in that time window.
+- Bid price should great than `minBidAmount` and less than order price
+- Makers can set price limit for bids for their order. For example: minimum price for token X: 100
+- Bider should able to specified a duration for this offering. Maker can only accept the bid in that time window.
 - Don't support partial bid for now.
 - Unfinished bid order should be allowed to claim it's assets back
 
 ** Process **
 
-- When the maker directly specifies a preferred taker, that taker can accept the order without competition. Otherwise, all other takers must participate in a bidding process.
 - Taker pick a order (he is interested),
-- Input a price and duration(should be equal or above minimum limit: if specified) and price will be less or same than buy price.
+- The taker enters their preferred price and duration, ensuring it's at least the specified minimum limit and that the entered amount does not exceed the buy token quantity.
 - Deposit required tokens
-- Submit the bider order.
-- Maker receive bider orders and decide if she/he want to accept the price.
+- The taker finalizes the process by submitting their bid order.
+- The maker then receives the bid orders and evaluates whether to accept the offered price.
 
 ```ts
 interface PlaceBidMsg {
   orderID: string;
   status: string; // 1. waiting for accept, 2. complete, 3.cancel
   bidAmount: number;
-  duration: u64;
-  completedAt: u64;
-  createdAt: u64;
+  expiredAt: number;
+  completedAt: number;
+  createdAt: number;
 }
 
 interface AcceptBidMsg {
-  orderID: string;
-}
-```
-
-```ts
-interface TakeBidMsg {
   orderID: string;
   bidder: string;
 }
@@ -165,7 +157,6 @@ interface TakeBidMsg {
 ```ts
 interface CancelBidMsg {
   orderID: string;
-  bidder: string;
 }
 ```
 
@@ -173,8 +164,7 @@ interface CancelBidMsg {
 
 - Maker fee: 0.1%
 - Take fee: 0.12%
-- When a maker creates an order, calculate the maker fee based on the order's value.
-- When a taker executes a trade, calculate the taker fee based on the order's value.
+- When a maker and taker engage in a trade, compute the maker's fee based on the order value and the taker's fee based on the bid's value.
 - Deducted fees will be sent to treasury account
 
 ### Escrow mechanism
