@@ -122,7 +122,7 @@ interface CancelSwapMsg {
  - The maker then receives the bid orders and evaluates whether to accept the offered price.
 
 ```ts
-interface BidMsg {
+interface MakeBidMsg {
   orderId: string,
   status: string, // 1. waiting for accept, 2. complete, 3.cancel
   offerringToken: Coin,
@@ -130,14 +130,19 @@ interface BidMsg {
   completeTimestamp: u64,
   creationTimestamp: u64
 }
-
-Suggestion: We can add this step in cancel itself, cancel means remove bid and refund tokens if bid was not taken
 ```
+
 ```ts
-interface ClaimBidMsg {
-  bidId: string,
-  completeTimestamp: u64,
-  creationTimestamp: u64
+interface TakeBidMsg {
+  orderId: string,
+  bidder: string,
+}
+```
+
+```ts
+interface CancelBidMsg {
+  orderId: string,
+  bidder: string,
 }
 ```
 ### Escrow mechanism
