@@ -143,7 +143,7 @@ interface CancelSwapMsg {
 - Place Bid to the order.
 
 ```ts
-interface MakeBidMsg {
+interface PlaceBidMsg {
   orderID: string;
   status: string; // 1. waiting for accept, 2. complete, 3.cancel
   bidAmount: number;
@@ -154,7 +154,8 @@ interface MakeBidMsg {
 ```
 
 - Accept Bid by Maker.
-Maker can select one of bid from the total bid list.
+  Maker can select one of bid from the total bid list.
+
 ```ts
 interface AcceptBidMsg {
   orderID: string;
@@ -168,7 +169,6 @@ interface AcceptBidMsg {
 ```ts
 interface CancelBidMsg {
   orderID: string;
-  bidder: string;
 }
 ```
 
@@ -178,7 +178,6 @@ interface CancelBidMsg {
 ```ts
 interface UpdateBidMsg {
   orderID: string;
-  bidder: string;
   addition: Coin;
 }
 ```
