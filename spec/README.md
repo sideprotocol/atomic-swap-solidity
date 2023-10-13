@@ -162,11 +162,12 @@ interface AcceptBidMsg {
 ```
 
 - Cancel Bid by bidder.
-  CancelBidMsg can be executed by bidder only. So msg.sender will become bidder address directly.
+  CancelBidMsg can be executed by bidder only.
 
 ```ts
 interface CancelBidMsg {
   orderID: string;
+  bidder: string;
 }
 ```
 
