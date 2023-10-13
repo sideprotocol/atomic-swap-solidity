@@ -43,16 +43,13 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 4. A taker takes an order by sending a `TakeSwap` transaction for a specific order.
 5. The taker's sell tokens are sent to the escrow address owned by the contract.
 6. If the taker's offered price matches the price specified in the order, the contract facilitates the exchange by transferring the maker's selling tokens to the taker and the taker's selling tokens to the maker. However, if the prices do not align, the contract will reject the "TakeSwap" transaction and promptly refund the taker's tokens.
-   > > > > > > > main
 7. An order cannot be taken if the current time is later than the `expiredAt`.
 
 #### Cancelling a swap
 
 1.  A maker cancels a previously created order. Expired orders can also be cancelled.
-    <<<<<<< HEAD
 2.  # An Order can only be cancelled once.
 3.  An order can only be cancelled once.
-    > > > > > > > main
 4.  Tokens should be refunded when order is cancelled.
 5.  An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
 6.  Maker should not be able to accept a bid order if the order has been canceled.
