@@ -18,16 +18,16 @@ describe("AtomicSwap: AcceptBid", () => {
     } = await bidToDefaultAtomicOrder(true, false);
 
     const sellTokenAmountAfterFee = payload.sellToken.amount
-      .mul(1000 - sellTokenFeeRate)
+      .mul(1000 - buyTokenFeeRate)
       .div(1000);
     const sellTokenFee = payload.sellToken.amount.sub(sellTokenAmountAfterFee);
 
     const buyTokenAmountAfterFee = bidAmount
-      .mul(1000 - buyTokenFeeRate)
+      .mul(1000 - sellTokenFeeRate)
       .div(1000);
     const buyTokenFee = bidAmount.sub(buyTokenAmountAfterFee);
 
-    await expect(atomicSwap.connect(maker).acceptBid(orderID, bidder))
+    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder }))
       .to.changeEtherBalance(bidder, sellTokenAmountAfterFee)
       .changeTokenBalance(usdt, maker.address, buyTokenAmountAfterFee)
       .changeEtherBalance(treasury, sellTokenFee)
@@ -49,16 +49,16 @@ describe("AtomicSwap: AcceptBid", () => {
       treasury,
     } = await bidToDefaultAtomicOrder(false, false);
     const sellTokenAmountAfterFee = payload.sellToken.amount
-      .mul(1000 - sellTokenFeeRate)
+      .mul(1000 - buyTokenFeeRate)
       .div(1000);
     const sellTokenFee = payload.sellToken.amount.sub(sellTokenAmountAfterFee);
 
     const buyTokenAmountAfterFee = bidAmount
-      .mul(1000 - buyTokenFeeRate)
+      .mul(1000 - sellTokenFeeRate)
       .div(1000);
     const buyTokenFee = bidAmount.sub(buyTokenAmountAfterFee);
 
-    await expect(atomicSwap.connect(maker).acceptBid(orderID, bidder))
+    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder }))
       .to.changeTokenBalance(usdt, maker.address, buyTokenAmountAfterFee)
       .changeTokenBalance(usdc, bidder, sellTokenAmountAfterFee)
       .changeTokenBalance(usdc, treasury, sellTokenFee)
@@ -69,18 +69,18 @@ describe("AtomicSwap: AcceptBid", () => {
       await bidToDefaultAtomicOrder(true, false);
 
     await expect(
-      atomicSwap.connect(taker).acceptBid(orderID, bidder)
-    ).to.revertedWithCustomError(atomicSwap, "NoPermissionToAccept");
+      atomicSwap.connect(taker).acceptBid({ orderID, bidder })
+    ).to.revertedWithCustomError(atomicSwap, "UnauthorizedAcceptAction");
   });
   it("should revert to accept bid with already took bid", async () => {
     const { atomicSwap, maker, orderID, bidAmount, bidder, payload } =
       await bidToDefaultAtomicOrder(true, false);
 
-    await expect(atomicSwap.connect(maker).acceptBid(orderID, bidder)).not.to
-      .reverted;
+    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder })).not
+      .to.reverted;
     await expect(
-      atomicSwap.connect(maker).acceptBid(orderID, bidder)
-    ).to.revertedWithCustomError(atomicSwap, "NoPlaceStatusOfBid");
+      atomicSwap.connect(maker).acceptBid({ orderID, bidder })
+    ).to.revertedWithCustomError(atomicSwap, "BidNotInPlacedStatus");
   });
 
   it("should revert to accept bid after bid expiration", async () => {
@@ -88,7 +88,7 @@ describe("AtomicSwap: AcceptBid", () => {
       await bidToDefaultAtomicOrder(true, false);
     await time.increase(50);
     await expect(
-      atomicSwap.connect(maker).acceptBid(orderID, bidder)
-    ).to.revertedWithCustomError(atomicSwap, "AlreadyExpired");
+      atomicSwap.connect(maker).acceptBid({ orderID, bidder })
+    ).to.revertedWithCustomError(atomicSwap, "BidAlreadyExpired");
   });
 });

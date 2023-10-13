@@ -1,128 +1,169 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
+// Interface defining the core functionality and structure for Atomic Swaps.
 interface IAtomicSwap {
+    // Enum representing the possible statuses of an order.
     enum OrderStatus {
-        INITIAL,
-        CANCEL,
-        COMPLETE
+        INITIAL, // The default status when an order is created.
+        CANCEL, // When the order has been canceled.
+        COMPLETE // When the order has been successfully executed/completed.
     }
 
+    // Struct representing a coin with its address (could be Ether) and amount.
     struct Coin {
-        address token;
-        uint256 amount;
+        address token; // Token address, use address(0) for Ether.
+        uint256 amount; // Amount of the token.
     }
 
+    // Struct representing the details of an atomic swap order.
     struct AtomicSwapOrder {
-        bytes32 id;
-        OrderStatus status;
-        address maker;
-        Coin sellToken;
-        address taker;
-        Coin buyToken;
-        uint minBidCap;
-        uint createdAt;
-        uint canceledAt;
-        uint completedAt;
-        uint expiredAt;
+        bytes32 id; // Unique identifier for the order.
+        OrderStatus status; // Current status of the order.
+        address maker; // Address of the user who created the order.
+        Coin sellToken; // Details of the token/coin to be sold.
+        address taker; // Address of the user who accepts the order.
+        Coin buyToken; // Details of the token/coin to be bought.
+        uint minBidAmount; // Minimum acceptable bid amount.
+        uint createdAt; // Timestamp of when the order was created.
+        uint canceledAt; // Timestamp of when the order was canceled.
+        uint completedAt; // Timestamp of when the order was completed.
+        uint expiredAt; // Timestamp of when the order will expire.
+        bool acceptBid; // If set to true, the order can accept bids.
     }
 
+    // Enum representing the possible statuses of a bid.
     enum BidStatus {
-        Cancelled,
-        Executed,
-        Placed
+        Cancelled, // When the bid has been canceled.
+        Executed, // When the bid has been successfully executed.
+        Placed // The default status when a bid is placed.
     }
 
+    // Struct representing a bid on an atomic swap order.
     struct Bid {
-        uint256 amount;
-        bytes32 order;
-        BidStatus status;
-        address bidder;
-        uint256 receiveTimestamp;
-        uint256 expireTimestamp;
+        uint256 amount; // Bid amount.
+        bytes32 order; // Associated order ID.
+        BidStatus status; // Current status of the bid.
+        address bidder; // Address of the user placing the bid.
+        uint256 receiveTimestamp; // Timestamp of when the bid was received.
+        uint256 expireTimestamp; // Timestamp of when the bid will expire.
     }
 
+    // Struct for making an atomic swap order.
     struct MakeSwapMsg {
-        Coin sellToken;
-        Coin buyToken;
-        address desiredTaker;
-        uint minBidCap;
-        uint expireAt;
+        Coin sellToken; // Details of the token/coin to be sold.
+        Coin buyToken; // Details of the token/coin to be bought.
+        address desiredTaker; // Desired address to take the order.
+        uint minBidAmount; // Minimum acceptable bid amount.
+        uint expireAt; // Timestamp of when the order will expire.
+        bool acceptBid; // If set to true, the order can accept bids.
     }
 
+    // Struct for taking an existing atomic swap order.
     struct TakeSwapMsg {
-        bytes32 orderID;
-        address takerReceiver;
+        bytes32 orderID; // ID of the order to be taken.
+        address takerReceiver; // Address to receive the swapped token/coin.
     }
 
+    // Struct for placing a bid on an atomic swap order.
     struct PlaceBidMsg {
-        address bidder;
-        uint256 bidAmount;
-        bytes32 orderID;
-        uint256 expireTimestamp;
+        uint256 bidAmount; // Amount to bid.
+        bytes32 orderID; // ID of the order to place the bid on.
+        uint256 expireTimestamp; // Timestamp of when the bid will expire.
     }
 
+    // Struct for updating an existing bid.
+    struct UpdateBidMsg {
+        bytes32 orderID; // ID of the associated order.
+        uint addition; // Amount to add to the existing bid.
+    }
+
+    // Struct for accepting a placed bid on an order.
     struct AcceptBidMsg {
-        bytes32 orderID;
-        address bidder;
+        bytes32 orderID; // ID of the associated order.
+        address bidder; // Address of the bidder whose bid is accepted.
     }
 
+    // Struct for canceling an atomic swap order.
     struct CancelSwapMsg {
-        bytes32 orderID;
+        bytes32 orderID; // ID of the order to be canceled.
     }
 
-    // Events
-    event PaymentReceived(
-        address indexed payer,
-        uint256 amount,
-        uint256 daoShare,
-        uint256 burned
-    );
+    // Events to log significant actions for atomic swaps.
     event AtomicSwapOrderCreated(bytes32 indexed id);
     event AtomicSwapOrderTook(
         address indexed maker,
         address indexed taker,
         bytes32 indexed id
     );
-
     event AtomicSwapOrderCanceled(bytes32 indexed id);
+    event ReceivedNewBid(
+        bytes32 indexed orderID,
+        address indexed bidder,
+        uint indexed amount
+    );
+    event UpdatedBid(
+        bytes32 indexed orderID,
+        address indexed bidder,
+        uint indexed amount
+    );
+    event AcceptedBid(
+        bytes32 indexed orderID,
+        address indexed bidder,
+        uint indexed amount
+    );
+    event CanceledBid(bytes32 indexed orderID, address indexed bidder);
 
-    // Define errors
-    error AlreadyExistPool();
+    // Custom error definitions for better clarity in revert messages.
+    // Error indicating that the swap already exists.
+    error OrderAlreadyExists();
 
-    error NonExistPool();
+    // Error indicating that the pool does not exist.
+    error OrderDoesNotExist();
 
-    error NoPermissionToTake();
+    // Error indicating the caller does not have permission to take the order.
+    error UnauthorizedTakeAction();
 
-    error AlreadyCompleted();
+    // Error indicating the action has already been completed.
+    error OrderAlreadyCompleted();
 
-    error NoPermissionToCancel();
+    error OrderNotAllowTake();
 
-    error NotAllowedAmount(uint256 real, uint256 expected);
+    // Error indicating the caller does not have permission to cancel.
+    error UnauthorizedCancelAction();
 
-    error WrongExpireTime(uint256 real, uint256 current);
+    // Error indicating that the token pair is invalid or not supported.
+    error UnsupportedTokenPair();
 
-    error InvalidTokenPair();
+    // Error indicating the sender or caller is invalid or unauthorized.
+    error UnauthorizedSender();
 
-    error ZeroTokenAddress();
+    // Error indicating the bid amount is invalid.
+    error MismatchedBidAmount(uint256 amount);
 
-    error InvalidSender();
+    // Error indicating the caller does not have permission to accept the bid.
+    error UnauthorizedAcceptAction(address caller, address expected);
 
-    error InvalidBidAmount(uint256 amount);
+    // Error indicating the bid is not allowed or valid.
+    error BidNotAllowed();
 
-    error TokenTransferFailed();
+    // Error indicating the bid is not in a 'Placed' status.
+    error BidNotInPlacedStatus(BidStatus status);
 
-    error NoPermissionToAccept(address real, address expected);
+    // Error indicating the action or order has already expired.
+    error BidAlreadyExpired(uint provided, uint expectedExpiry);
 
-    error InvalidBidder(address real, address expected);
+    // Error indicating the provided expiration time is invalid.
+    error InvalidExpirationTime(uint256 provided, uint256 maximum);
 
-    error NoPlaceStatusOfBid(BidStatus status);
+    // Error indicating the minimum bid cap is invalid.
+    error InvalidMinimumBidLimit();
 
-    error AlreadyExpired(uint real, uint expected);
+    // Error indicating the bid has already been placed.
+    error BidAlreadyPlaced();
 
-    error NotExpired(uint real, uint expected);
+    // Error indicating there's no bid placed.
+    error NoBidPlaced();
 
-    error InvalidExpireTime(uint256 max, uint value);
-
-    error InvalidMinBidCap();
+    error NotAllowedTransferAmount(uint amount, uint allowance);
 }

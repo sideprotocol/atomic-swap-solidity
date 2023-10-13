@@ -6,9 +6,9 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("AtomicSwap: MakeSwap", () => {
   describe("In-chain", () => {
-    it("create in-chain pool with native token", async () =>
+    it("create in-chain swap with native token", async () =>
       createDefaultAtomicOrder(true));
-    it("create in-chain pool with ERC20 token", async () =>
+    it("create in-chain swap with ERC20 token", async () =>
       createDefaultAtomicOrder());
 
     it("should revert to create in-chain pool with same token address", async () => {
@@ -26,14 +26,16 @@ describe("AtomicSwap: MakeSwap", () => {
           amount: "20",
         },
 
-        makerSender: maker.address,
-        minBidCap: ethers.utils.parseEther("15"),
+        maker: maker.address,
+        minBidAmount: ethers.utils.parseEther("15"),
         desiredTaker: taker.address,
         expireAt: expireAt,
+        acceptBid: true,
       };
+
       await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
         atomicSwap,
-        "InvalidTokenPair"
+        "UnsupportedTokenPair"
       );
     });
 
@@ -52,14 +54,15 @@ describe("AtomicSwap: MakeSwap", () => {
           amount: "20",
         },
         makerSender: taker.address,
-        minBidCap: ethers.utils.parseEther("15"),
+        minBidAmount: ethers.utils.parseEther("15"),
         desiredTaker: taker.address,
         expireAt: expireAt,
+        acceptBid: true,
       };
 
       await expect(
         atomicSwap.connect(taker).makeSwap(payload)
-      ).to.revertedWithCustomError(atomicSwap, "NotAllowedAmount");
+      ).to.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");
     });
 
     it("should revert to create in-chain pool with transfer failed", async () => {
@@ -77,9 +80,10 @@ describe("AtomicSwap: MakeSwap", () => {
           amount: "20",
         },
         makerSender: maker.address,
-        minBidCap: ethers.utils.parseEther("15"),
+        minBidAmount: ethers.utils.parseEther("15"),
         desiredTaker: taker.address,
         expireAt: expireAt,
+        acceptBid: true,
       };
 
       await usdc.setFailTransferFrom(true);
@@ -104,9 +108,10 @@ describe("AtomicSwap: MakeSwap", () => {
           amount: ethers.utils.parseEther("20"),
         },
         makerSender: maker.address,
-        minBidCap: ethers.utils.parseEther("15"),
+        minBidAmount: ethers.utils.parseEther("15"),
         desiredTaker: taker.address,
         expireAt: expireAt,
+        acceptBid: true,
       };
 
       await expect(atomicSwap.makeSwap(payload)).to.revertedWith(

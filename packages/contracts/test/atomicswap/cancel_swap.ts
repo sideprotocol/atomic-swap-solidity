@@ -43,7 +43,7 @@ describe("AtomicSwap: CancelSwap", () => {
 
     await expect(
       atomicSwap.connect(taker).cancelSwap(cancelSwapMsg)
-    ).to.be.revertedWithCustomError(atomicSwap, "NoPermissionToCancel");
+    ).to.be.revertedWithCustomError(atomicSwap, "UnauthorizedCancelAction");
   });
 
   it("should revert when swap doesn't exist", async () => {
@@ -53,6 +53,6 @@ describe("AtomicSwap: CancelSwap", () => {
     };
     await expect(
       atomicSwap.connect(taker).cancelSwap(cancelSwapMsg)
-    ).to.be.revertedWithCustomError(atomicSwap, "NonExistPool");
+    ).to.be.revertedWithCustomError(atomicSwap, "OrderDoesNotExist");
   });
 });

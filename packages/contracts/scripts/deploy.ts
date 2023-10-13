@@ -4,17 +4,11 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import { Settings } from "@sideprotocol/contracts-typechain";
-import { ethers, network } from "hardhat";
+import { ethers, network, upgrades } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-
-import {
-  saveDeployedAddress,
-  ERC20_MINT_AMOUNT,
-  generateRandomString,
-} from "../utils/utils";
-
-//
-
+import dotenv from "dotenv";
+import { saveDeployedAddress } from "../utils/utils";
+dotenv.config();
 async function main(network: string) {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -22,32 +16,24 @@ async function main(network: string) {
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
   // await hre.run('compile');
-
   //import users
   //deploy contracts
-  const sweeperFactory = await ethers.getContractFactory("Sweeper");
-  const sweeper = await sweeperFactory.deploy();
-  await sweeper.deployed();
-  console.log("Sweeper address", sweeper.address);
+  const admin = process.env.ADMIN;
+  const treasury = process.env.TREASURY;
+  const sellTokenRate = process.env.SELL_TOKEN_FEE_RATE;
+  const buyTokenRate = process.env.BUY_TOKEN_FEE_RATE;
 
-  const tokens: string[] = [];
-  let testAccounts: string[] = [];
-  if (network === "localhost") {
-    const signers = await ethers.getSigners();
-    testAccounts = signers.map((acc) => acc.address);
-  }
-  for (let index = 0; index < 5; index++) {
-    const tokenName = generateRandomString(3);
-    const mockERC20Factory = await ethers.getContractFactory("MockErc20Token");
-    const mockERC20Token = await mockERC20Factory.deploy(tokenName, tokenName);
-    await mockERC20Token.deployed();
-    tokens.push(mockERC20Token.address);
-    console.log("Test ERC2Token address", mockERC20Token.address);
-    if (network === "localhost") {
-      await mockERC20Token.mint(testAccounts, ERC20_MINT_AMOUNT);
+  // AtomicSwap contract deploy
+  const atomicSwapFactory = await ethers.getContractFactory("AtomicSwap");
+  const atomicSwap = await upgrades.deployProxy(
+    atomicSwapFactory,
+    [admin, treasury, sellTokenRate, buyTokenRate],
+    {
+      initializer: "initialize",
     }
-  }
-  await saveDeployedAddress(sweeper.address, tokens);
+  );
+  console.log("contract address:", atomicSwap.address);
+  await saveDeployedAddress(atomicSwap.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

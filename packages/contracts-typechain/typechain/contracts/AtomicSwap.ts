@@ -29,6 +29,16 @@ import type {
 } from "../common";
 
 export declare namespace IAtomicSwap {
+  export type AcceptBidMsgStruct = {
+    orderID: PromiseOrValue<BytesLike>;
+    bidder: PromiseOrValue<string>;
+  };
+
+  export type AcceptBidMsgStructOutput = [string, string] & {
+    orderID: string;
+    bidder: string;
+  };
+
   export type CancelSwapMsgStruct = { orderID: PromiseOrValue<BytesLike> };
 
   export type CancelSwapMsgStructOutput = [string] & { orderID: string };
@@ -47,8 +57,9 @@ export declare namespace IAtomicSwap {
     sellToken: IAtomicSwap.CoinStruct;
     buyToken: IAtomicSwap.CoinStruct;
     desiredTaker: PromiseOrValue<string>;
-    minBidCap: PromiseOrValue<BigNumberish>;
+    minBidAmount: PromiseOrValue<BigNumberish>;
     expireAt: PromiseOrValue<BigNumberish>;
+    acceptBid: PromiseOrValue<boolean>;
   };
 
   export type MakeSwapMsgStructOutput = [
@@ -56,29 +67,24 @@ export declare namespace IAtomicSwap {
     IAtomicSwap.CoinStructOutput,
     string,
     BigNumber,
-    BigNumber
+    BigNumber,
+    boolean
   ] & {
     sellToken: IAtomicSwap.CoinStructOutput;
     buyToken: IAtomicSwap.CoinStructOutput;
     desiredTaker: string;
-    minBidCap: BigNumber;
+    minBidAmount: BigNumber;
     expireAt: BigNumber;
+    acceptBid: boolean;
   };
 
   export type PlaceBidMsgStruct = {
-    bidder: PromiseOrValue<string>;
     bidAmount: PromiseOrValue<BigNumberish>;
     orderID: PromiseOrValue<BytesLike>;
     expireTimestamp: PromiseOrValue<BigNumberish>;
   };
 
-  export type PlaceBidMsgStructOutput = [
-    string,
-    BigNumber,
-    string,
-    BigNumber
-  ] & {
-    bidder: string;
+  export type PlaceBidMsgStructOutput = [BigNumber, string, BigNumber] & {
     bidAmount: BigNumber;
     orderID: string;
     expireTimestamp: BigNumber;
@@ -93,24 +99,35 @@ export declare namespace IAtomicSwap {
     orderID: string;
     takerReceiver: string;
   };
+
+  export type UpdateBidMsgStruct = {
+    orderID: PromiseOrValue<BytesLike>;
+    addition: PromiseOrValue<BigNumberish>;
+  };
+
+  export type UpdateBidMsgStructOutput = [string, BigNumber] & {
+    orderID: string;
+    addition: BigNumber;
+  };
 }
 
 export interface AtomicSwapInterface extends utils.Interface {
   functions: {
-    "acceptBid(bytes32,address)": FunctionFragment;
+    "acceptBid((bytes32,address))": FunctionFragment;
     "bids(bytes32,address)": FunctionFragment;
     "buyerFeeRate()": FunctionFragment;
     "cancelBid(bytes32)": FunctionFragment;
     "cancelSwap((bytes32))": FunctionFragment;
     "initialize(address,address,uint256,uint256)": FunctionFragment;
-    "makeSwap(((address,uint256),(address,uint256),address,uint256,uint256))": FunctionFragment;
+    "makeSwap(((address,uint256),(address,uint256),address,uint256,uint256,bool))": FunctionFragment;
     "owner()": FunctionFragment;
-    "placeBid((address,uint256,bytes32,uint256))": FunctionFragment;
+    "placeBid((uint256,bytes32,uint256))": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "sellerFeeRate()": FunctionFragment;
     "swapOrder(bytes32)": FunctionFragment;
     "takeSwap((bytes32,address))": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "updateBid((bytes32,uint256))": FunctionFragment;
   };
 
   getFunction(
@@ -129,11 +146,12 @@ export interface AtomicSwapInterface extends utils.Interface {
       | "swapOrder"
       | "takeSwap"
       | "transferOwnership"
+      | "updateBid"
   ): FunctionFragment;
 
   encodeFunctionData(
     functionFragment: "acceptBid",
-    values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+    values: [IAtomicSwap.AcceptBidMsgStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "bids",
@@ -189,6 +207,10 @@ export interface AtomicSwapInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     values: [PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "updateBid",
+    values: [IAtomicSwap.UpdateBidMsgStruct]
+  ): string;
 
   decodeFunctionResult(functionFragment: "acceptBid", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
@@ -216,23 +238,42 @@ export interface AtomicSwapInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "updateBid", data: BytesLike): Result;
 
   events: {
+    "AcceptedBid(bytes32,address,uint256)": EventFragment;
     "AtomicSwapOrderCanceled(bytes32)": EventFragment;
     "AtomicSwapOrderCreated(bytes32)": EventFragment;
     "AtomicSwapOrderTook(address,address,bytes32)": EventFragment;
+    "CanceledBid(bytes32,address)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "PaymentReceived(address,uint256,uint256,uint256)": EventFragment;
+    "ReceivedNewBid(bytes32,address,uint256)": EventFragment;
+    "UpdatedBid(bytes32,address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "AcceptedBid"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AtomicSwapOrderCanceled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AtomicSwapOrderCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AtomicSwapOrderTook"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CanceledBid"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PaymentReceived"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ReceivedNewBid"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "UpdatedBid"): EventFragment;
 }
+
+export interface AcceptedBidEventObject {
+  orderID: string;
+  bidder: string;
+  amount: BigNumber;
+}
+export type AcceptedBidEvent = TypedEvent<
+  [string, string, BigNumber],
+  AcceptedBidEventObject
+>;
+
+export type AcceptedBidEventFilter = TypedEventFilter<AcceptedBidEvent>;
 
 export interface AtomicSwapOrderCanceledEventObject {
   id: string;
@@ -269,6 +310,17 @@ export type AtomicSwapOrderTookEvent = TypedEvent<
 export type AtomicSwapOrderTookEventFilter =
   TypedEventFilter<AtomicSwapOrderTookEvent>;
 
+export interface CanceledBidEventObject {
+  orderID: string;
+  bidder: string;
+}
+export type CanceledBidEvent = TypedEvent<
+  [string, string],
+  CanceledBidEventObject
+>;
+
+export type CanceledBidEventFilter = TypedEventFilter<CanceledBidEvent>;
+
 export interface InitializedEventObject {
   version: number;
 }
@@ -288,18 +340,29 @@ export type OwnershipTransferredEvent = TypedEvent<
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
-export interface PaymentReceivedEventObject {
-  payer: string;
+export interface ReceivedNewBidEventObject {
+  orderID: string;
+  bidder: string;
   amount: BigNumber;
-  daoShare: BigNumber;
-  burned: BigNumber;
 }
-export type PaymentReceivedEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber],
-  PaymentReceivedEventObject
+export type ReceivedNewBidEvent = TypedEvent<
+  [string, string, BigNumber],
+  ReceivedNewBidEventObject
 >;
 
-export type PaymentReceivedEventFilter = TypedEventFilter<PaymentReceivedEvent>;
+export type ReceivedNewBidEventFilter = TypedEventFilter<ReceivedNewBidEvent>;
+
+export interface UpdatedBidEventObject {
+  orderID: string;
+  bidder: string;
+  amount: BigNumber;
+}
+export type UpdatedBidEvent = TypedEvent<
+  [string, string, BigNumber],
+  UpdatedBidEventObject
+>;
+
+export type UpdatedBidEventFilter = TypedEventFilter<UpdatedBidEvent>;
 
 export interface AtomicSwap extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -329,8 +392,7 @@ export interface AtomicSwap extends BaseContract {
 
   functions: {
     acceptBid(
-      _orderID: PromiseOrValue<BytesLike>,
-      _bidder: PromiseOrValue<string>,
+      acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -402,7 +464,8 @@ export interface AtomicSwap extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber
+        BigNumber,
+        boolean
       ] & {
         id: string;
         status: number;
@@ -410,11 +473,12 @@ export interface AtomicSwap extends BaseContract {
         sellToken: IAtomicSwap.CoinStructOutput;
         taker: string;
         buyToken: IAtomicSwap.CoinStructOutput;
-        minBidCap: BigNumber;
+        minBidAmount: BigNumber;
         createdAt: BigNumber;
         canceledAt: BigNumber;
         completedAt: BigNumber;
         expiredAt: BigNumber;
+        acceptBid: boolean;
       }
     >;
 
@@ -427,11 +491,15 @@ export interface AtomicSwap extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    updateBid(
+      updateBidMsg: IAtomicSwap.UpdateBidMsgStruct,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
   };
 
   acceptBid(
-    _orderID: PromiseOrValue<BytesLike>,
-    _bidder: PromiseOrValue<string>,
+    acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -503,7 +571,8 @@ export interface AtomicSwap extends BaseContract {
       BigNumber,
       BigNumber,
       BigNumber,
-      BigNumber
+      BigNumber,
+      boolean
     ] & {
       id: string;
       status: number;
@@ -511,11 +580,12 @@ export interface AtomicSwap extends BaseContract {
       sellToken: IAtomicSwap.CoinStructOutput;
       taker: string;
       buyToken: IAtomicSwap.CoinStructOutput;
-      minBidCap: BigNumber;
+      minBidAmount: BigNumber;
       createdAt: BigNumber;
       canceledAt: BigNumber;
       completedAt: BigNumber;
       expiredAt: BigNumber;
+      acceptBid: boolean;
     }
   >;
 
@@ -529,10 +599,14 @@ export interface AtomicSwap extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  updateBid(
+    updateBidMsg: IAtomicSwap.UpdateBidMsgStruct,
+    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     acceptBid(
-      _orderID: PromiseOrValue<BytesLike>,
-      _bidder: PromiseOrValue<string>,
+      acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -602,7 +676,8 @@ export interface AtomicSwap extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
-        BigNumber
+        BigNumber,
+        boolean
       ] & {
         id: string;
         status: number;
@@ -610,11 +685,12 @@ export interface AtomicSwap extends BaseContract {
         sellToken: IAtomicSwap.CoinStructOutput;
         taker: string;
         buyToken: IAtomicSwap.CoinStructOutput;
-        minBidCap: BigNumber;
+        minBidAmount: BigNumber;
         createdAt: BigNumber;
         canceledAt: BigNumber;
         completedAt: BigNumber;
         expiredAt: BigNumber;
+        acceptBid: boolean;
       }
     >;
 
@@ -627,9 +703,25 @@ export interface AtomicSwap extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    updateBid(
+      updateBidMsg: IAtomicSwap.UpdateBidMsgStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
+    "AcceptedBid(bytes32,address,uint256)"(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null,
+      amount?: PromiseOrValue<BigNumberish> | null
+    ): AcceptedBidEventFilter;
+    AcceptedBid(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null,
+      amount?: PromiseOrValue<BigNumberish> | null
+    ): AcceptedBidEventFilter;
+
     "AtomicSwapOrderCanceled(bytes32)"(
       id?: PromiseOrValue<BytesLike> | null
     ): AtomicSwapOrderCanceledEventFilter;
@@ -655,6 +747,15 @@ export interface AtomicSwap extends BaseContract {
       id?: PromiseOrValue<BytesLike> | null
     ): AtomicSwapOrderTookEventFilter;
 
+    "CanceledBid(bytes32,address)"(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null
+    ): CanceledBidEventFilter;
+    CanceledBid(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null
+    ): CanceledBidEventFilter;
+
     "Initialized(uint8)"(version?: null): InitializedEventFilter;
     Initialized(version?: null): InitializedEventFilter;
 
@@ -667,24 +768,32 @@ export interface AtomicSwap extends BaseContract {
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
 
-    "PaymentReceived(address,uint256,uint256,uint256)"(
-      payer?: PromiseOrValue<string> | null,
-      amount?: null,
-      daoShare?: null,
-      burned?: null
-    ): PaymentReceivedEventFilter;
-    PaymentReceived(
-      payer?: PromiseOrValue<string> | null,
-      amount?: null,
-      daoShare?: null,
-      burned?: null
-    ): PaymentReceivedEventFilter;
+    "ReceivedNewBid(bytes32,address,uint256)"(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null,
+      amount?: PromiseOrValue<BigNumberish> | null
+    ): ReceivedNewBidEventFilter;
+    ReceivedNewBid(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null,
+      amount?: PromiseOrValue<BigNumberish> | null
+    ): ReceivedNewBidEventFilter;
+
+    "UpdatedBid(bytes32,address,uint256)"(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null,
+      amount?: PromiseOrValue<BigNumberish> | null
+    ): UpdatedBidEventFilter;
+    UpdatedBid(
+      orderID?: PromiseOrValue<BytesLike> | null,
+      bidder?: PromiseOrValue<string> | null,
+      amount?: PromiseOrValue<BigNumberish> | null
+    ): UpdatedBidEventFilter;
   };
 
   estimateGas: {
     acceptBid(
-      _orderID: PromiseOrValue<BytesLike>,
-      _bidder: PromiseOrValue<string>,
+      acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -746,12 +855,16 @@ export interface AtomicSwap extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    updateBid(
+      updateBidMsg: IAtomicSwap.UpdateBidMsgStruct,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     acceptBid(
-      _orderID: PromiseOrValue<BytesLike>,
-      _bidder: PromiseOrValue<string>,
+      acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -812,6 +925,11 @@ export interface AtomicSwap extends BaseContract {
     transferOwnership(
       newOwner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateBid(
+      updateBidMsg: IAtomicSwap.UpdateBidMsgStruct,
+      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

@@ -3,88 +3,24 @@ import type { Provider } from "@ethersproject/providers";
 import type { IAtomicSwap, IAtomicSwapInterface } from "../../../contracts/interfaces/IAtomicSwap";
 export declare class IAtomicSwap__factory {
     static readonly abi: readonly [{
-        readonly inputs: readonly [];
-        readonly name: "AlreadyCompleted";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "AlreadyExistPool";
-        readonly type: "error";
-    }, {
         readonly inputs: readonly [{
             readonly internalType: "uint256";
-            readonly name: "real";
+            readonly name: "provided";
             readonly type: "uint256";
         }, {
             readonly internalType: "uint256";
-            readonly name: "expected";
+            readonly name: "expectedExpiry";
             readonly type: "uint256";
         }];
-        readonly name: "AlreadyExpired";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "InvalidBidAmount";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "real";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "expected";
-            readonly type: "address";
-        }];
-        readonly name: "InvalidBidder";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "max";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "value";
-            readonly type: "uint256";
-        }];
-        readonly name: "InvalidExpireTime";
+        readonly name: "BidAlreadyExpired";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "InvalidMinBidCap";
+        readonly name: "BidAlreadyPlaced";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "InvalidSender";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "InvalidTokenPair";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "real";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "expected";
-            readonly type: "address";
-        }];
-        readonly name: "NoPermissionToAccept";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "NoPermissionToCancel";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "NoPermissionToTake";
+        readonly name: "BidNotAllowed";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
@@ -92,56 +28,112 @@ export declare class IAtomicSwap__factory {
             readonly name: "status";
             readonly type: "uint8";
         }];
-        readonly name: "NoPlaceStatusOfBid";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "NonExistPool";
+        readonly name: "BidNotInPlacedStatus";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
             readonly internalType: "uint256";
-            readonly name: "real";
+            readonly name: "provided";
             readonly type: "uint256";
         }, {
             readonly internalType: "uint256";
+            readonly name: "maximum";
+            readonly type: "uint256";
+        }];
+        readonly name: "InvalidExpirationTime";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidMinimumBidLimit";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "MismatchedBidAmount";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "NoBidPlaced";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "allowance";
+            readonly type: "uint256";
+        }];
+        readonly name: "NotAllowedTransferAmount";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "OrderAlreadyCompleted";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "OrderAlreadyExists";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "OrderDoesNotExist";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "OrderNotAllowTake";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "caller";
+            readonly type: "address";
+        }, {
+            readonly internalType: "address";
             readonly name: "expected";
-            readonly type: "uint256";
+            readonly type: "address";
         }];
-        readonly name: "NotAllowedAmount";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "real";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "expected";
-            readonly type: "uint256";
-        }];
-        readonly name: "NotExpired";
+        readonly name: "UnauthorizedAcceptAction";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "TokenTransferFailed";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "real";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "current";
-            readonly type: "uint256";
-        }];
-        readonly name: "WrongExpireTime";
+        readonly name: "UnauthorizedCancelAction";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "ZeroTokenAddress";
+        readonly name: "UnauthorizedSender";
         readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "UnauthorizedTakeAction";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "UnsupportedTokenPair";
+        readonly type: "error";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "bidder";
+            readonly type: "address";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "AcceptedBid";
+        readonly type: "event";
     }, {
         readonly anonymous: false;
         readonly inputs: readonly [{
@@ -186,26 +178,56 @@ export declare class IAtomicSwap__factory {
         readonly anonymous: false;
         readonly inputs: readonly [{
             readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
             readonly internalType: "address";
-            readonly name: "payer";
+            readonly name: "bidder";
+            readonly type: "address";
+        }];
+        readonly name: "CanceledBid";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "bidder";
             readonly type: "address";
         }, {
-            readonly indexed: false;
+            readonly indexed: true;
             readonly internalType: "uint256";
             readonly name: "amount";
             readonly type: "uint256";
+        }];
+        readonly name: "ReceivedNewBid";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
         }, {
-            readonly indexed: false;
-            readonly internalType: "uint256";
-            readonly name: "daoShare";
-            readonly type: "uint256";
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "bidder";
+            readonly type: "address";
         }, {
-            readonly indexed: false;
+            readonly indexed: true;
             readonly internalType: "uint256";
-            readonly name: "burned";
+            readonly name: "amount";
             readonly type: "uint256";
         }];
-        readonly name: "PaymentReceived";
+        readonly name: "UpdatedBid";
         readonly type: "event";
     }];
     static createInterface(): IAtomicSwapInterface;

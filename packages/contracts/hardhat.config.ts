@@ -57,7 +57,7 @@ const config: HardhatUserConfig = {
         url: process.env.MAINNET_URL || "",
       },
     },
-    goerli: {
+    sepolia: {
       url: process.env.TESTNET_URL,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],

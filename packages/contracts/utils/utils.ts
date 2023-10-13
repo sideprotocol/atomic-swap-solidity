@@ -19,19 +19,13 @@ const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 const ETH_USDC = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";
 
 export const WHALES: string[] = [];
-export const saveDeployedAddress = async (
-  sweeper: string,
-  tokens: string[]
-) => {
+export const saveDeployedAddress = async (contract: string) => {
   const settingInfo: {
-    sweeperAddress: string;
-    erc20Tokens: string[];
+    contractAddress: string;
   } = {
-    sweeperAddress: "",
-    erc20Tokens: [],
+    contractAddress: "",
   };
-  settingInfo.sweeperAddress = sweeper;
-  settingInfo.erc20Tokens = tokens;
+  settingInfo.contractAddress = contract;
 
   const settingsPath = "../contracts-typechain/settings";
   if (!existsSync(settingsPath)) {
@@ -124,7 +118,8 @@ export function newAtomicSwapOrderID(
 export const createDefaultAtomicOrder = async (
   withNativeSellToken?: boolean,
   withNativeBuyToken?: boolean,
-  noTaker?: boolean
+  noTaker?: boolean,
+  acceptBid?: boolean
 ) => {
   const {
     atomicSwap,
@@ -146,10 +141,11 @@ export const createDefaultAtomicOrder = async (
       token: withNativeBuyToken ? ethers.constants.AddressZero : usdt.address,
       amount: ethers.utils.parseEther("20"),
     },
-    makerSender: maker.address,
-    minBidCap: ethers.utils.parseEther("15"),
+    maker: maker.address,
+    minBidAmount: ethers.utils.parseEther("15"),
     desiredTaker: noTaker ? ethers.constants.AddressZero : taker.address,
     expireAt: expireAt,
+    acceptBid: acceptBid ?? true,
   };
 
   if (!withNativeSellToken) {

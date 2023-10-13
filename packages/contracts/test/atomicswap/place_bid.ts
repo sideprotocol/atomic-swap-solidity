@@ -2,14 +2,8 @@ import { ethers } from "hardhat";
 import { createDefaultAtomicOrder } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("AtomicSwap: PlaceBid", () => {
-  let accounts: SignerWithAddress[];
-  beforeEach(async () => {
-    accounts = await ethers.getSigners();
-  });
-
   describe("In-chain", () => {
     it("should place bid with native token", async () => {
       const { atomicSwap, taker, orderID, usdt } =
@@ -17,7 +11,7 @@ describe("AtomicSwap: PlaceBid", () => {
 
       const bidPayload = {
         bidder: taker.address,
-        bidAmount: ethers.utils.parseEther("30"),
+        bidAmount: ethers.utils.parseEther("18"),
         orderID: orderID,
         bidderReceiver: taker.address,
         expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -29,7 +23,7 @@ describe("AtomicSwap: PlaceBid", () => {
         })
       ).to.changeEtherBalance(atomicSwap.address, bidPayload.bidAmount);
     });
-    it("should update bid with more native token than original one", async () => {
+    it("should revert to  bid again", async () => {
       const { atomicSwap, taker, orderID, maker, usdt } =
         await createDefaultAtomicOrder(false, true);
       // try to take swap
@@ -38,11 +32,11 @@ describe("AtomicSwap: PlaceBid", () => {
           orderID,
           takerReceiver: maker.address,
         })
-      ).to.revertedWithCustomError(atomicSwap, "NoPermissionToTake");
+      ).to.revertedWithCustomError(atomicSwap, "OrderNotAllowTake");
 
       const bidPayload = {
         bidder: taker.address,
-        bidAmount: ethers.utils.parseEther("30"),
+        bidAmount: ethers.utils.parseEther("19"),
         orderID: orderID,
         bidderReceiver: taker.address,
         expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -69,27 +63,16 @@ describe("AtomicSwap: PlaceBid", () => {
         atomicSwap.connect(taker).placeBid(bidPayload2, {
           value: bidPayload2.bidAmount.sub(bidPayload.bidAmount),
         })
-      ).to.changeEtherBalance(
-        atomicSwap.address,
-        bidPayload2.bidAmount.sub(bidPayload.bidAmount)
-      );
+      ).to.revertedWithCustomError(atomicSwap, "BidAlreadyPlaced");
     });
 
     it("should place bid with erc20 token", async () => {
       const { atomicSwap, taker, orderID, usdt } =
         await createDefaultAtomicOrder(true);
 
-      // try to take swap
-      await expect(
-        atomicSwap.connect(taker).takeSwap({
-          orderID,
-          takerReceiver: taker.address,
-        })
-      ).to.revertedWithCustomError(atomicSwap, "NotAllowedAmount");
-
       const bidPayload = {
         bidder: taker.address,
-        bidAmount: ethers.utils.parseEther("30"),
+        bidAmount: ethers.utils.parseEther("18"),
         orderID: orderID,
         bidderReceiver: taker.address,
         expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -106,22 +89,13 @@ describe("AtomicSwap: PlaceBid", () => {
         })
       ).to.changeEtherBalance(atomicSwap.address, bidPayload.bidAmount);
     });
-    it("should update bid with more erc20 token than original one", async () => {
+    it("should revert to bid again to the same order with erc20 token", async () => {
       const { atomicSwap, taker, orderID, maker, usdt } =
         await createDefaultAtomicOrder(true);
 
-      // try to take swap
-
-      await expect(
-        atomicSwap.connect(maker).takeSwap({
-          orderID,
-          takerReceiver: maker.address,
-        })
-      ).to.revertedWithCustomError(atomicSwap, "NoPermissionToTake");
-
       const bidPayload = {
         bidder: taker.address,
-        bidAmount: ethers.utils.parseEther("30"),
+        bidAmount: ethers.utils.parseEther("18"),
         orderID: orderID,
         bidderReceiver: taker.address,
         expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -152,11 +126,7 @@ describe("AtomicSwap: PlaceBid", () => {
       // make bid
       await expect(
         atomicSwap.connect(taker).placeBid(bidPayload2)
-      ).to.changeTokenBalance(
-        usdt,
-        atomicSwap.address,
-        bidPayload2.bidAmount.sub(bidPayload.bidAmount)
-      );
+      ).to.revertedWithCustomError(atomicSwap, "BidAlreadyPlaced");
     });
     it("should revert to place bid with not enough native token", async () => {
       const { atomicSwap, taker, orderID } = await createDefaultAtomicOrder(
@@ -176,7 +146,7 @@ describe("AtomicSwap: PlaceBid", () => {
       // make bid
       await expect(
         atomicSwap.connect(taker).placeBid(bidPayload)
-      ).to.revertedWithCustomError(atomicSwap, "InvalidBidAmount");
+      ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
     });
     it("should revert to place bid with not allowed amount erc20 token", async () => {
       const { atomicSwap, taker, orderID, usdt } =
@@ -194,13 +164,13 @@ describe("AtomicSwap: PlaceBid", () => {
       // make bid
       await expect(
         atomicSwap.connect(taker).placeBid(bidPayload)
-      ).to.revertedWithCustomError(atomicSwap, "NotAllowedAmount");
+      ).to.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");
     });
     it("should revert to place bid with not enough erc20 token", async () => {
       const { atomicSwap, taker, orderID, usdt } =
         await createDefaultAtomicOrder(false, false, true);
       // try to take swap
-      const minBidCap = (await atomicSwap.swapOrder(orderID)).minBidCap;
+      const minBidCap = (await atomicSwap.swapOrder(orderID)).minBidAmount;
       const bidPayload = {
         bidder: taker.address,
         bidAmount: minBidCap.sub(10),
@@ -213,7 +183,7 @@ describe("AtomicSwap: PlaceBid", () => {
       await usdt.connect(taker).approve(atomicSwap.address, minBidCap);
       await expect(
         atomicSwap.connect(taker).placeBid(bidPayload)
-      ).to.revertedWithCustomError(atomicSwap, "InvalidBidAmount");
+      ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
     });
   });
 

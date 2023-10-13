@@ -26,7 +26,7 @@ contract AtomicSwap is
 
     modifier onlyExist(bytes32 id) {
         if (swapOrder[id].id == bytes32(0x0)) {
-            revert NonExistPool();
+            revert OrderDoesNotExist();
         }
         _;
     }
@@ -56,22 +56,22 @@ contract AtomicSwap is
     ) external payable virtual nonReentrant {
         // Ensure the sell token and buy token are not the same non-zero address.
         if (makeswap.sellToken.token == makeswap.buyToken.token) {
-            revert InvalidTokenPair();
+            revert UnsupportedTokenPair();
         }
 
         // Ensure the sell token and buy token are not the same non-zero address.
-        if (makeswap.minBidCap <= 0) {
-            revert InvalidMinBidCap();
+        if (makeswap.minBidAmount <= 0) {
+            revert InvalidMinimumBidLimit();
         }
 
         // Ensure the caller is the maker of the swap order.
         if (msg.sender == address(0)) {
-            revert InvalidSender();
+            revert UnauthorizedSender();
         }
 
         // Ensure the expireAt is the future time.
         if (makeswap.expireAt < block.timestamp) {
-            revert WrongExpireTime(makeswap.expireAt, block.timestamp);
+            revert InvalidExpirationTime(makeswap.expireAt, block.timestamp);
         }
 
         // Generate a unique ID and add the new swap order to the contract's state.
@@ -86,7 +86,10 @@ contract AtomicSwap is
             IERC20 sellToken = IERC20(makeswap.sellToken.token);
             uint256 allowance = sellToken.allowance(msg.sender, address(this));
             if (allowance < makeswap.sellToken.amount) {
-                revert NotAllowedAmount(makeswap.sellToken.amount, allowance);
+                revert NotAllowedTransferAmount(
+                    makeswap.sellToken.amount,
+                    allowance
+                );
             }
 
             require(
@@ -119,13 +122,17 @@ contract AtomicSwap is
         AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
 
         // Ensure the caller is the designated taker of the swap order
-        if (order.taker == address(0) || order.taker != msg.sender) {
-            revert NoPermissionToTake();
+        if (order.acceptBid) {
+            revert OrderNotAllowTake();
+        }
+
+        if (order.taker != address(0) && order.taker != msg.sender) {
+            revert UnauthorizedTakeAction();
         }
 
         // Ensure the swap order has not already been completed
         if (order.status == OrderStatus.COMPLETE) {
-            revert AlreadyCompleted();
+            revert OrderAlreadyCompleted();
         }
 
         // Update order details
@@ -138,10 +145,10 @@ contract AtomicSwap is
             order.sellToken.token,
             takeswap.takerReceiver,
             order.sellToken.amount,
-            sellerFeeRate
+            buyerFeeRate
         );
 
-        uint buyTokenFee = (order.buyToken.amount * buyerFeeRate) / maxFee;
+        uint buyTokenFee = (order.buyToken.amount * sellerFeeRate) / maxFee;
         uint buyTokenAmountAfterFee = order.buyToken.amount - buyTokenFee;
         // Exchange the tokens
         if (order.buyToken.token == address(0)) {
@@ -191,12 +198,12 @@ contract AtomicSwap is
 
         // Ensure the caller is the maker of the swap order
         if (order.maker != msg.sender) {
-            revert NoPermissionToCancel();
+            revert UnauthorizedCancelAction();
         }
 
         // Ensure the caller is the maker of the swap order
         if (order.status != OrderStatus.INITIAL) {
-            revert AlreadyCompleted();
+            revert OrderAlreadyCompleted();
         }
 
         // Update the status of the swap order to 'CANCEL'
@@ -231,7 +238,7 @@ contract AtomicSwap is
     // Refactored functions
     function _addNewSwapOrder(bytes32 id, MakeSwapMsg memory makeswap) private {
         if (swapOrder[id].id != bytes32(0x0)) {
-            revert AlreadyExistPool();
+            revert OrderAlreadyExists();
         }
         AtomicSwapOrder memory _order = AtomicSwapOrder(
             id,
@@ -240,11 +247,12 @@ contract AtomicSwap is
             makeswap.sellToken,
             makeswap.desiredTaker,
             makeswap.buyToken,
-            makeswap.minBidCap,
+            makeswap.minBidAmount,
             block.timestamp,
             0,
             0,
-            makeswap.expireAt
+            makeswap.expireAt,
+            makeswap.acceptBid
         );
 
         swapOrder[id] = _order;
@@ -264,28 +272,23 @@ contract AtomicSwap is
     function placeBid(
         PlaceBidMsg calldata placeBidMsg
     ) external payable nonReentrant onlyExist(placeBidMsg.orderID) {
-        // Ensure the caller is the bidder
-        require(placeBidMsg.bidder == msg.sender, "Not the bidder");
-        // Update last bidder expire time in order
-        AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
-        if (_order.expiredAt < placeBidMsg.expireTimestamp) {
-            revert InvalidExpireTime(
-                _order.expiredAt,
-                placeBidMsg.expireTimestamp
-            );
-        }
-
         bytes32 _orderID = placeBidMsg.orderID;
         uint256 _bidAmount = placeBidMsg.bidAmount;
 
-        // Retrieve the current bid (if any) for this order by this bidder
+        // Ensure the caller is the bidder
         Bid storage _currentBid = bids[_orderID][msg.sender];
+        if (_currentBid.bidder != address(0)) {
+            revert BidAlreadyPlaced();
+        }
+        // Update last bidder expire time in order
+        AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
 
-        // Ensure the new bid amount is greater than or equal to the current bid amount
-        uint _minBidCap = swapOrder[_orderID].minBidCap;
         // Ensure bide amount meet bid requirements.
-        if (_bidAmount < _currentBid.amount || _bidAmount < _minBidCap) {
-            revert InvalidBidAmount(_bidAmount);
+        if (
+            _bidAmount < _order.minBidAmount ||
+            _bidAmount > _order.buyToken.amount
+        ) {
+            revert MismatchedBidAmount(_bidAmount);
         }
 
         // Calculate the additional token amount being bid
@@ -304,7 +307,7 @@ contract AtomicSwap is
         } else {
             // Ensure the bidder has sent sufficient Ether for the bid
             if (msg.value != tokenAmount) {
-                revert InvalidBidAmount(msg.value);
+                revert MismatchedBidAmount(msg.value);
             }
         }
 
@@ -313,54 +316,123 @@ contract AtomicSwap is
     }
 
     /**
+     * @dev Allows an existing bidder to increase their bid amount.
+     * @param updateBidMsg The message containing orderID and the amount to be added to the existing bid.
+     */
+    function updateBid(
+        UpdateBidMsg calldata updateBidMsg
+    )
+        external
+        payable
+        nonReentrant // Ensures the function cannot be re-entered during execution
+        onlyExist(updateBidMsg.orderID) // Ensures the order exists
+    {
+        // Extracting details from the updateBidMsg for easy reference
+        bytes32 _orderID = updateBidMsg.orderID;
+        uint256 _addition = updateBidMsg.addition;
+
+        // Retrieving the current bid for this order and sender
+        Bid storage _currentBid = bids[_orderID][msg.sender];
+
+        // Ensure the function caller has previously placed a bid
+        if (_currentBid.bidder == address(0)) {
+            revert NoBidPlaced();
+        }
+
+        // Retrieve the associated AtomicSwapOrder
+        AtomicSwapOrder storage _order = swapOrder[_orderID];
+
+        // Ensure the additional bid amount is non-zero
+        if (_addition == 0) {
+            revert MismatchedBidAmount(_addition);
+        }
+
+        // Update the bid amount
+        _currentBid.amount += _addition;
+        if (_currentBid.amount > _order.buyToken.amount) {
+            revert MismatchedBidAmount(_currentBid.amount);
+        }
+
+        // Retrieving details of the buy token for this order
+        Coin storage _buyToken = _order.buyToken;
+
+        // Check if the bid is in ERC20 tokens or in Ether
+        if (_buyToken.token != address(0)) {
+            // Bidding with ERC20 token
+
+            // Safely transfer the additional bid amount from the bidder to this contract
+            _safeTransferFrom(
+                _buyToken.token,
+                msg.sender,
+                address(this),
+                _addition
+            );
+        } else {
+            // Ensure the sent Ether matches the additional bid amount
+            if (msg.value != _addition) {
+                revert MismatchedBidAmount(msg.value);
+            }
+        }
+    }
+
+    /**
      * @notice Allows the maker of an order to accept a specific bid.
-     * @param _orderID The ID of the order for which a bid is being accepted.
-     * @param _bidder The address of the bidder whose bid is being accepted.
+     * @param acceptBidMsg.orderID The ID of the order for which a bid is being accepted.
+     * @param acceptBidMsg.bidder The address of the bidder whose bid is being accepted.
      */
     function acceptBid(
-        bytes32 _orderID,
-        address _bidder
-    ) external payable nonReentrant onlyExist(_orderID) {
+        AcceptBidMsg calldata acceptBidMsg
+    ) external payable nonReentrant onlyExist(acceptBidMsg.orderID) {
         // Ensure no unnecessary Ether is sent with the transaction
-        require(msg.value == 0, "Unexpected Ether sent");
+        bytes32 _orderID = acceptBidMsg.orderID;
+        address _bidder = acceptBidMsg.bidder;
+        if (msg.sender == address(0)) {
+            revert UnauthorizedSender();
+        }
+        AtomicSwapOrder storage _order = swapOrder[_orderID];
 
+        if (!_order.acceptBid) {
+            revert BidNotAllowed();
+        }
         // Ensure the caller is the maker of the order
-        if (swapOrder[_orderID].maker != msg.sender) {
-            revert NoPermissionToAccept(swapOrder[_orderID].maker, msg.sender);
+        if (_order.maker != msg.sender) {
+            revert UnauthorizedAcceptAction(_order.maker, msg.sender);
         }
 
         // Retrieve the bid from storage
         Bid storage selectedBid = bids[_orderID][_bidder];
-
         // Ensure the bid is in 'Placed' status
         if (selectedBid.status != BidStatus.Placed) {
-            revert NoPlaceStatusOfBid(selectedBid.status);
+            revert BidNotInPlacedStatus(selectedBid.status);
         }
 
         // Ensure the bid is expired or not
         if (selectedBid.expireTimestamp < block.timestamp) {
-            revert AlreadyExpired(selectedBid.expireTimestamp, block.timestamp);
+            revert BidAlreadyExpired(
+                selectedBid.expireTimestamp,
+                block.timestamp
+            );
         }
 
         // Update the bid status to 'Executed'
         selectedBid.status = BidStatus.Executed;
 
         // Process sell token transfers
-        Coin storage _sellToken = swapOrder[_orderID].sellToken;
+        Coin storage _sellToken = _order.sellToken;
         _processTransfer(
             _sellToken.token,
             selectedBid.bidder,
             _sellToken.amount,
-            sellerFeeRate
+            buyerFeeRate
         );
 
         // Process buy token transfers
-        Coin storage _buyToken = swapOrder[_orderID].buyToken;
+        Coin storage _buyToken = _order.buyToken;
         _processTransfer(
             _buyToken.token,
-            swapOrder[_orderID].maker,
+            _order.maker,
             selectedBid.amount,
-            buyerFeeRate
+            sellerFeeRate
         );
     }
 
@@ -400,16 +472,12 @@ contract AtomicSwap is
 
         // Ensure that msg.sender is same with bidder.
         if (selectedBid.bidder != msg.sender) {
-            revert NoPermissionToCancel();
-        }
-
-        if (selectedBid.expireTimestamp < block.timestamp) {
-            revert NotExpired(selectedBid.expireTimestamp, block.timestamp);
+            revert UnauthorizedCancelAction();
         }
 
         // Ensure that the bid is in the 'Placed' status
         if (selectedBid.status != BidStatus.Placed) {
-            revert NoPlaceStatusOfBid(selectedBid.status);
+            revert BidNotInPlacedStatus(selectedBid.status);
         }
         // Update the bid status to 'Cancelled'
         selectedBid.status = BidStatus.Cancelled;
@@ -439,7 +507,7 @@ contract AtomicSwap is
         IERC20 _token = IERC20(token);
         uint allowalnce = _token.allowance(msg.sender, address(this));
         if (allowalnce < amount) {
-            revert NotAllowedAmount(allowalnce, amount);
+            revert NotAllowedTransferAmount(allowalnce, amount);
         }
         require(
             _token.transferFrom(from, to, amount),
@@ -458,10 +526,10 @@ contract AtomicSwap is
             amount: bidMsg.bidAmount,
             order: bidMsg.orderID,
             status: BidStatus.Placed,
-            bidder: bidMsg.bidder,
+            bidder: msg.sender,
             receiveTimestamp: block.timestamp,
             expireTimestamp: bidMsg.expireTimestamp
         });
-        bids[bidMsg.orderID][bidMsg.bidder] = newBid;
+        bids[bidMsg.orderID][msg.sender] = newBid;
     }
 }

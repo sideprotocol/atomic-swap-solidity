@@ -23,18 +23,18 @@ describe("AtomicSwap: CancelBid", () => {
       await bidToDefaultAtomicOrder(false, false);
     await expect(
       atomicSwap.connect(maker).cancelBid(orderID)
-    ).to.revertedWithCustomError(atomicSwap, "NoPermissionToCancel");
+    ).to.revertedWithCustomError(atomicSwap, "UnauthorizedCancelAction");
   });
 
   it("should revert to cancel bid with already took bid", async () => {
     const { atomicSwap, maker, taker, orderID, bidder } =
       await bidToDefaultAtomicOrder(true, false);
 
-    await expect(atomicSwap.connect(maker).acceptBid(orderID, bidder)).not.to
-      .reverted;
+    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder })).not
+      .to.reverted;
 
     await expect(
       atomicSwap.connect(taker).cancelBid(orderID)
-    ).to.revertedWithCustomError(atomicSwap, "NoPlaceStatusOfBid");
+    ).to.revertedWithCustomError(atomicSwap, "BidNotInPlacedStatus");
   });
 });
