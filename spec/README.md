@@ -49,10 +49,9 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 
 1. A maker cancels a previously created order. Expired orders can also be cancelled.
 2. An Order can only be cancelled once.
-3. An order can only be cancelled once.
-4. Tokens should be refunded when order is cancelled.
-5. An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
-6. Maker should not be able to accept a bid order if the order has been canceled.
+3. Tokens should be refunded when order is cancelled.
+4. An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
+5. Maker should not be able to accept a bid order if the order has been canceled.
 
 ### Data struct and types
 
