@@ -76,6 +76,9 @@ interface MakeSwapMsg {
   // only the desiredTaker is allowed to take this order
   // this is the address on the taker chain
   desiredTaker: string
+  acceptBid: boolean
+  // mininum amount of sell token
+  mininumBidAmount: u64 
   creationTimestamp: uint64
   expirationTimestamp: uint64
 }
