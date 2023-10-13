@@ -96,6 +96,7 @@ interface MakeSwapMsg {
   // if desiredTaker is specified,
   // only the desiredTaker is allowed to take this order
   // this is the address on the taker chain
+  minBidAmount: number;
   desiredTaker: string;
   createdAt: number;
   expiredAt: number;
@@ -128,7 +129,7 @@ interface CancelSwapMsg {
 ** Properties **:
 
 - Anyone can bid for any open orders. if the order has specified desired recipient, then only he can bid for this old.
-- bid price should great than `minBidCap` and less than order price
+- bid price should great than `minBidAmount` and less than order price
   - makers can set price limit for bids for their order. For example: minimum price for token X: 100
 - bider should able to specified a duration for this offering. Maker can only accept the bid in that time window.
 - Don't support partial bid for now.
