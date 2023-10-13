@@ -108,6 +108,7 @@ interface CancelSwapMsg {
 
  - Anyone can bid for any open orders. if the order has specified desired recipient, then only he can bid for this old.
  - bid price should great than 0 and less than order price
+    - makers can set price limit for bids for their order. For example: minimum bid amount: 100
  - bider should able to specified a duration for this offering. Maker can only accept the bid in that time window.
  - Don't support partial bid for now.
  - Unfinished bid order should be allowed to claim it's assets back
@@ -115,7 +116,7 @@ interface CancelSwapMsg {
 ** Process **
 
  - Taker pick a order (he is interested), 
- - Input a price and duration
+ - Input a price and duration(should be equal or above minimum limit: if specified)
  - Deposit required tokens
  - Submit the bider order.
  - Maker receive bider orders and decide if she/he want to accept the price.
@@ -129,6 +130,8 @@ interface BidMsg {
   completeTimestamp: u64,
   creationTimestamp: u64
 }
+
+Suggestion: We can add this step in cancel itself, cancel means remove bid and refund tokens if bid was not taken
 ```
 ```ts
 interface ClaimBidMsg {
