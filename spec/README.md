@@ -152,6 +152,7 @@ interface PlaceBidMsg {
 
 interface AcceptBidMsg {
   orderID: string;
+  bidder: string;
 }
 ```
 
