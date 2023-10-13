@@ -54,16 +54,13 @@ Guarantee of Desired Exchange: Users can trust that the contract ensures a fair 
 
  -  Order: 
 ```ts
-pub struct AtomicSwapOrder {
-    pub id: String,
-    pub maker: MakeSwapMsg,
-    pub status: Status,
-    pub taker: Option<TakeSwapMsg>,
-    pub highestBid: String,
-    // In seconds
-    pub createTimestamp: u64,
-    pub cancelTimestamp: Option<Timestamp>,
-    pub completeTimestamp: Option<Timestamp>,
+interface AtomicSwapOrder {
+  id: string
+  maker: MakeSwapMsg
+  status: Status
+  taker: TakeSwapMsg
+  cancelTimestamp: uint64
+  completeTimestamp: uint64
 }
 ```
 
