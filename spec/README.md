@@ -68,8 +68,8 @@ interface AtomicSwapOrder {
   status: status;
   maker: string;
   taker: string;
-  sellToken: Coin;
-  buyToken: Coin;
+  quoteToken: Coin;
+  baseToken: Coin;
   highestBid: string;
   minBidCap: number;
   // evm block timestamp
@@ -84,8 +84,8 @@ interface AtomicSwapOrder {
 ```ts
 interface MakeSwapMsg {
   // the tokens to be exchanged
-  sellToken: Coin;
-  buyToken: Coin;
+  quoteToken: Coin; // sellToken
+  baseToken: Coin; // buyToken
   // the maker's address
   maker: string;
   // if desiredTaker is specified,
@@ -105,7 +105,7 @@ interface MakeSwapMsg {
 interface TakeSwapMsg {
   orderID: string;
   // the tokens to be sold
-  sellToken: Coin;
+  quoteToken: Coin;
   // taker can setup custom address to receive token. we will open this for future development and integration with other protocols.
   takerReceiver: string;
   createdAt: number;
