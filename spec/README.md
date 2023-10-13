@@ -32,7 +32,7 @@ Guarantee of Desired Exchange: Users can trust that the contract ensures a fair 
 1. A maker creates an order transaction with selling tokens and the price. 
 2. The maker's sell tokens are sent to the escrow address owned by the contract. 
 3. The order is saved in contract.
-4. An order expiry will result in a refund of the escrowed tokens.
+4. An order expiry will result in a refund of the escrowed tokens. (will be done by user contract won't automatically do it, we can reuse cancelswap operation for this)
 
 #### Taking a swap
 
@@ -45,9 +45,11 @@ Guarantee of Desired Exchange: Users can trust that the contract ensures a fair 
 #### Cancelling a swap
 
 1.  A maker cancels a previously created order. Expired orders can also be cancelled.
-2.  An Order can only be cancel once. 
-3.  Tokens should be refunded when order is cancel.
-4.  An order can be also cancel if there are unfinished bidding orders. 
+2.  An Order can only be cancelled once. 
+3.  Tokens should be refunded when order is cancelled.
+4.  An order can be also cancelled even if there are unfinished bidding orders. 
+
+Question: What does this mean ? I think maker should not be able to accept as they already cancelled order
 5.  Maker can accept the bid order if the order has canceled.
 
 ### Data struct and types
