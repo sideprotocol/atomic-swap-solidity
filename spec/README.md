@@ -22,9 +22,9 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 
 ### User roles
 
-- Maker: The maker is the user who initiates the trade, taking the first step in the process.
-- Taker: The taker,on the other hand, is the user who responds to an existing trade, essentially becoming the trade's counterpart.
-- Bidder: The taker who offer a different price for an order.
+- `Maker`: The maker is the user who initiates the trade, taking the first step in the process.
+- `Taker`: The taker,on the other hand, is the user who responds to an existing trade, essentially becoming the trade's counterpart.
+- `Bidder`: The taker who offer a different price for an order.
 
 ### Order creation and execution
 
@@ -47,12 +47,12 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 
 #### Cancelling a swap
 
-1.  A maker cancels a previously created order. Expired orders can also be cancelled.
-2.  An Order can only be cancelled once.
-3.  An order can only be cancelled once.
-4.  Tokens should be refunded when order is cancelled.
-5.  An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
-6.  Maker should not be able to accept a bid order if the order has been canceled.
+1. A maker cancels a previously created order. Expired orders can also be cancelled.
+2. An Order can only be cancelled once.
+3. An order can only be cancelled once.
+4. Tokens should be refunded when order is cancelled.
+5. An order can be cancelled by the maker at any time, even if there are outstanding, incomplete bidding orders associated with it.
+6. Maker should not be able to accept a bid order if the order has been canceled.
 
 ### Data struct and types
 
@@ -139,7 +139,6 @@ interface CancelSwapMsg {
 - Deposit required tokens
 - Submit the bider order.
 - Maker receive bider orders and decide if she/he want to accept the price.
-
 - Place Bid to the order.
 
 ```ts
@@ -186,8 +185,8 @@ interface UpdateBidMsg {
 
 - Maker fee: 0.1%
 - Take fee: 0.12%
-- When a maker creates an order, calculate the maker fee based on the order's value.
-- When a taker executes a trade, calculate the taker fee based on the order's value.
+- When a maker creates an order, the maker fee is calculated based on the selected bid value.
+- When a taker executes a trade, the taker fee is determined based on the value of the order on which they bid.
 - Deducted fees will be sent to treasury account
 
 ### Escrow mechanism
