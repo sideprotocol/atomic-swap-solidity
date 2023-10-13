@@ -151,10 +151,11 @@ interface MakeBidMsg {
   completedAt: u64;
   createdAt: u64;
 }
-
+```
 
 - Accept Bid by Maker.
 Maker can select one of bid from the total bid list.
+```ts
 interface AcceptBidMsg {
   orderID: string;
   bidder: string;
