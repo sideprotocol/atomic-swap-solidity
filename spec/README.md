@@ -37,8 +37,6 @@ Our goal is to create a contract that enables users to trade their tokens smooth
 
 #### Taking a swap
 
-<<<<<<< HEAD
-
 1. A taker takes an order by sending a `TakeSwap` transaction.
 2. The taker's sell tokens are sent to the escrow address owned by the contract.
 3. # if the taker's price is equate to order's price ,the contract sending Maker's selling tokens to taker and sending Taker's selling Token to maker. otherwise reject the take transaction and refund the taker's token.
@@ -96,6 +94,7 @@ interface MakeSwapMsg {
   // if desiredTaker is specified,
   // only the desiredTaker is allowed to take this order
   // this is the address on the taker chain
+  acceptBid: boolean;
   minBidAmount: number;
   desiredTaker: string;
   createdAt: number;
