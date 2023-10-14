@@ -34,7 +34,7 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 - `Bidder`: A bidder is an individual or entity participating who submits bids or offers to purchase a specific asset at a specified price or under certain conditions.
 - `Recipient`: A recipient becomes the sole taker of an order when the maker designates a specific counterparty for the transaction.
 
-### Order Process
+### Atomic Swap Order Process
 
 #### Making a swap
 
@@ -57,6 +57,13 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 4. Tokens can be refunded when an order is canceled.
 5. A maker can cancel an order at any time, even if there are outstanding incomplete bidding orders associated with it.
 6. The maker should not be able to accept a bid order if the order has been canceled.
+
+#### Counter offer
+
+1. The maker can select a bid to provide a new `Desired Taker Token` for the bidder.
+2. Only the bidder can accept this special offer.
+3. An order can only have at most one Counter offer.
+4. The new `Desired Taker Token` and `bider` stores on the atomic swap order. 
 
 ### Order Data struct and types
 
@@ -87,6 +94,12 @@ interface AtomicSwapOrder {
   acceptBid: boolean;
   highestBid: string;
   minBidCap: number;
+  // It's similar with desiredTakerToken,
+  // it's used for maker to offer a discount for a bidder, therefore the bidder can take the order with this price.
+  // default value is null.
+  counterDesiredTakerToken: Coin;
+  // default value is null
+  counterBider: string;
   // evm block timestamp
   createdAt: number;
   canceledAt: number;
@@ -146,6 +159,7 @@ interface CancelSwapMsg {
 - Bidders should be able to specify an expiration time for their bid offers. The maker can only accept the bid within that specified time window.
 - Partial bids (partially fill the order by accepting some bid orders) do not need to be supported in this version.
 - The Status of bid order is `WAIT_FOR_ACCEPT`.
+- The bidder should send `tokenToken` to the contract when he/she place a bid.
 
 #### Accept Bid
 
@@ -167,8 +181,19 @@ interface CancelSwapMsg {
 
  - The bidder should be able to increase the `bidAmount` by sending a update msg.
  - Only the orders in `WAIT_FOR_ACCEPT` can be update.
+ - the bidder should send `addition` takerToken to the contract address.
  - The latest bider amount equals the amount of order plus the `addition` of updateMsg
-   
+
+#### Accept Counter Offer
+
+ - For a successful bid acceptance, both the atomic swap order and bid order must be valid, meaning they haven't expired and are in the `OPEN` and `WAIT_FOR_ACCEPT` states, respectively.
+ - The bidder can complete this transaction by adding the insufficient amount of `takeToken`.
+ - This action effectively closes both the atomic swap order and the bid order simultaneously.
+ - The status of the atomic swap order changes from `OPEN` to `COMPLETED_BY_BID`.
+ - The status of the accepted bid order transitions from `WAIT_FOR_ACCEPT` to `ACCEPTED`.
+ - The `counterDesiredTakerToken` is transferred to the Maker, with applicable fees deducted.
+ - The `makerToken` is transferred to the bidder, also with fees subtracted. 
+
 **Process**
 
 - The bidder selects an order for which they want to submit a bid.
@@ -235,6 +260,15 @@ interface CancelBidMsg {
 
 ```ts
 interface UpdateBidMsg {
+  orderID: string;
+  addition: Coin;
+}
+```
+
+- Accept Counter offer by bidder.
+ 
+```ts
+interface AcceptCounterOfferMsg {
   orderID: string;
   addition: Coin;
 }
