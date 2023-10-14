@@ -4,7 +4,7 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 
 ### Definitions
 
-- `Atomic Swap`: In an atomic swap, both parties commit their assets to a smart contract. If the conditions specified in the contract are met, the swap occurs automatically. It's "atomic" because it either successfully completes with the agreed-upon terms, or it doesn't happen at all. 
+- `Atomic Swap`: In an atomic swap, both parties lock their assets in a smart contract. If the predefined conditions are met, the contract swaps the tokens between the two parties. If the conditions are not met, the taker's request is rejected. The term "atomic" is used because the swap either successfully occurs according to the agreed terms or doesn't happen at all. 
 - `Order`: An order is a request or instruction from a trader to buy or sell a particular asset at a specified price. Orders can be limit orders (with a specific price) or market orders (executed at the current market price). To ensure safety, the tokens involved in an order are kept secure within the contract until the trade is finalized.
 - `Maker`: The maker is an individual or entity who initiates or creates an order to buy or sell a specific asset at a specified price. Makers provide liquidity to the market by placing orders that are not immediately matched with existing orders. 
 - `Taker`: The taker is an individual or entity who matches an existing order created by a maker. Takers consume liquidity from the market by executing orders that are already on the order book.
