@@ -13,7 +13,6 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 - `Taker Token`: A taker token is the tokens that a taker uses to accept and execute an existing order created by a maker. Taker tokens are used to pay for the assets they acquire when they execute a trade. Initially, taker tokens are deposited into the smart contract by the taker and then transferred to the maker if the trade is executed successfully
 - `Bid`: A bid is a type of order in which a trader expresses the intention to purchase a specific asset at a certain price. Bids are typically placed by buyers who are willing to pay a specified amount for an asset.
 - `Bidder`: A bidder is an individual or entity participating who submits bids or offers to purchase a specific asset at a specified price or under certain conditions. Bidders compete with each other to secure the best possible terms for their desired transactions. A bidder may also be referred to as a `Taker` if their bid is accepted by the `Maker`.
-- `Counter-offer`: A counter-offer is a response made by a `Maker` in a negotiation or trade to the initial offer made by a `Bidder`. It occurs when a `Maker`, after receiving a bid or offer, proposes a different price or terms for the trade. If the Bidder accepts the counter-offer, they cancel their previous bid offer and place a new bid offer that matches the counter-offer, resulting in the completion of the entire trade.
 - `Designate`: A maker is allowed to explicitly specify or select a particular counterparty (a Recipient, in the form of an address) as the exclusive taker of the order. When the `Designate` feature is enabled, only the recipient can bid on this order.
 - `Recipient`: A recipient becomes the sole taker of an order when the maker designates a specific counterparty for the transaction.
 - `Expiration`: Expiration refers to the predefined date and time at which an order or contract automatically becomes invalid or no longer active. Both orders initiated by `Maker` and bids submitted by `Bidder` must include an expiration date.
@@ -58,14 +57,6 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 5. A maker can cancel an order at any time, even if there are outstanding incomplete bidding orders associated with it.
 6. The maker should not be able to accept a bid order if the order has been canceled.
 
-#### Counter offer
-
-1. A maker can choose a bid order within their swap order to propose a special price. This price is lower than the maker's "Desired Taker Token" but higher than the bidder's "takerToken."
-2. The maker has the option to offer a new Desired Taker Token to the bidder.
-3. Only the bidder has the privilege to accept this unique offer.
-4. An order can feature a maximum of one counteroffer.
-5. The new Desired Taker Token and the bidder's address are stored in the atomic swap order.
-
 ### Order Data struct and types
 
 - Order:
@@ -95,12 +86,6 @@ interface AtomicSwapOrder {
   acceptBid: boolean;
   highestBid: string;
   minBidCap: number;
-  // It's similar with desiredTakerToken,
-  // it's used for maker to offer a discount for a bidder, therefore the bidder can take the order with this price.
-  // default value is null.
-  counterDesiredTakerToken: Coin;
-  // default value is null
-  counterBider: string;
   // evm block timestamp
   createdAt: number;
   canceledAt: number;
@@ -185,15 +170,6 @@ interface CancelSwapMsg {
  - the bidder should send `addition` takerToken to the contract address.
  - The latest bider amount equals the amount of order plus the `addition` of updateMsg
 
-#### Accept Counter Offer
-
- - For a successful bid acceptance, both the atomic swap order and bid order must be valid, meaning they haven't expired and are in the `OPEN` and `WAIT_FOR_ACCEPT` states, respectively.
- - The bidder can complete this transaction by adding the insufficient amount of `takeToken`.
- - This action effectively closes both the atomic swap order and the bid order simultaneously.
- - The status of the atomic swap order changes from `OPEN` to `COMPLETED_BY_BID`.
- - The status of the accepted bid order transitions from `WAIT_FOR_ACCEPT` to `ACCEPTED`.
- - The `counterDesiredTakerToken` is transferred to the Maker, with applicable fees deducted.
- - The `makerToken` is transferred to the bidder, also with fees subtracted. 
 
 **Process**
 
