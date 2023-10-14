@@ -143,7 +143,7 @@ interface CancelSwapMsg {
 - The bidder submits their bid order by depositing the bid token amount into the contract.
 - The maker receives the bid orders and decides whether to accept the bid order.
 - If the maker accepts the bid order, the contract sends the bid token amount provided by the bidder to the maker and the amount of Maker Token provided by the maker to the bidder.
-- If the maker chooses not to accept the bid order, they can make a counter-offer by specifying the amount of tokens they are willing to accept. If the bidder accepts the counter-offer (cancelling the previous bid offer and placing a new bid offer with an amount of deposited assets that matches the counter-offer's amount), the contract sends the counter-offered token amount provided by the bidder to the maker and the amount of Maker Token provided by the maker to the bidder.
+- If the maker chooses not to accept the bid order, they can make a counter-offer by specifying the amount of tokens they are willing to accept. If the bidder accepts the counter-offer, the contract sends the counter-offered token amount provided by the bidder to the maker and the amount of Maker Token provided by the maker to the bidder.
 
 ```ts
 interface PlaceBidMsg {
