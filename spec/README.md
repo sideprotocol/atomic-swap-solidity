@@ -94,7 +94,7 @@ interface AtomicSwapOrder {
 }
 ```
 
-- Make Transaction
+- Make Order
 
 ```ts
 interface MakeSwapMsg {
@@ -115,7 +115,7 @@ interface MakeSwapMsg {
 }
 ```
 
-- Take Transaction
+- Take Order
 
 ```ts
 interface TakeSwapMsg {
@@ -128,7 +128,7 @@ interface TakeSwapMsg {
 }
 ```
 
-- Cancel Transaction
+- Cancel Order
 
 ```ts
 interface CancelSwapMsg {
