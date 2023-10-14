@@ -1,0 +1,18 @@
+{
+  "name": "@sideprotocol/contracts-typechain",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "author": "Oleg S",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc --preserveSymlinks"
+  },
+  "peerDependencies": {
+    "@ethersproject/providers": "*",
+    "@typechain/ethers-v5": "*",
+    "ethers": "*",
+    "typechain": "*",
+    "typescript": "*"
+  }
+}

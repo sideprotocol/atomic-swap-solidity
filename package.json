@@ -1,0 +1,71 @@
+{
+  "name": "@sideprotocol/ibcswap",
+  "version": "0.0.1",
+  "description": "sideprotocol/ibcswap",
+  "author": "Marian Z",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/contracts-typechain",
+      "packages/contracts"
+    ]
+  },
+  "packageManager": "yarn@3.1.0",
+  "installConfig": {
+    "hoistingLimits": "workspaces"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "lint": "eslintg .",
+    "lint-fix": "eslint --fix .",
+    "typechain:build": "cd packages/contracts-typechain && yarn build",
+    "hh:node": "cd packages/blockchain && npx hardhat node",
+    "hh:build": "cd packages/contracts && npx hardhat compile --force && cd .. && yarn typechain:build",
+    "hh:test": "yarn hh:build && cd packages/contracts && npx hardhat test",
+    "hh:coverage": "cd packages/contracts && npx hardhat coverage",
+    "hh:deploy:local": "cd packages/contracts && npx hardhat run --network localhost scripts/deploy.ts && cd .. && yarn typechain:build",
+    "hh:deploy:sepolia": "cd packages/contracts && npx hardhat run --network sepolia scripts/deploy.ts && cd .. && yarn typechain:build"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "crypto-js": "^4.1.1",
+    "ethers-eip712": "^0.2.0"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v5": "^9.0.0",
+    "@typechain/hardhat": "^3.1.0",
+    "@types/chai": "^4.3.0",
+    "@types/crypto-js": "^4.1.1",
+    "@types/jest": "^27.4.1",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "^14.18.12",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "chai": "^4.3.6",
+    "dotenv": "^16.0.0",
+    "eslint": "^8.10.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-typescript": "^14.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-formatjs": "^2.17.9",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jest": "^26.1.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint-plugin-tailwind": "^0.2.1",
+    "eslint-plugin-unused-imports": "^1.1.5",
+    "ethers": "^5.6.0",
+    "jest": "^27.0.4",
+    "mocha": "^9.2.2",
+    "openapi-examples-validator": "^4.6.0",
+    "prettier": "^2.4.1",
+    "ts-jest": "^27.0.2",
+    "ts-node": "^10.5.0",
+    "typechain": "^7.0.0",
+    "typescript": "^4.5.4"
+  }
+}
