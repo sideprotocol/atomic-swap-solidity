@@ -138,16 +138,37 @@ interface CancelSwapMsg {
 
 ### Bid process
 
-**Properties**:
+#### Place Bid
 
 - Anyone can place bids on open orders. If an order has a designated recipient, only the recipient can place bids for that order. No bid offers (except from the recipient) are allowed for this order. 
 - The bid amount should be greater than the `minBidAmount` and less than the amount of `Desired Taker Token`. 
 - Makers are allowed to set a minimum bid amount for their orders. For example, the minimum bid amount for token X is 100.
 - Bidders should be able to specify an expiration time for their bid offers. The maker can only accept the bid within that specified time window.
 - Partial bids (partially fill the order by accepting some bid orders) do not need to be supported in this version.
+- The Status of bid order is `WAIT_FOR_ACCEPT`.
+
+#### Accept Bid
+
+ - The order maker are able to accept any bider, even the bid is not the highest bid.
+ - When a bid is accept by maker, the `makerToken` will send to the recipient in the bider order. if no recipient is sepcifiled, send to the bider,
+ - When a bid is accept by maker, the `tokerToken` of bid order will send to the maker of order.
+ - The Status of order change from `OPEN` to `COMPLETED_BY_BID`.
+ - The Status of the accepted bid change from `WAIT_FOR_ACCEPT` to `ACCEPTED`.
+   
+#### Cancel Bid
+
 - Unaccepted bid orders should be claimable by the bidder. Similar to how makers need to claim their funds after canceling an order, bidders also need to manually claim back their funds.
 - Bid orders can be canceled by the bidder before they expire, but not by the maker
+- Only orders in `WAIT_FOR_ACCEPT` can be canceled.
+- Order status change from "WAIT_FOR_ACCEPT" to "CANCELED".
+- All funds should be refunded, no extra fees(execpt gas) should be charged for canceled bid.
 
+#### Update Bid
+
+ - The bidder should be able to increase the `bidAmount` by sending a update msg.
+ - Only the orders in `WAIT_FOR_ACCEPT` can be update.
+ - The latest bider amount equals the amount of order plus the `addition` of updateMsg
+   
 **Process**
 
 - The bidder selects an order for which they want to submit a bid.
