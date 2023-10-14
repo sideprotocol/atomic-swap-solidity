@@ -269,8 +269,11 @@ interface AcceptCounterOfferMsg {
 ### Handling data for query
 
  - Order List
+   
    Users can query orders by their status and receive a paginated list of matching orders.
+   
  - Bid List
+   
    Users can query bids by orderId and receive a paginated list of matching Bids.
 
 ### Future improvements
