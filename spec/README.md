@@ -160,7 +160,7 @@ interface CancelSwapMsg {
 - Unaccepted bid orders should be claimable by the bidder. Similar to how makers need to claim their funds after canceling an order, bidders also need to manually claim back their funds.
 - Bid orders can be canceled by the bidder before they expire, but not by the maker
 - Only orders in `WAIT_FOR_ACCEPT` can be canceled.
-- Order status change from "WAIT_FOR_ACCEPT" to "CANCELED".
+- Order status change from `WAIT_FOR_ACCEPT` to `CANCELED`.
 - All funds should be refunded, no extra fees(execpt gas) should be charged for canceled bid.
 
 #### Update Bid
