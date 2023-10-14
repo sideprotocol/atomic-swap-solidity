@@ -60,10 +60,10 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 
 #### Counter offer
 
-1. The maker can select a bid to provide a new `Desired Taker Token` for the bidder.
-2. Only the bidder can accept this special offer.
-3. An order can only have at most one Counter offer.
-4. The new `Desired Taker Token` and `bider` stores on the atomic swap order. 
+1. The maker has the option to offer a new Desired Taker Token to the bidder.
+2. Only the bidder has the privilege to accept this unique offer.
+3. An order can feature a maximum of one counteroffer.
+4. The new Desired Taker Token and the bidder's address are stored in the atomic swap order.
 
 ### Order Data struct and types
 
