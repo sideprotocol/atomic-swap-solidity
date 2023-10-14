@@ -184,10 +184,8 @@ interface BidOrder {
 ```ts
 interface PlaceBidMsg {
   orderID: string;
-  status: string; // 1. waiting for accept, 2. complete, 3.cancel
   bidAmount: number;
   duration: u64;
-  completedAt: u64;
   createdAt: u64;
 }
 ```
