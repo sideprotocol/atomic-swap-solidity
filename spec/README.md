@@ -85,7 +85,7 @@ interface AtomicSwapOrder {
   desiredTakerToken: Coin;
   acceptBid: boolean;
   highestBid: string;
-  minBidCap: number;
+  minBidAmount: number;
   // evm block timestamp
   createdAt: number;
   canceledAt: number;
