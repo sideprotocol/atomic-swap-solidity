@@ -34,7 +34,7 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 - `Bidder`: A bidder is an individual or entity participating who submits bids or offers to purchase a specific asset at a specified price or under certain conditions.
 - `Recipient`: A recipient becomes the sole taker of an order when the maker designates a specific counterparty for the transaction.
 
-### Order creation and execution
+### Order Process
 
 #### Making a swap
 
@@ -58,7 +58,7 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 5. A maker can cancel an order at any time, even if there are outstanding incomplete bidding orders associated with it.
 6. The maker should not be able to accept a bid order if the order has been canceled.
 
-### Data struct and types
+### Order Data struct and types
 
 - Order:
 
@@ -69,13 +69,22 @@ interface Coin {
   token: string;
   amount: number;
 }
+
+enum OrderStatus {
+  CANCELED = 0,
+  OPEN = 1,
+  COMPLETED = 2,
+  COMPLETED_BY_BID = 3,
+}
+
 interface AtomicSwapOrder {
   id: string;
-  status: status;
+  status: OrderStatus;
   maker: string;
   taker: string;
   makerToken: Coin;
   desiredTakerToken: Coin;
+  acceptBid: boolean;
   highestBid: string;
   minBidCap: number;
   // evm block timestamp
@@ -129,7 +138,7 @@ interface CancelSwapMsg {
 
 ### Bid process
 
-** Properties **:
+**Properties**:
 
 - Anyone can place bids on open orders. If an order has a designated recipient, only the recipient can place bids for that order. No bid offers (except from the recipient) are allowed for this order. 
 - The bid amount should be greater than the `minBidAmount` and less than the amount of `Desired Taker Token`. 
@@ -139,7 +148,7 @@ interface CancelSwapMsg {
 - Unaccepted bid orders should be claimable by the bidder. Similar to how makers need to claim their funds after canceling an order, bidders also need to manually claim back their funds.
 - Bid orders can be canceled by the bidder before they expire, but not by the maker
 
-** Process **
+**Process**
 
 - The bidder selects an order for which they want to submit a bid.
 - They input a bid amount (which must be greater than `minBidAmount` and equal to or smaller than the desired amount of taker tokens) as well as an expiration time.
@@ -148,6 +157,30 @@ interface CancelSwapMsg {
 - If the maker accepts the bid order, the contract sends the bid token amount provided by the bidder to the maker and the amount of Maker Token provided by the maker to the bidder.
 - If the maker chooses not to accept the bid order, they can make a counter-offer by specifying the amount of tokens they are willing to accept. If the bidder accepts the counter-offer, the contract sends the counter-offered token amount provided by the bidder to the maker and the amount of Maker Token provided by the maker to the bidder.
 
+### Bid data structure
+
+```ts
+
+enum BidStatus {
+  CANCELED = 0,
+  WAITING_FOR_ACCEPT = 1,
+  ACCEPTED = 2,
+}
+
+interface BidOrder {
+  id: string;
+  status: BidStatus;
+  orderId: string;
+  bidder: string;
+  amount: number
+  // evm block timestamp
+  createdAt: number;
+  canceledAt: number;
+  completedAt: number;
+}
+```
+
+ - Place Bid by Bidder
 ```ts
 interface PlaceBidMsg {
   orderID: string;
