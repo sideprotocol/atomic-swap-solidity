@@ -129,7 +129,7 @@ interface CancelSwapMsg {
 ** Properties **:
 
 - Anyone can place bids on open orders. If an order has a designated recipient, only the recipient can place bids for that order. No bid offers (except from the recipient) are allowed for this order. 
-- The bid amount should be greater than the `minBidAmount` and less than the amount of `Desired Taker Token`. `minBidAmount` is a mandatory field when the maker creates an order that allows bidding.
+- The bid amount should be greater than the `minBidAmount` and less than the amount of `Desired Taker Token`. 
 - Makers are allowed to set a minimum bid amount for their orders. For example, the minimum bid amount for token X is 100.
 - Bidders should be able to specify an expiration time for their bid offers. The maker can only accept the bid within that specified time window.
 - Partial bids (partially fill the order by accepting some bid orders) do not need to be supported in this version.
