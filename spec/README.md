@@ -64,6 +64,8 @@ Our objective is to establish a decentralized and permissionless on-chain OTC ma
 
 ```ts
 interface Coin {
+  // use symbol for native token
+  // use contract address for ERC 20
   token: string;
   amount: number;
 }
