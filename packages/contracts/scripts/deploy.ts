@@ -32,8 +32,23 @@ async function main(network: string) {
       initializer: "initialize",
     }
   );
-  console.log("contract address:", atomicSwap.address);
-  await saveDeployedAddress(atomicSwap.address);
+
+  // Deploy mock token contracts. This will be used for testing purposes.
+  const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");
+  const mockUSDC = await mockERC20TokenFactory.deploy("USDC", "USDC");
+  const mockUSDT = await mockERC20TokenFactory.deploy("USDT", "USDT");
+
+  const ownerPriv = process.env.PRIVATE_KEY;
+  const wallet = new ethers.Wallet(ownerPriv!);
+  const MINT_AMOUNT = ethers.utils.parseEther("1000");
+  await mockUSDC.mint(wallet.address, MINT_AMOUNT);
+  await mockUSDT.mint(wallet.address, MINT_AMOUNT);
+
+  await saveDeployedAddress(
+    atomicSwap.address,
+    mockUSDC.address,
+    mockUSDT.address
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere

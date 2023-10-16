@@ -89,6 +89,12 @@ interface IAtomicSwap {
         bytes32 orderID; // ID of the order to be canceled.
     }
 
+    struct CounterOfferMsg {
+        bytes32 orderID;
+        address bidder;
+        uint amount;
+    }
+
     // Events to log significant actions for atomic swaps.
     event AtomicSwapOrderCreated(bytes32 indexed id);
     event AtomicSwapOrderTook(

@@ -1,0 +1,27 @@
+{
+  "name": "@sideprotocol/cli",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "author": "Side Protocol Team",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc --preserveSymlinks",
+    "start": "ts-node index.ts"
+  },
+  "peerDependencies": {
+    "@ethersproject/providers": "*",
+    "@sideprotocol/contracts-typechain": "*",
+    "@typechain/ethers-v5": "*",
+    "ethers": "*",
+    "typechain": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1",
+    "yargs": "^17.0.28"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.28"
+  }
+}

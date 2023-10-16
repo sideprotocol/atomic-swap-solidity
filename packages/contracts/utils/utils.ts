@@ -19,14 +19,23 @@ const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 const ETH_USDC = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";
 
 export const WHALES: string[] = [];
-export const saveDeployedAddress = async (contract: string) => {
+export const saveDeployedAddress = async (
+  atomicswap: string,
+  usdc: string,
+  usdt: string
+) => {
   const settingInfo: {
-    contractAddress: string;
+    atomicswap: string;
+    mockUSDC: string;
+    mockUSDT: string;
   } = {
-    contractAddress: "",
+    atomicswap: "",
+    mockUSDC: "",
+    mockUSDT: "",
   };
-  settingInfo.contractAddress = contract;
-
+  settingInfo.atomicswap = atomicswap;
+  settingInfo.mockUSDC = usdc;
+  settingInfo.mockUSDT = usdt;
   const settingsPath = "../contracts-typechain/settings";
   if (!existsSync(settingsPath)) {
     mkdirSync(settingsPath, { recursive: true });

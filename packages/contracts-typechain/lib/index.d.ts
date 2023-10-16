@@ -1,4 +1,6 @@
 export * from "./typechain";
 export declare const Settings: {
-    contractAddress: string;
+    atomicswap: string;
+    mockUSDC: string;
+    mockUSDT: string;
 };
