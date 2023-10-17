@@ -27,7 +27,8 @@
     "hh:test": "yarn hh:build && cd packages/contracts && npx hardhat test",
     "hh:coverage": "cd packages/contracts && npx hardhat coverage",
     "hh:deploy:local": "cd packages/contracts && npx hardhat run --network localhost scripts/deploy.ts && cd .. && yarn typechain:build",
-    "hh:deploy:sepolia": "cd packages/contracts && npx hardhat run --network sepolia scripts/deploy.ts && cd .. && yarn typechain:build"
+    "hh:deploy:sepolia": "cd packages/contracts && npx hardhat run --network sepolia scripts/deploy.ts && cd .. && yarn typechain:build",
+    "hh:deploy:bnb_test": "cd packages/contracts && npx hardhat run --network bnb_test scripts/deploy.ts && cd .. && yarn typechain:build"
   },
   "dependencies": {
     "axios": "^0.26.0",
