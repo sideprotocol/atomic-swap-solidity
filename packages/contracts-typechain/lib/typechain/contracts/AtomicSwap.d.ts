@@ -11,6 +11,16 @@ export declare namespace IAtomicSwap {
         orderID: string;
         bidder: string;
     };
+    type CounterOfferMsgStruct = {
+        orderID: PromiseOrValue<BytesLike>;
+        bidder: PromiseOrValue<string>;
+        amount: PromiseOrValue<BigNumberish>;
+    };
+    type CounterOfferMsgStructOutput = [string, string, BigNumber] & {
+        orderID: string;
+        bidder: string;
+        amount: BigNumber;
+    };
     type CancelSwapMsgStruct = {
         orderID: PromiseOrValue<BytesLike>;
     };
@@ -78,10 +88,13 @@ export declare namespace IAtomicSwap {
 export interface AtomicSwapInterface extends utils.Interface {
     functions: {
         "acceptBid((bytes32,address))": FunctionFragment;
+        "acceptCountOfffer((bytes32,address,uint256))": FunctionFragment;
         "bids(bytes32,address)": FunctionFragment;
         "buyerFeeRate()": FunctionFragment;
         "cancelBid(bytes32)": FunctionFragment;
         "cancelSwap((bytes32))": FunctionFragment;
+        "counteroffer((bytes32,address,uint256))": FunctionFragment;
+        "counteroffers(bytes32,address)": FunctionFragment;
         "initialize(address,address,uint256,uint256)": FunctionFragment;
         "makeSwap(((address,uint256),(address,uint256),address,uint256,uint256,bool))": FunctionFragment;
         "owner()": FunctionFragment;
@@ -93,12 +106,15 @@ export interface AtomicSwapInterface extends utils.Interface {
         "transferOwnership(address)": FunctionFragment;
         "updateBid((bytes32,uint256))": FunctionFragment;
     };
-    getFunction(nameOrSignatureOrTopic: "acceptBid" | "bids" | "buyerFeeRate" | "cancelBid" | "cancelSwap" | "initialize" | "makeSwap" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
+    getFunction(nameOrSignatureOrTopic: "acceptBid" | "acceptCountOfffer" | "bids" | "buyerFeeRate" | "cancelBid" | "cancelSwap" | "counteroffer" | "counteroffers" | "initialize" | "makeSwap" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
     encodeFunctionData(functionFragment: "acceptBid", values: [IAtomicSwap.AcceptBidMsgStruct]): string;
+    encodeFunctionData(functionFragment: "acceptCountOfffer", values: [IAtomicSwap.CounterOfferMsgStruct]): string;
     encodeFunctionData(functionFragment: "bids", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "buyerFeeRate", values?: undefined): string;
     encodeFunctionData(functionFragment: "cancelBid", values: [PromiseOrValue<BytesLike>]): string;
     encodeFunctionData(functionFragment: "cancelSwap", values: [IAtomicSwap.CancelSwapMsgStruct]): string;
+    encodeFunctionData(functionFragment: "counteroffer", values: [IAtomicSwap.CounterOfferMsgStruct]): string;
+    encodeFunctionData(functionFragment: "counteroffers", values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "initialize", values: [
         PromiseOrValue<string>,
         PromiseOrValue<string>,
@@ -115,10 +131,13 @@ export interface AtomicSwapInterface extends utils.Interface {
     encodeFunctionData(functionFragment: "transferOwnership", values: [PromiseOrValue<string>]): string;
     encodeFunctionData(functionFragment: "updateBid", values: [IAtomicSwap.UpdateBidMsgStruct]): string;
     decodeFunctionResult(functionFragment: "acceptBid", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "acceptCountOfffer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyerFeeRate", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "cancelBid", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "counteroffer", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "counteroffers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -249,6 +268,9 @@ export interface AtomicSwap extends BaseContract {
         acceptBid(acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct, overrides?: PayableOverrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        acceptCountOfffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
         bids(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[
             BigNumber,
             string,
@@ -271,6 +293,10 @@ export interface AtomicSwap extends BaseContract {
         cancelSwap(cancelswap: IAtomicSwap.CancelSwapMsgStruct, overrides?: PayableOverrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
+        counteroffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<ContractTransaction>;
+        counteroffers(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[BigNumber]>;
         initialize(_admin: PromiseOrValue<string>, _treasury: PromiseOrValue<string>, _sellerFee: PromiseOrValue<BigNumberish>, _buyerFee: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<ContractTransaction>;
@@ -325,6 +351,9 @@ export interface AtomicSwap extends BaseContract {
     acceptBid(acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct, overrides?: PayableOverrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    acceptCountOfffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
     bids(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[
         BigNumber,
         string,
@@ -347,6 +376,10 @@ export interface AtomicSwap extends BaseContract {
     cancelSwap(cancelswap: IAtomicSwap.CancelSwapMsgStruct, overrides?: PayableOverrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
+    counteroffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+        from?: PromiseOrValue<string>;
+    }): Promise<ContractTransaction>;
+    counteroffers(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
     initialize(_admin: PromiseOrValue<string>, _treasury: PromiseOrValue<string>, _sellerFee: PromiseOrValue<BigNumberish>, _buyerFee: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
         from?: PromiseOrValue<string>;
     }): Promise<ContractTransaction>;
@@ -399,6 +432,7 @@ export interface AtomicSwap extends BaseContract {
     }): Promise<ContractTransaction>;
     callStatic: {
         acceptBid(acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct, overrides?: CallOverrides): Promise<void>;
+        acceptCountOfffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: CallOverrides): Promise<void>;
         bids(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<[
             BigNumber,
             string,
@@ -417,6 +451,8 @@ export interface AtomicSwap extends BaseContract {
         buyerFeeRate(overrides?: CallOverrides): Promise<BigNumber>;
         cancelBid(_orderID: PromiseOrValue<BytesLike>, overrides?: CallOverrides): Promise<void>;
         cancelSwap(cancelswap: IAtomicSwap.CancelSwapMsgStruct, overrides?: CallOverrides): Promise<void>;
+        counteroffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: CallOverrides): Promise<void>;
+        counteroffers(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         initialize(_admin: PromiseOrValue<string>, _treasury: PromiseOrValue<string>, _sellerFee: PromiseOrValue<BigNumberish>, _buyerFee: PromiseOrValue<BigNumberish>, overrides?: CallOverrides): Promise<void>;
         makeSwap(makeswap: IAtomicSwap.MakeSwapMsgStruct, overrides?: CallOverrides): Promise<void>;
         owner(overrides?: CallOverrides): Promise<string>;
@@ -478,6 +514,9 @@ export interface AtomicSwap extends BaseContract {
         acceptBid(acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct, overrides?: PayableOverrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        acceptCountOfffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
         bids(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         buyerFeeRate(overrides?: CallOverrides): Promise<BigNumber>;
         cancelBid(_orderID: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -486,6 +525,10 @@ export interface AtomicSwap extends BaseContract {
         cancelSwap(cancelswap: IAtomicSwap.CancelSwapMsgStruct, overrides?: PayableOverrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
+        counteroffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<BigNumber>;
+        counteroffers(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<BigNumber>;
         initialize(_admin: PromiseOrValue<string>, _treasury: PromiseOrValue<string>, _sellerFee: PromiseOrValue<BigNumberish>, _buyerFee: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<BigNumber>;
@@ -515,6 +558,9 @@ export interface AtomicSwap extends BaseContract {
         acceptBid(acceptBidMsg: IAtomicSwap.AcceptBidMsgStruct, overrides?: PayableOverrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
+        acceptCountOfffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
         bids(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         buyerFeeRate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
         cancelBid(_orderID: PromiseOrValue<BytesLike>, overrides?: PayableOverrides & {
@@ -523,6 +569,10 @@ export interface AtomicSwap extends BaseContract {
         cancelSwap(cancelswap: IAtomicSwap.CancelSwapMsgStruct, overrides?: PayableOverrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;
+        counteroffer(counterOfferMsg: IAtomicSwap.CounterOfferMsgStruct, overrides?: Overrides & {
+            from?: PromiseOrValue<string>;
+        }): Promise<PopulatedTransaction>;
+        counteroffers(arg0: PromiseOrValue<BytesLike>, arg1: PromiseOrValue<string>, overrides?: CallOverrides): Promise<PopulatedTransaction>;
         initialize(_admin: PromiseOrValue<string>, _treasury: PromiseOrValue<string>, _sellerFee: PromiseOrValue<BigNumberish>, _buyerFee: PromiseOrValue<BigNumberish>, overrides?: Overrides & {
             from?: PromiseOrValue<string>;
         }): Promise<PopulatedTransaction>;

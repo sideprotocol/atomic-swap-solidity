@@ -20,6 +20,7 @@ contract AtomicSwap is
     // Bid
     // Primary mapping using BidKey (order + bidder)
     mapping(bytes32 => mapping(address => Bid)) public bids;
+    mapping(bytes32 => mapping(address => uint)) public counteroffers;
 
     uint256 swapOrderCounter;
     uint16 chainID;
@@ -496,6 +497,54 @@ contract AtomicSwap is
             // If buy token is Ether, transfer it back to the bidder
             payable(selectedBid.bidder).transfer(selectedBid.amount);
         }
+    }
+
+    function counteroffer(CounterOfferMsg calldata counterOfferMsg) external {
+        bytes32 _orderID = counterOfferMsg.orderID;
+        address _bidder = counterOfferMsg.bidder;
+
+        AtomicSwapOrder storage _order = swapOrder[_orderID];
+        if (!_order.acceptBid) {
+            revert BidNotAllowed();
+        }
+        Bid storage _bid = bids[_orderID][_bidder];
+        if (_bid.amount == 0) {
+            revert NoBidPlaced();
+        }
+
+        if (
+            counterOfferMsg.amount == 0 ||
+            counterOfferMsg.amount > _order.buyToken.amount
+        ) {
+            revert MismatchedBidAmount(counterOfferMsg.amount);
+        }
+
+        counteroffers[_orderID][_bidder] = counterOfferMsg.amount;
+    }
+
+    function acceptCountOfffer(
+        CounterOfferMsg calldata counterOfferMsg
+    ) external {
+        bytes32 _orderID = counterOfferMsg.orderID;
+        address _bidder = counterOfferMsg.bidder;
+
+        AtomicSwapOrder storage _order = swapOrder[_orderID];
+        if (!_order.acceptBid) {
+            revert BidNotAllowed();
+        }
+        Bid storage _bid = bids[_orderID][_bidder];
+        if (_bid.amount == 0) {
+            revert NoBidPlaced();
+        }
+
+        if (
+            counterOfferMsg.amount == 0 ||
+            counterOfferMsg.amount > _order.buyToken.amount
+        ) {
+            revert MismatchedBidAmount(counterOfferMsg.amount);
+        }
+
+        counteroffers[_orderID][_bidder] = counterOfferMsg.amount;
     }
 
     function _safeTransferFrom(
