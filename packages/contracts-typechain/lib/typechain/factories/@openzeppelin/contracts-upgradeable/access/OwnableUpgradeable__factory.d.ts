@@ -1,14 +1,37 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { OwnableUpgradeable, OwnableUpgradeableInterface } from "../../../../@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable";
 export declare class OwnableUpgradeable__factory {
     static readonly abi: readonly [{
+        readonly inputs: readonly [];
+        readonly name: "InvalidInitialization";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "NotInitializing";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "owner";
+            readonly type: "address";
+        }];
+        readonly name: "OwnableInvalidOwner";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "account";
+            readonly type: "address";
+        }];
+        readonly name: "OwnableUnauthorizedAccount";
+        readonly type: "error";
+    }, {
         readonly anonymous: false;
         readonly inputs: readonly [{
             readonly indexed: false;
-            readonly internalType: "uint8";
+            readonly internalType: "uint64";
             readonly name: "version";
-            readonly type: "uint8";
+            readonly type: "uint64";
         }];
         readonly name: "Initialized";
         readonly type: "event";
@@ -55,5 +78,5 @@ export declare class OwnableUpgradeable__factory {
         readonly type: "function";
     }];
     static createInterface(): OwnableUpgradeableInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): OwnableUpgradeable;
+    static connect(address: string, runner?: ContractRunner | null): OwnableUpgradeable;
 }

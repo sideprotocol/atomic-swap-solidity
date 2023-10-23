@@ -12,7 +12,7 @@
   "peerDependencies": {
     "@ethersproject/providers": "*",
     "@sideprotocol/contracts-typechain": "*",
-    "@typechain/ethers-v5": "*",
+    "@typechain/ethers-v6": "*",
     "ethers": "*",
     "typechain": "*",
     "typescript": "*"

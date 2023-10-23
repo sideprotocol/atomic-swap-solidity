@@ -1,38 +1,79 @@
 import { ethers } from "hardhat";
-import { createDefaultAtomicOrder } from "../../utils/utils";
+import { calcSwapAmount, createDefaultAtomicOrder } from "../../utils/utils";
 import { expect } from "chai";
 describe("TakeSwap", () => {
   beforeEach(async () => {});
 
   const testTakeSwap = async (withNativeToken?: boolean) => {
     const [, , takerReceiver] = await ethers.getSigners();
-    const { orderID, atomicSwap, taker, usdc, usdt } =
-      await createDefaultAtomicOrder(withNativeToken, false, false, false);
+    const {
+      orderID,
+      atomicSwap,
+      maker,
+      taker,
+      usdc,
+      usdt,
+      treasury,
+      sellTokenFeeRate,
+      buyTokenFeeRate,
+    } = await createDefaultAtomicOrder(withNativeToken, false, false, false);
 
     const order = await atomicSwap.swapOrder(orderID);
     const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
+    const atomicSwapAddress = await atomicSwap.getAddress();
     await expect(
-      usdt.connect(taker).approve(atomicSwap.address, buyToken.amount)
+      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount)
     ).not.to.reverted;
 
-    if (order.sellToken.token == ethers.constants.AddressZero) {
-      await expect(
-        atomicSwap.connect(taker).takeSwap({
-          orderID,
-          takerReceiver: takerReceiver.address,
-        })
-      )
-        .to.changeEtherBalance(order.maker, order.buyToken.amount)
-        .changeTokenBalance(usdt, takerReceiver.address, order.buyToken.amount);
+    if (order.sellToken.token == ethers.ZeroAddress) {
+      const tx = atomicSwap.connect(taker).takeSwap({
+        orderID,
+        takerReceiver: takerReceiver.address,
+      });
+
+      const { amountAfterFee, feeAmount } = calcSwapAmount(
+        order.buyToken.amount,
+        buyTokenFeeRate
+      );
+
+      await expect(tx).to.changeEtherBalances(
+        [takerReceiver, treasury],
+        [amountAfterFee, feeAmount]
+      );
+      const amountAfterSwap = calcSwapAmount(
+        order.sellToken.amount,
+        sellTokenFeeRate
+      );
+      await expect(tx).changeTokenBalances(
+        usdt,
+        [maker.address, treasury],
+        [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
+      );
     } else {
-      await expect(
-        atomicSwap.connect(taker).takeSwap({
-          orderID,
-          takerReceiver: takerReceiver.address,
-        })
-      )
-        .to.changeTokenBalance(usdc, order.maker, order.buyToken.amount)
-        .changeTokenBalance(usdt, takerReceiver.address, order.buyToken.amount);
+      const tx = atomicSwap.connect(taker).takeSwap({
+        orderID,
+        takerReceiver: takerReceiver.address,
+      });
+
+      const { amountAfterFee, feeAmount } = calcSwapAmount(
+        order.buyToken.amount,
+        buyTokenFeeRate
+      );
+
+      await expect(tx).to.changeTokenBalances(
+        usdc,
+        [takerReceiver.address, treasury],
+        [amountAfterFee, feeAmount]
+      );
+      const amountAfterSwap = calcSwapAmount(
+        order.sellToken.amount,
+        sellTokenFeeRate
+      );
+      await expect(tx).changeTokenBalances(
+        usdt,
+        [maker.address, treasury],
+        [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
+      );
     }
 
     expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
@@ -51,7 +92,7 @@ describe("TakeSwap", () => {
 
     await expect(
       atomicSwap.connect(taker).takeSwap({
-        orderID: ethers.utils.randomBytes(32), // Some random orderID
+        orderID: ethers.randomBytes(32), // Some random orderID
         takerReceiver: taker.address,
       })
     ).to.be.revertedWithCustomError(atomicSwap, "OrderDoesNotExist");
@@ -71,7 +112,7 @@ describe("TakeSwap", () => {
           takerReceiver: taker.address,
         },
         {
-          value: ethers.utils.parseEther("0"),
+          value: ethers.parseEther("0"),
         }
       )
     ).to.be.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");

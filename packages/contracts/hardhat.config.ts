@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.9",
+        version: "0.8.20",
       },
     ],
     settings: {
@@ -49,7 +49,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: "../contracts-typechain/typechain",
-    target: "ethers-v5",
+    target: "ethers-v6",
   },
   networks: {
     hardhat: {

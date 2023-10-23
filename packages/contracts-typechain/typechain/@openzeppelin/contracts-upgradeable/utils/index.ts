@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ContextUpgradeable } from "./ContextUpgradeable";
+export type { ReentrancyGuardUpgradeable } from "./ReentrancyGuardUpgradeable";

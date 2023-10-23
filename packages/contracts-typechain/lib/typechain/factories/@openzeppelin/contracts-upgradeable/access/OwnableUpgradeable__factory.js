@@ -7,13 +7,45 @@ exports.OwnableUpgradeable__factory = void 0;
 const ethers_1 = require("ethers");
 const _abi = [
     {
+        inputs: [],
+        name: "InvalidInitialization",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "NotInitializing",
+        type: "error",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "owner",
+                type: "address",
+            },
+        ],
+        name: "OwnableInvalidOwner",
+        type: "error",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
+                name: "account",
+                type: "address",
+            },
+        ],
+        name: "OwnableUnauthorizedAccount",
+        type: "error",
+    },
+    {
         anonymous: false,
         inputs: [
             {
                 indexed: false,
-                internalType: "uint8",
+                internalType: "uint64",
                 name: "version",
-                type: "uint8",
+                type: "uint64",
             },
         ],
         name: "Initialized",
@@ -74,10 +106,10 @@ const _abi = [
 ];
 class OwnableUpgradeable__factory {
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.OwnableUpgradeable__factory = OwnableUpgradeable__factory;

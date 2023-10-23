@@ -7,13 +7,23 @@ exports.Initializable__factory = void 0;
 const ethers_1 = require("ethers");
 const _abi = [
     {
+        inputs: [],
+        name: "InvalidInitialization",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "NotInitializing",
+        type: "error",
+    },
+    {
         anonymous: false,
         inputs: [
             {
                 indexed: false,
-                internalType: "uint8",
+                internalType: "uint64",
                 name: "version",
-                type: "uint8",
+                type: "uint64",
             },
         ],
         name: "Initialized",
@@ -22,10 +32,10 @@ const _abi = [
 ];
 class Initializable__factory {
     static createInterface() {
-        return new ethers_1.utils.Interface(_abi);
+        return new ethers_1.Interface(_abi);
     }
-    static connect(address, signerOrProvider) {
-        return new ethers_1.Contract(address, _abi, signerOrProvider);
+    static connect(address, runner) {
+        return new ethers_1.Contract(address, _abi, runner);
     }
 }
 exports.Initializable__factory = Initializable__factory;

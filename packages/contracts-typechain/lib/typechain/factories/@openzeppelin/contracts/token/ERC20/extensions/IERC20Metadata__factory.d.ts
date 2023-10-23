@@ -1,5 +1,4 @@
-import { Signer } from "ethers";
-import type { Provider } from "@ethersproject/providers";
+import { type ContractRunner } from "ethers";
 import type { IERC20Metadata, IERC20MetadataInterface } from "../../../../../../@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata";
 export declare class IERC20Metadata__factory {
     static readonly abi: readonly [{
@@ -67,7 +66,7 @@ export declare class IERC20Metadata__factory {
             readonly type: "address";
         }, {
             readonly internalType: "uint256";
-            readonly name: "amount";
+            readonly name: "value";
             readonly type: "uint256";
         }];
         readonly name: "approve";
@@ -139,7 +138,7 @@ export declare class IERC20Metadata__factory {
             readonly type: "address";
         }, {
             readonly internalType: "uint256";
-            readonly name: "amount";
+            readonly name: "value";
             readonly type: "uint256";
         }];
         readonly name: "transfer";
@@ -161,7 +160,7 @@ export declare class IERC20Metadata__factory {
             readonly type: "address";
         }, {
             readonly internalType: "uint256";
-            readonly name: "amount";
+            readonly name: "value";
             readonly type: "uint256";
         }];
         readonly name: "transferFrom";
@@ -174,5 +173,5 @@ export declare class IERC20Metadata__factory {
         readonly type: "function";
     }];
     static createInterface(): IERC20MetadataInterface;
-    static connect(address: string, signerOrProvider: Signer | Provider): IERC20Metadata;
+    static connect(address: string, runner?: ContractRunner | null): IERC20Metadata;
 }

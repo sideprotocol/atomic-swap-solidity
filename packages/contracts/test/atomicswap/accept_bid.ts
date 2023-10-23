@@ -1,5 +1,5 @@
 import { time } from "@nomicfoundation/hardhat-network-helpers";
-import { bidToDefaultAtomicOrder } from "../../utils/utils";
+import { bidToDefaultAtomicOrder, calcSwapAmount } from "../../utils/utils";
 import { expect } from "chai";
 
 describe("AtomicSwap: AcceptBid", () => {
@@ -17,21 +17,29 @@ describe("AtomicSwap: AcceptBid", () => {
       treasury,
     } = await bidToDefaultAtomicOrder(true, false);
 
-    const sellTokenAmountAfterFee = payload.sellToken.amount
-      .mul(1000 - buyTokenFeeRate)
-      .div(1000);
-    const sellTokenFee = payload.sellToken.amount.sub(sellTokenAmountAfterFee);
+    const sellTokenAmount = calcSwapAmount(
+      payload.sellToken.amount,
+      buyTokenFeeRate
+    );
 
-    const buyTokenAmountAfterFee = bidAmount
-      .mul(1000 - sellTokenFeeRate)
-      .div(1000);
-    const buyTokenFee = bidAmount.sub(buyTokenAmountAfterFee);
+    const buyTokenAmount = calcSwapAmount(bidAmount, sellTokenFeeRate);
 
-    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder }))
-      .to.changeEtherBalance(bidder, sellTokenAmountAfterFee)
-      .changeTokenBalance(usdt, maker.address, buyTokenAmountAfterFee)
-      .changeEtherBalance(treasury, sellTokenFee)
-      .changeTokenBalance(usdt, treasury, buyTokenFee);
+    const tx = atomicSwap.connect(maker).acceptBid({ orderID, bidder });
+    await expect(tx).to.changeEtherBalance(
+      bidder,
+      sellTokenAmount.amountAfterFee
+    );
+    await expect(tx).to.changeTokenBalance(
+      usdt,
+      maker.address,
+      buyTokenAmount.amountAfterFee
+    );
+    await expect(tx).to.changeEtherBalance(treasury, sellTokenAmount.feeAmount);
+    await expect(tx).to.changeTokenBalance(
+      usdt,
+      treasury,
+      buyTokenAmount.feeAmount
+    );
   });
 
   it("should accept bid with erc20 token", async () => {
@@ -48,22 +56,37 @@ describe("AtomicSwap: AcceptBid", () => {
       buyTokenFeeRate,
       treasury,
     } = await bidToDefaultAtomicOrder(false, false);
-    const sellTokenAmountAfterFee = payload.sellToken.amount
-      .mul(1000 - buyTokenFeeRate)
-      .div(1000);
-    const sellTokenFee = payload.sellToken.amount.sub(sellTokenAmountAfterFee);
+    const sellTokenAmount = calcSwapAmount(
+      payload.sellToken.amount,
+      buyTokenFeeRate
+    );
 
-    const buyTokenAmountAfterFee = bidAmount
-      .mul(1000 - sellTokenFeeRate)
-      .div(1000);
-    const buyTokenFee = bidAmount.sub(buyTokenAmountAfterFee);
+    const buyTokenAmount = calcSwapAmount(bidAmount, sellTokenFeeRate);
 
-    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder }))
-      .to.changeTokenBalance(usdt, maker.address, buyTokenAmountAfterFee)
-      .changeTokenBalance(usdc, bidder, sellTokenAmountAfterFee)
-      .changeTokenBalance(usdc, treasury, sellTokenFee)
-      .changeTokenBalance(usdt, treasury, buyTokenFee);
+    const tx = atomicSwap.connect(maker).acceptBid({ orderID, bidder });
+    await expect(tx).to.changeTokenBalance(
+      usdt,
+      maker.address,
+      buyTokenAmount.amountAfterFee
+    );
+    await expect(tx).to.changeTokenBalance(
+      usdc,
+      bidder,
+      sellTokenAmount.amountAfterFee
+    );
+
+    await expect(tx).to.changeTokenBalance(
+      usdc,
+      treasury,
+      sellTokenAmount.feeAmount
+    );
+    await expect(tx).to.changeTokenBalance(
+      usdt,
+      treasury,
+      buyTokenAmount.feeAmount
+    );
   });
+
   it("should revert to accept bid by not maker", async () => {
     const { atomicSwap, taker, orderID, bidder } =
       await bidToDefaultAtomicOrder(true, false);

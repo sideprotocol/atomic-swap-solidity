@@ -17,7 +17,7 @@ describe("AtomicSwap: UpdateBid", () => {
 
     const bidPayload = {
       bidder: taker.address,
-      bidAmount: ethers.utils.parseEther("19"),
+      bidAmount: ethers.parseEther("19"),
       orderID: orderID,
       bidderReceiver: taker.address,
       expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -28,18 +28,24 @@ describe("AtomicSwap: UpdateBid", () => {
       atomicSwap.connect(taker).placeBid(bidPayload, {
         value: bidPayload.bidAmount,
       })
-    ).to.changeEtherBalance(atomicSwap.address, bidPayload.bidAmount);
+    ).to.changeEtherBalance(
+      await atomicSwap.getAddress(),
+      bidPayload.bidAmount
+    );
 
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
-      addition: ethers.utils.parseEther("1"),
+      addition: ethers.parseEther("1"),
     };
     await expect(
       atomicSwap.connect(taker).updateBid(updatePayload2, {
         value: updatePayload2.addition,
       })
-    ).to.changeEtherBalance(atomicSwap.address, updatePayload2.addition);
+    ).to.changeEtherBalance(
+      await atomicSwap.getAddress(),
+      updatePayload2.addition
+    );
   });
 
   it("should update bid with erc20 token", async () => {
@@ -49,31 +55,41 @@ describe("AtomicSwap: UpdateBid", () => {
 
     const bidPayload = {
       bidder: taker.address,
-      bidAmount: ethers.utils.parseEther("18"),
+      bidAmount: ethers.parseEther("18"),
       orderID: orderID,
       bidderReceiver: taker.address,
       expireTimestamp: await BlockTime.AfterSeconds(30),
     };
 
-    await usdt.connect(taker).approve(atomicSwap.address, bidPayload.bidAmount);
+    await usdt
+      .connect(taker)
+      .approve(await atomicSwap.getAddress(), bidPayload.bidAmount);
 
     // make bid
     await expect(
       atomicSwap.connect(taker).placeBid(bidPayload)
-    ).to.changeTokenBalance(usdt, atomicSwap.address, bidPayload.bidAmount);
+    ).to.changeTokenBalance(
+      usdt,
+      await atomicSwap.getAddress(),
+      bidPayload.bidAmount
+    );
 
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
-      addition: ethers.utils.parseEther("1"),
+      addition: ethers.parseEther("1"),
     };
     await usdt
       .connect(taker)
-      .approve(atomicSwap.address, updatePayload2.addition);
+      .approve(await atomicSwap.getAddress(), updatePayload2.addition);
 
     await expect(
       atomicSwap.connect(taker).updateBid(updatePayload2)
-    ).to.changeTokenBalance(usdt, atomicSwap.address, updatePayload2.addition);
+    ).to.changeTokenBalance(
+      usdt,
+      await atomicSwap.getAddress(),
+      updatePayload2.addition
+    );
   });
 
   it("should revert to place bid with native token with over amount", async () => {
@@ -89,7 +105,7 @@ describe("AtomicSwap: UpdateBid", () => {
 
     const bidPayload = {
       bidder: taker.address,
-      bidAmount: ethers.utils.parseEther("19"),
+      bidAmount: ethers.parseEther("19"),
       orderID: orderID,
       bidderReceiver: taker.address,
       expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -100,12 +116,15 @@ describe("AtomicSwap: UpdateBid", () => {
       atomicSwap.connect(taker).placeBid(bidPayload, {
         value: bidPayload.bidAmount,
       })
-    ).to.changeEtherBalance(atomicSwap.address, bidPayload.bidAmount);
+    ).to.changeEtherBalance(
+      await atomicSwap.getAddress(),
+      bidPayload.bidAmount
+    );
 
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
-      addition: ethers.utils.parseEther("2"),
+      addition: ethers.parseEther("2"),
     };
 
     // make bid
@@ -122,23 +141,7 @@ describe("AtomicSwap: UpdateBid", () => {
 
     const bidPayload = {
       bidder: taker.address,
-      bidAmount: ethers.utils.parseEther("18"),
-      orderID: orderID,
-      bidderReceiver: taker.address,
-      expireTimestamp: await BlockTime.AfterSeconds(30),
-    };
-
-    await usdt.connect(taker).approve(atomicSwap.address, bidPayload.bidAmount);
-
-    // make bid
-    await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload)
-    ).to.changeTokenBalance(usdt, atomicSwap.address, bidPayload.bidAmount);
-
-    // Add updates.
-    const bidPayload2 = {
-      bidder: taker.address,
-      bidAmount: ethers.utils.parseEther("50"),
+      bidAmount: ethers.parseEther("18"),
       orderID: orderID,
       bidderReceiver: taker.address,
       expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -146,7 +149,29 @@ describe("AtomicSwap: UpdateBid", () => {
 
     await usdt
       .connect(taker)
-      .approve(atomicSwap.address, bidPayload2.bidAmount);
+      .approve(await atomicSwap.getAddress(), bidPayload.bidAmount);
+
+    // make bid
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload)
+    ).to.changeTokenBalance(
+      usdt,
+      await atomicSwap.getAddress(),
+      bidPayload.bidAmount
+    );
+
+    // Add updates.
+    const bidPayload2 = {
+      bidder: taker.address,
+      bidAmount: ethers.parseEther("50"),
+      orderID: orderID,
+      bidderReceiver: taker.address,
+      expireTimestamp: await BlockTime.AfterSeconds(30),
+    };
+
+    await usdt
+      .connect(taker)
+      .approve(await atomicSwap.getAddress(), bidPayload2.bidAmount);
 
     // make bid
     await expect(
@@ -161,27 +186,33 @@ describe("AtomicSwap: UpdateBid", () => {
 
     const bidPayload = {
       bidder: taker.address,
-      bidAmount: ethers.utils.parseEther("18"),
+      bidAmount: ethers.parseEther("18"),
       orderID: orderID,
       bidderReceiver: taker.address,
       expireTimestamp: await BlockTime.AfterSeconds(30),
     };
 
-    await usdt.connect(taker).approve(atomicSwap.address, bidPayload.bidAmount);
+    await usdt
+      .connect(taker)
+      .approve(await atomicSwap.getAddress(), bidPayload.bidAmount);
 
     // make bid
     await expect(
       atomicSwap.connect(taker).placeBid(bidPayload)
-    ).to.changeTokenBalance(usdt, atomicSwap.address, bidPayload.bidAmount);
+    ).to.changeTokenBalance(
+      usdt,
+      await atomicSwap.getAddress(),
+      bidPayload.bidAmount
+    );
 
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
-      addition: ethers.utils.parseEther("6"),
+      addition: ethers.parseEther("6"),
     };
     await usdt
       .connect(taker)
-      .approve(atomicSwap.address, updatePayload2.addition);
+      .approve(await atomicSwap.getAddress(), updatePayload2.addition);
 
     await expect(
       atomicSwap.connect(taker).updateBid(updatePayload2)
