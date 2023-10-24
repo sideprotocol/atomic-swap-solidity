@@ -1,5 +1,6 @@
 import { ethers } from "hardhat";
-import { Utils, newAtomicSwapOrderID } from "../../utils/utils";
+import { newAtomicSwapOrderID } from "../../utils/utils";
+import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";

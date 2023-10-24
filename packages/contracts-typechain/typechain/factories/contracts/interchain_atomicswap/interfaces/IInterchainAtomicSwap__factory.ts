@@ -32,6 +32,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "BidDoesNotExist",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "BidNotAllowed",
     type: "error",
   },
@@ -326,34 +331,6 @@ const _abi = [
     ],
     name: "UpdatedBid",
     type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint16",
-        name: "_srcChainId",
-        type: "uint16",
-      },
-      {
-        internalType: "bytes",
-        name: "_srcAddress",
-        type: "bytes",
-      },
-      {
-        internalType: "uint64",
-        name: "_nonce",
-        type: "uint64",
-      },
-      {
-        internalType: "bytes",
-        name: "_payload",
-        type: "bytes",
-      },
-    ],
-    name: "onAcknowledgePacket",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [

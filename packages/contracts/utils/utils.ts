@@ -112,9 +112,29 @@ export const Utils = {
     const sideBridgeAtAAddress = await sideBridgeAtChainA.getAddress();
     const sideBridgeAtBAddress = await sideBridgeAtChainB.getAddress();
 
+    // Deploy libraries
+    const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
+      "AtomicSwapMsgValidator"
+    );
+    const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
+
+    const ITCAtomicSwapLogicFactory = await ethers.getContractFactory(
+      "InterchainAtomicSwapLogic"
+    );
+    const interchainAtomicSwapLogic = await ITCAtomicSwapLogicFactory.deploy();
+
+    //await atomicSwapMsgValidatorFactory.deploy();
+
     // AtomicSwap contract deploy
     const atomicSwapFactory = await ethers.getContractFactory(
-      "InterchainAtomicSwap"
+      "InterchainAtomicSwap",
+      {
+        libraries: {
+          AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
+          InterchainAtomicSwapLogic:
+            await interchainAtomicSwapLogic.getAddress(),
+        },
+      }
     );
 
     const sellTokenFeeRate = 10;
@@ -135,6 +155,7 @@ export const Utils = {
       [initialAParams],
       {
         initializer: "initialize",
+        unsafeAllowLinkedLibraries: true,
       }
     );
 
@@ -151,6 +172,7 @@ export const Utils = {
       [initialBParams],
       {
         initializer: "initialize",
+        unsafeAllowLinkedLibraries: true,
       }
     );
 
@@ -358,6 +380,7 @@ export const bidToDefaultAtomicOrder = async (
 
   const bidPayload = {
     bidder: taker.address,
+    bidderReceiver: taker.address,
     bidAmount: buyToken.amount,
     orderID: orderID,
     expireTimestamp: await BlockTime.AfterSeconds(30),
@@ -537,6 +560,7 @@ export const bidToDefaultITCAtomicOrder = async (
     usdt,
     bridgeA,
     bridgeB,
+    takerReceiver,
   } = orderParams;
   // // try to take swap
   const bridge = bridgeB;
@@ -563,23 +587,25 @@ export const bidToDefaultITCAtomicOrder = async (
       .approve(await atomicSwap.getAddress(), buyToken.amount);
   }
 
-  await expect(
-    atomicSwap.connect(taker).takeSwap(
-      {
-        orderID,
-        takerReceiver: maker.address,
-      },
-      {
-        value: nativeTokenAmount,
-      }
-    )
-  ).to.revertedWith("NoPermissionToTake");
+  if (noTaker) {
+    await expect(
+      atomicSwap.connect(taker).takeSwap(
+        {
+          orderID,
+          takerReceiver: maker.address,
+        },
+        {
+          value: nativeTokenAmount,
+        }
+      )
+    ).to.revertedWithCustomError(atomicSwap, "OrderNotAllowTake");
+  }
 
   const bidPayload = {
     bidder: taker.address,
     bidAmount: buyToken.amount,
     orderID: orderID,
-    bidderReceiver: taker.address,
+    bidderReceiver: takerReceiver.address,
     expireTimestamp: await BlockTime.AfterSeconds(30),
   };
 
@@ -600,8 +626,7 @@ export const bidToDefaultITCAtomicOrder = async (
     bidPayloadBytes
   );
 
-  let txAmount =
-    (estimateBidFee.nativeFee * BigInt(11)) / BigInt(10) + buyToken.amount;
+  let txAmount = safeFactor(estimateBidFee.nativeFee, 1.1) + buyToken.amount;
 
   // make bid
 

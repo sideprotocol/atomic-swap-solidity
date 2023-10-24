@@ -3,12 +3,12 @@ pragma solidity ^0.8.9;
 import "../../abstracts/interfaces/IAtomicSwapBase.sol";
 
 interface IInterchainAtomicSwap is IAtomicSwapBase {
-    enum PacketType {
-        ATOMICSWAP_RECEIVED,
-        ATOMICSWAP_ACKNOWLEDGE,
-        AMMSWAP_RECEIVED,
-        AMMSWAP_ACKNOWLEDGE
-    }
+    // enum PacketType {
+    //     ATOMICSWAP_RECEIVED,
+    //     ATOMICSWAP_ACKNOWLEDGE,
+    //     AMMSWAP_RECEIVED,
+    //     AMMSWAP_ACKNOWLEDGE
+    // }
     struct InitialParams {
         address admin;
         uint16 chainID;
@@ -53,10 +53,10 @@ interface IInterchainAtomicSwap is IAtomicSwapBase {
         bytes calldata _payload
     ) external payable;
 
-    function onAcknowledgePacket(
-        uint16 _srcChainId,
-        bytes memory _srcAddress,
-        uint64 _nonce,
-        bytes calldata _payload
-    ) external;
+    // function onAcknowledgePacket(
+    //     uint16 _srcChainId,
+    //     bytes memory _srcAddress,
+    //     uint64 _nonce,
+    //     bytes calldata _payload
+    // ) external;
 }

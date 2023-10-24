@@ -1,11 +1,9 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
 export interface IInterchainAtomicSwapInterface extends Interface {
-    getFunction(nameOrSignature: "onAcknowledgePacket" | "onReceivePacket"): FunctionFragment;
+    getFunction(nameOrSignature: "onReceivePacket"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
-    encodeFunctionData(functionFragment: "onAcknowledgePacket", values: [BigNumberish, BytesLike, BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "onReceivePacket", values: [BigNumberish, BytesLike, BigNumberish, BytesLike]): string;
-    decodeFunctionResult(functionFragment: "onAcknowledgePacket", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onReceivePacket", data: BytesLike): Result;
 }
 export declare namespace AcceptedBidEvent {
@@ -123,14 +121,6 @@ export interface IInterchainAtomicSwap extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
-    onAcknowledgePacket: TypedContractMethod<[
-        _srcChainId: BigNumberish,
-        _srcAddress: BytesLike,
-        _nonce: BigNumberish,
-        _payload: BytesLike
-    ], [
-        void
-    ], "nonpayable">;
     onReceivePacket: TypedContractMethod<[
         _srcChainId: BigNumberish,
         _srcAddress: BytesLike,
@@ -140,14 +130,6 @@ export interface IInterchainAtomicSwap extends BaseContract {
         void
     ], "payable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
-    getFunction(nameOrSignature: "onAcknowledgePacket"): TypedContractMethod<[
-        _srcChainId: BigNumberish,
-        _srcAddress: BytesLike,
-        _nonce: BigNumberish,
-        _payload: BytesLike
-    ], [
-        void
-    ], "nonpayable">;
     getFunction(nameOrSignature: "onReceivePacket"): TypedContractMethod<[
         _srcChainId: BigNumberish,
         _srcAddress: BytesLike,

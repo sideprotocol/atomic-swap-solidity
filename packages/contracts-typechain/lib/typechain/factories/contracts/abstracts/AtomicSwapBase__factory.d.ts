@@ -19,6 +19,10 @@ export declare class AtomicSwapBase__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "BidDoesNotExist";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "BidNotAllowed";
         readonly type: "error";
     }, {
@@ -327,6 +331,10 @@ export declare class AtomicSwapBase__factory {
         }, {
             readonly internalType: "address";
             readonly name: "bidder";
+            readonly type: "address";
+        }, {
+            readonly internalType: "address";
+            readonly name: "bidderReceiver";
             readonly type: "address";
         }, {
             readonly internalType: "uint256";

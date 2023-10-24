@@ -4,23 +4,19 @@ import "../abstracts/AtomicSwapBase.sol";
 import "./interfaces/IInterchainAtomicSwap.sol";
 import "./interfaces/ISideLzAppUpgradable.sol";
 import "hardhat/console.sol";
+import "./libs/InterchainAtomicSwapLogic.sol";
+import "../abstracts/libs/AtomicSwapMsgValidator.sol";
 
 contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
+    using InterchainAtomicSwapLogic for *;
+    using AtomicSwapMsgValidator for *;
     ISideLzAppUpgradable public bridge;
     mapping(bytes32 => ASITCParams) public swapOrderITCParams;
     uint16 chainID;
 
     function initialize(InitialParams calldata _params) external initializer {
         __Ownable_init_unchained(_params.admin);
-        require(
-            _params.sellerFee < maxFee,
-            "sellerFee has to be smaller than maxFee"
-        );
-        require(
-            _params.buyerFee < maxFee,
-            "sellerFee has to be smaller than maxFee"
-        );
-        require(_params.treasury != address(0), "invalid treasury address");
+        _params._validateInitializeParams(maxFee);
         sellerFeeRate = _params.sellerFee;
         buyerFeeRate = _params.buyerFee;
         treasury = _params.treasury;
@@ -33,32 +29,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
     ) external payable nonReentrant {
         // Ensure the sell token and buy token are not the same non-zero address.
         MakeSwapMsg memory makeswap = icMakeSwap.base;
-
-        // makeswap token is validate. that's just contract address or not.
-        if (
-            makeswap.sellToken.token != address(0) &&
-            !isContract(makeswap.sellToken.token)
-        ) {
-            revert InvalidContractAddress(makeswap.sellToken.token);
-        }
-
-        // Ensure the sell token and buy token are not the same non-zero address.
-        if (makeswap.minBidAmount <= 0) {
-            revert InvalidMinimumBidLimit();
-        }
-
-        // Ensure the caller is the maker of the swap order.
-        if (msg.sender == address(0) || msg.sender != makeswap.maker) {
-            revert UnauthorizedSender();
-        }
-
-        // Ensure the expireAt is the future time.
-        if (makeswap.expireAt < block.timestamp) {
-            revert InvalidExpirationTime(makeswap.expireAt, block.timestamp);
-        }
-
+        // validate
+        makeswap._validateMakeSwapParams();
         // Generate a unique ID and add the new swap order to the contract's state.
         bytes32 id = _generateNewAtomicSwapID(msg.sender);
+
         _addNewSwapOrder(id, msg.sender, makeswap);
         ASITCParams memory _params = ASITCParams(
             Side.NATIVE,
@@ -128,20 +103,8 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
         address makerReceiver = swapOrderITCParams[takeswap.orderID]
             .makerReceiver;
-        // Ensure the caller is the designated taker of the swap order
-        //console.log("acceptBID:", order)
-        if (order.acceptBid) {
-            revert OrderNotAllowTake();
-        }
-        if (order.taker != address(0) && order.taker != msg.sender) {
-            revert UnauthorizedTakeAction();
-        }
 
-        // Ensure the swap order has not already been completed
-        if (order.status == OrderStatus.COMPLETE) {
-            revert OrderAlreadyCompleted();
-        }
-
+        takeswap._validateTakeSwapParams(swapOrder);
         // Update order details
         order.status = OrderStatus.COMPLETE;
         order.completedAt = block.timestamp;
@@ -187,16 +150,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         onlyExist(cancelswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage order = swapOrder[cancelswap.orderID];
-
-        // Ensure the caller is the maker of the swap order
-        if (order.maker != msg.sender) {
-            revert UnauthorizedCancelAction();
-        }
-
-        // Ensure the caller is the maker of the swap order
-        if (order.status != OrderStatus.INITIAL) {
-            revert OrderAlreadyCompleted();
-        }
+        order._validateCancelSwap();
 
         // Update the status of the swap order to 'CANCEL'
         order.status = OrderStatus.CANCEL;
@@ -219,6 +173,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             cancelswap.orderID
         );
 
+        _removeAtomicSwapOrder(cancelswap.orderID);
         // Send the interchain cancellation message
         bridge.sendLzMsg{value: msg.value}(
             chainID,
@@ -259,7 +214,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         // Calculate the additional token amount being bid
         uint256 tokenAmount = _bidAmount - _currentBid.amount;
         Coin storage _buyToken = swapOrder[_orderID].buyToken;
-
+        uint nativeFee = msg.value;
         // Handle ERC20 token or Ether bids
         if (_buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
@@ -275,6 +230,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             if (msg.value < tokenAmount) {
                 revert MismatchedBidAmount(msg.value);
             }
+            nativeFee -= tokenAmount;
         }
 
         // Record the new bid
@@ -284,7 +240,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         bytes memory payload = abi.encode(0, MsgType.PLACEBID, placeBidMsg);
 
         // Send the interchain message with the necessary payload
-        bridge.sendLzMsg{value: msg.value - tokenAmount}(
+        bridge.sendLzMsg{value: nativeFee}(
             chainID,
             payable(msg.sender),
             payload
@@ -327,7 +283,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Retrieving details of the buy token for this order
         Coin storage _buyToken = _order.buyToken;
-
+        uint nativeFee = msg.value;
         // Check if the bid is in ERC20 tokens or in Ether
         if (_buyToken.token != address(0)) {
             // Bidding with ERC20 token
@@ -341,16 +297,17 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             );
         } else {
             // Ensure the sent Ether matches the additional bid amount
-            if (msg.value != _addition) {
+            if (msg.value < _addition) {
                 revert MismatchedBidAmount(msg.value);
             }
+            nativeFee -= _addition;
         }
 
         // Encode the bid message into a payload
         bytes memory payload = abi.encode(0, MsgType.UPDATEBID, updateBidMsg);
 
         // Send the interchain message with the necessary payload
-        bridge.sendLzMsg{value: msg.value}(
+        bridge.sendLzMsg{value: nativeFee}(
             chainID,
             payable(msg.sender),
             payload
@@ -405,30 +362,30 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         Coin storage _sellToken = _order.sellToken;
         _processTransfer(
             _sellToken.token,
-            selectedBid.bidder,
+            selectedBid.bidderReceiver,
             _sellToken.amount,
             buyerFeeRate
         );
 
-        // Process buy token transfers
-        Coin storage _buyToken = _order.buyToken;
-        _processTransfer(
-            _buyToken.token,
-            _order.maker,
-            selectedBid.amount,
-            sellerFeeRate
+        // Encode the bid message into a payload
+        bytes memory payload = abi.encode(0, MsgType.ACCEPTBID, acceptBidMsg);
+
+        // Send the interchain message with the necessary payload
+        bridge.sendLzMsg{value: msg.value}(
+            chainID,
+            payable(msg.sender),
+            payload
         );
     }
 
     function cancelBid(
         bytes32 _orderID
     ) external payable nonReentrant onlyExist(_orderID) {
-        // Ensure no unnecessary Ether is sent with the transaction
-        require(msg.value == 0, "Unexpected Ether sent");
-
         // Retrieve the selected bid from storage
         Bid storage selectedBid = bids[_orderID][msg.sender];
-
+        if (selectedBid.bidder == address(0)) {
+            revert BidDoesNotExist();
+        }
         // Ensure that msg.sender is same with bidder.
         if (selectedBid.bidder != msg.sender) {
             revert UnauthorizedCancelAction();
@@ -455,54 +412,16 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             // If buy token is Ether, transfer it back to the bidder
             payable(selectedBid.bidder).transfer(selectedBid.amount);
         }
-    }
 
-    function counteroffer(CounterOfferMsg calldata counterOfferMsg) external {
-        bytes32 _orderID = counterOfferMsg.orderID;
-        address _bidder = counterOfferMsg.bidder;
+        // Encode the bid message into a payload
+        bytes memory payload = abi.encode(0, MsgType.ACCEPTBID, _orderID);
 
-        AtomicSwapOrder storage _order = swapOrder[_orderID];
-        if (!_order.acceptBid) {
-            revert BidNotAllowed();
-        }
-        Bid storage _bid = bids[_orderID][_bidder];
-        if (_bid.amount == 0) {
-            revert NoBidPlaced();
-        }
-
-        if (
-            counterOfferMsg.amount == 0 ||
-            counterOfferMsg.amount > _order.buyToken.amount
-        ) {
-            revert MismatchedBidAmount(counterOfferMsg.amount);
-        }
-
-        counteroffers[_orderID][_bidder] = counterOfferMsg.amount;
-    }
-
-    function acceptCountOfffer(
-        CounterOfferMsg calldata counterOfferMsg
-    ) external {
-        bytes32 _orderID = counterOfferMsg.orderID;
-        address _bidder = counterOfferMsg.bidder;
-
-        AtomicSwapOrder storage _order = swapOrder[_orderID];
-        if (!_order.acceptBid) {
-            revert BidNotAllowed();
-        }
-        Bid storage _bid = bids[_orderID][_bidder];
-        if (_bid.amount == 0) {
-            revert NoBidPlaced();
-        }
-
-        if (
-            counterOfferMsg.amount == 0 ||
-            counterOfferMsg.amount > _order.buyToken.amount
-        ) {
-            revert MismatchedBidAmount(counterOfferMsg.amount);
-        }
-
-        counteroffers[_orderID][_bidder] = counterOfferMsg.amount;
+        // Send the interchain message with the necessary payload
+        bridge.sendLzMsg{value: msg.value}(
+            chainID,
+            payable(msg.sender),
+            payload
+        );
     }
 
     function onReceivePacket(
@@ -518,7 +437,6 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
                 _payload[64:],
                 (ICMakeSwapLzMsg)
             );
-
             swapOrder[id].id = id;
             swapOrder[id].acceptBid = makeswap.acceptBid;
             swapOrder[id].buyToken = makeswap.buyToken;
@@ -541,67 +459,35 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
                 (PlaceBidMsg)
             );
             _addNewBid(_bidMsg);
+        } else if (msgType == MsgType.ACCEPTBID) {
+            AcceptBidMsg memory _acceptBidMsg = abi.decode(
+                _payload[32:],
+                (AcceptBidMsg)
+            );
+            bytes32 _orderID = _acceptBidMsg.orderID;
+            address _bidder = _acceptBidMsg.bidder;
+
+            Coin storage _buyToken = swapOrder[_orderID].buyToken;
+            address _makerReceiver = swapOrderITCParams[_orderID].makerReceiver;
+
+            _processTransfer(
+                _buyToken.token,
+                _makerReceiver,
+                _buyToken.amount,
+                sellerFeeRate
+            );
+            bids[_orderID][_bidder].status = BidStatus.Executed;
+        } else if (msgType == MsgType.UPDATEBID) {
+            UpdateBidMsg memory _updateBidMsg = abi.decode(
+                _payload[32:],
+                (UpdateBidMsg)
+            );
+            bytes32 _orderID = _updateBidMsg.orderID;
+            address _bidder = _updateBidMsg.bidder;
+            Bid storage _bid = bids[_orderID][_bidder];
+            _bid.amount += _updateBidMsg.addition;
         }
-        // } else if (msgType == MsgType.ACCEPTBID) {
-        //     AcceptBidMsg memory _acceptBidMsg = abi.decode(
-        //         _payload[32:],
-        //         (AcceptBidMsg)
-        //     );
-        //     bytes32 _orderID = _acceptBidMsg.orderID;
-        //     address _bidder = _acceptBidMsg.bidder;
-
-        //     Bid storage _bid = bids[_orderID][_bidder];
-        //     Coin storage _buyToken = swapOrder[_orderID].buyToken;
-        //     address _makerReceiver = swapOrder[_orderID].maker;
-        //     if (_buyToken.token != address(0)) {
-        //         _safeTransfer(_buyToken.token, _makerReceiver, _bid.amount);
-        //     } else {
-        //         payable(_makerReceiver).transfer(_bid.amount);
-        //     }
-        //     bids[_orderID][_bidder].status = BidStatus.Executed;
-        // } else if (msgType == MsgType.CANCELBID) {
-        //     AcceptBidMsg memory _acceptBidMsg = abi.decode(
-        //         _payload[32:],
-        //         (AcceptBidMsg)
-        //     );
-        //     bytes32 _orderID = _acceptBidMsg.orderID;
-        //     address _bidder = _acceptBidMsg.bidder;
-
-        //     Bid storage _bid = bids[_orderID][_bidder];
-        //     Coin storage _buyToken = swapOrder[_orderID].buyToken;
-        //     address _makerReceiver = swapOrder[_orderID].maker;
-        //     if (_buyToken.token != address(0)) {
-        //         _safeTransfer(_buyToken.token, _makerReceiver, _bid.amount);
-        //     } else {
-        //         payable(_makerReceiver).transfer(_bid.amount);
-        //     }
-        //     bids[_orderID][_bidder].status = BidStatus.Executed;
-        // } else if (msgType == MsgType.UPDATEBID) {
-        //     AcceptBidMsg memory _acceptBidMsg = abi.decode(
-        //         _payload[32:],
-        //         (AcceptBidMsg)
-        //     );
-        //     bytes32 _orderID = _acceptBidMsg.orderID;
-        //     address _bidder = _acceptBidMsg.bidder;
-
-        //     Bid storage _bid = bids[_orderID][_bidder];
-        //     Coin storage _buyToken = swapOrder[_orderID].buyToken;
-        //     address _makerReceiver = swapOrder[_orderID].maker;
-        //     if (_buyToken.token != address(0)) {
-        //         _safeTransfer(_buyToken.token, _makerReceiver, _bid.amount);
-        //     } else {
-        //         payable(_makerReceiver).transfer(_bid.amount);
-        //     }
-        //     bids[_orderID][_bidder].status = BidStatus.Executed;
-        // }
     }
-
-    function onAcknowledgePacket(
-        uint16 _srcChainId,
-        bytes memory _srcAddress,
-        uint64 _nonce,
-        bytes calldata _payload
-    ) external override {}
 
     function bytesToAddress(bytes memory data) public pure returns (address) {
         return address(uint160(bytes20(data)));

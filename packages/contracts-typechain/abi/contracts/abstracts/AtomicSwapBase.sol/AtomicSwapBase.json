@@ -26,6 +26,11 @@
     },
     {
       "inputs": [],
+      "name": "BidDoesNotExist",
+      "type": "error"
+    },
+    {
+      "inputs": [],
       "name": "BidNotAllowed",
       "type": "error"
     },
@@ -423,6 +428,11 @@
         {
           "internalType": "address",
           "name": "bidder",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "bidderReceiver",
           "type": "address"
         },
         {

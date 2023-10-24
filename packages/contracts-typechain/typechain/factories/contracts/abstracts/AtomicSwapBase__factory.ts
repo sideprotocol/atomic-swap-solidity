@@ -32,6 +32,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "BidDoesNotExist",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "BidNotAllowed",
     type: "error",
   },
@@ -429,6 +434,11 @@ const _abi = [
       {
         internalType: "address",
         name: "bidder",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "bidderReceiver",
         type: "address",
       },
       {

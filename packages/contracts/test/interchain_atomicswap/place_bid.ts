@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 import {
-  Utils,
   createDefaultAtomicOrder,
   createDefaultITCAtomicOrder,
   encodePayload,
@@ -14,7 +13,6 @@ describe("ITCAtomicSwap: PlaceBid", () => {
     const {
       atomicSwapA,
       atomicSwapB,
-
       taker,
       takerReceiver,
       orderID,

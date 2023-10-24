@@ -29,6 +29,11 @@ const _abi = [
     },
     {
         inputs: [],
+        name: "BidDoesNotExist",
+        type: "error",
+    },
+    {
+        inputs: [],
         name: "BidNotAllowed",
         type: "error",
     },

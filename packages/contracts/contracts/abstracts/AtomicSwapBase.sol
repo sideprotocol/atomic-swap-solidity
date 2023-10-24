@@ -158,6 +158,7 @@ abstract contract AtomicSwapBase is
             order: bidMsg.orderID,
             status: BidStatus.Placed,
             bidder: bidMsg.bidder,
+            bidderReceiver: bidMsg.bidderReceiver,
             receiveTimestamp: block.timestamp,
             expireTimestamp: bidMsg.expireTimestamp
         });
@@ -228,13 +229,5 @@ abstract contract AtomicSwapBase is
     function _safeTransfer(address token, address to, uint256 amount) internal {
         IERC20 _token = IERC20(token);
         require(_token.transfer(to, amount), "Failed to transfer from");
-    }
-
-    function isContract(address addr) internal view returns (bool) {
-        uint size;
-        assembly {
-            size := extcodesize(addr)
-        }
-        return size > 0;
     }
 }

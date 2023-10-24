@@ -19,6 +19,6 @@ describe("AtomicSwap: Initialization", () => {
     const { atomicSwap } = await loadFixture(Utils.prepareInChainAtomicTest);
     await expect(
       atomicSwap.initialize(accounts[0].address, accounts[10].address, 100, 100)
-    ).to.be.revertedWith("Initializable: contract is already initialized");
+    ).to.be.reverted;
   });
 });

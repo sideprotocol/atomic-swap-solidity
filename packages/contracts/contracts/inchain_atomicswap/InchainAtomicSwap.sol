@@ -84,8 +84,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyExist(takeswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
-        console.log("address", order.taker);
-        console.log("taker", msg.sender);
         // Ensure the caller is the designated taker of the swap order
         if (order.acceptBid) {
             revert OrderNotAllowTake();
@@ -120,35 +118,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             order.buyToken.amount,
             sellerFeeRate
         );
-
-        // uint buyTokenFee = (order.buyToken.amount * sellerFeeRate) / maxFee;
-        // uint buyTokenAmountAfterFee = order.buyToken.amount - buyTokenFee;
-        // // Exchange the tokens
-        // if (order.buyToken.token == address(0)) {
-        //     // If buying with Ether
-        //     require(
-        //         msg.value >= order.buyToken.amount,
-        //         "Not enough funds to buy"
-        //     );
-        //     payable(order.maker).transfer(buyTokenAmountAfterFee);
-        //     payable(treasury).transfer(buyTokenFee);
-        // } else {
-        //     // Send token to the taker
-        //     _safeTransferFrom(
-        //         order.buyToken.token,
-        //         msg.sender,
-        //         takeswap.takerReceiver,
-        //         buyTokenAmountAfterFee
-        //     );
-        //     // Send token to the treasury
-        //     _safeTransferFrom(
-        //         order.buyToken.token,
-        //         msg.sender,
-        //         treasury,
-        //         buyTokenFee
-        //     );
-        // }
-
         // Emit an event signaling the swap was completed
         emit AtomicSwapOrderTook(order.maker, order.taker, takeswap.orderID);
     }

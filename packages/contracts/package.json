@@ -5,7 +5,8 @@
   "private": "true",
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "^5.0.0",
-    "@openzeppelin/hardhat-upgrades": "^2.3.3"
+    "@openzeppelin/hardhat-upgrades": "^2.3.3",
+    "hardhat-contract-sizer": "2.10.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",

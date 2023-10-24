@@ -24,9 +24,7 @@ import type {
 } from "../../../common";
 
 export interface IInterchainAtomicSwapInterface extends Interface {
-  getFunction(
-    nameOrSignature: "onAcknowledgePacket" | "onReceivePacket"
-  ): FunctionFragment;
+  getFunction(nameOrSignature: "onReceivePacket"): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
@@ -40,18 +38,10 @@ export interface IInterchainAtomicSwapInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "onAcknowledgePacket",
-    values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "onReceivePacket",
     values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "onAcknowledgePacket",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "onReceivePacket",
     data: BytesLike
@@ -210,17 +200,6 @@ export interface IInterchainAtomicSwap extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  onAcknowledgePacket: TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "nonpayable"
-  >;
-
   onReceivePacket: TypedContractMethod<
     [
       _srcChainId: BigNumberish,
@@ -236,18 +215,6 @@ export interface IInterchainAtomicSwap extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
-  getFunction(
-    nameOrSignature: "onAcknowledgePacket"
-  ): TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "nonpayable"
-  >;
   getFunction(
     nameOrSignature: "onReceivePacket"
   ): TypedContractMethod<

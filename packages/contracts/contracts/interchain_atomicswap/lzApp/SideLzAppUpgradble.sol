@@ -46,13 +46,13 @@ contract SideLzAppUpgradable is NonblockingLzAppUpgradeable {
                 _payload[32:]
             );
         } else if (packetType == bytes32(uint(1))) {
-            console.log("Received Packet");
-            atomicswap.onAcknowledgePacket(
-                _srcChainId,
-                _srcAddress,
-                _nonce,
-                _payload[32:]
-            );
+            //console.log("Received Packet");
+            // atomicswap.onAcknowledgePacket(
+            //     _srcChainId,
+            //     _srcAddress,
+            //     _nonce,
+            //     _payload[32:]
+            // );
             // interchainswap.onReceivePacket(
             //     _srcChainId,
             //     _srcAddress,

@@ -54,6 +54,7 @@ interface IAtomicSwapBase {
         bytes32 order; // Associated order ID.
         BidStatus status; // Current status of the bid.
         address bidder; // Address of the user placing the bid.
+        address bidderReceiver;
         uint256 receiveTimestamp; // Timestamp of when the bid was received.
         uint256 expireTimestamp; // Timestamp of when the bid will expire.
     }
@@ -79,6 +80,7 @@ interface IAtomicSwapBase {
     struct PlaceBidMsg {
         uint256 bidAmount; // Amount to bid.
         address bidder;
+        address bidderReceiver; // Address to
         bytes32 orderID; // ID of the order to place the bid on.
         uint256 expireTimestamp; // Timestamp of when the bid will expire.
     }
@@ -86,6 +88,7 @@ interface IAtomicSwapBase {
     // Struct for updating an existing bid.
     struct UpdateBidMsg {
         bytes32 orderID; // ID of the associated order.
+        address bidder;
         uint addition; // Amount to add to the existing bid.
     }
 
@@ -140,6 +143,9 @@ interface IAtomicSwapBase {
 
     // Error indicating that the pool does not exist.
     error OrderDoesNotExist();
+
+    // Error indicating that the pool does not exist.
+    error BidDoesNotExist();
 
     // Error indicating the caller does not have permission to take the order.
     error UnauthorizedTakeAction();

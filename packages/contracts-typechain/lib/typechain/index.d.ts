@@ -45,6 +45,8 @@ export type { AtomicSwapBase } from "./contracts/abstracts/AtomicSwapBase";
 export { AtomicSwapBase__factory } from "./factories/contracts/abstracts/AtomicSwapBase__factory";
 export type { IAtomicSwapBase } from "./contracts/abstracts/interfaces/IAtomicSwapBase";
 export { IAtomicSwapBase__factory } from "./factories/contracts/abstracts/interfaces/IAtomicSwapBase__factory";
+export type { AtomicSwapMsgValidator } from "./contracts/abstracts/libs/AtomicSwapMsgValidator";
+export { AtomicSwapMsgValidator__factory } from "./factories/contracts/abstracts/libs/AtomicSwapMsgValidator__factory";
 export type { InchainAtomicSwap } from "./contracts/inchain_atomicswap/InchainAtomicSwap";
 export { InchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/InchainAtomicSwap__factory";
 export type { IInchainAtomicSwap } from "./contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap";
@@ -61,6 +63,8 @@ export type { ILayerZeroReceiverUpgradeable } from "./contracts/interchain_atomi
 export { ILayerZeroReceiverUpgradeable__factory } from "./factories/contracts/interchain_atomicswap/interfaces/layerzero/ILayerZeroReceiverUpgradeable__factory";
 export type { ILayerZeroUserApplicationConfigUpgradeable } from "./contracts/interchain_atomicswap/interfaces/layerzero/ILayerZeroUserApplicationConfigUpgradeable";
 export { ILayerZeroUserApplicationConfigUpgradeable__factory } from "./factories/contracts/interchain_atomicswap/interfaces/layerzero/ILayerZeroUserApplicationConfigUpgradeable__factory";
+export type { InterchainAtomicSwapLogic } from "./contracts/interchain_atomicswap/libs/InterchainAtomicSwapLogic";
+export { InterchainAtomicSwapLogic__factory } from "./factories/contracts/interchain_atomicswap/libs/InterchainAtomicSwapLogic__factory";
 export type { LzAppUpgradeable } from "./contracts/interchain_atomicswap/lzApp/LzAppUpgradeable";
 export { LzAppUpgradeable__factory } from "./factories/contracts/interchain_atomicswap/lzApp/LzAppUpgradeable__factory";
 export type { NonblockingLzAppUpgradeable } from "./contracts/interchain_atomicswap/lzApp/NonblockingLzAppUpgradeable";

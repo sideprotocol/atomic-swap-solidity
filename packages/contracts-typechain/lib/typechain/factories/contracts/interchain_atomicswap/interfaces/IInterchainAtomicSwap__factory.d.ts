@@ -19,6 +19,10 @@ export declare class IInterchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "BidDoesNotExist";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "BidNotAllowed";
         readonly type: "error";
     }, {
@@ -248,28 +252,6 @@ export declare class IInterchainAtomicSwap__factory {
         }];
         readonly name: "UpdatedBid";
         readonly type: "event";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint16";
-            readonly name: "_srcChainId";
-            readonly type: "uint16";
-        }, {
-            readonly internalType: "bytes";
-            readonly name: "_srcAddress";
-            readonly type: "bytes";
-        }, {
-            readonly internalType: "uint64";
-            readonly name: "_nonce";
-            readonly type: "uint64";
-        }, {
-            readonly internalType: "bytes";
-            readonly name: "_payload";
-            readonly type: "bytes";
-        }];
-        readonly name: "onAcknowledgePacket";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
     }, {
         readonly inputs: readonly [{
             readonly internalType: "uint16";

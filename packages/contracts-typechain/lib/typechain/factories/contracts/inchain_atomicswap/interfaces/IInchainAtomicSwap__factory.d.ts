@@ -19,6 +19,10 @@ export declare class IInchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "BidDoesNotExist";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "BidNotAllowed";
         readonly type: "error";
     }, {

@@ -98,6 +98,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IAtomicSwapBase__factory>;
     getContractFactory(
+      name: "AtomicSwapMsgValidator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
+    getContractFactory(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.InchainAtomicSwap__factory>;
@@ -129,6 +133,10 @@ declare module "hardhat/types/runtime" {
       name: "ILayerZeroUserApplicationConfigUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable__factory>;
+    getContractFactory(
+      name: "InterchainAtomicSwapLogic",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.InterchainAtomicSwapLogic__factory>;
     getContractFactory(
       name: "LzAppUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -268,6 +276,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IAtomicSwapBase>;
     getContractAt(
+      name: "AtomicSwapMsgValidator",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    getContractAt(
       name: "InchainAtomicSwap",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -307,6 +320,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable>;
+    getContractAt(
+      name: "InterchainAtomicSwapLogic",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.InterchainAtomicSwapLogic>;
     getContractAt(
       name: "LzAppUpgradeable",
       address: string | ethers.Addressable,
@@ -433,6 +451,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAtomicSwapBase>;
     deployContract(
+      name: "AtomicSwapMsgValidator",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.InchainAtomicSwap>;
@@ -464,6 +486,10 @@ declare module "hardhat/types/runtime" {
       name: "ILayerZeroUserApplicationConfigUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable>;
+    deployContract(
+      name: "InterchainAtomicSwapLogic",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.InterchainAtomicSwapLogic>;
     deployContract(
       name: "LzAppUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -603,6 +629,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAtomicSwapBase>;
     deployContract(
+      name: "AtomicSwapMsgValidator",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
       name: "InchainAtomicSwap",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -642,6 +673,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable>;
+    deployContract(
+      name: "InterchainAtomicSwapLogic",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.InterchainAtomicSwapLogic>;
     deployContract(
       name: "LzAppUpgradeable",
       args: any[],

@@ -1,5 +1,6 @@
 import { ethers } from "hardhat";
-import { Utils, createDefaultAtomicOrder } from "../../utils/utils";
+import { createDefaultAtomicOrder } from "../../utils/utils";
+import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
@@ -57,7 +58,7 @@ describe("AtomicSwap: MakeSwap", () => {
         token: await usdt.getAddress(),
         amount: "20",
       },
-      makerSender: taker.address,
+      maker: taker.address,
       minBidAmount: ethers.parseEther("15"),
       desiredTaker: taker.address,
       expireAt: expireAt,
@@ -85,7 +86,7 @@ describe("AtomicSwap: MakeSwap", () => {
         token: await usdt.getAddress(),
         amount: "20",
       },
-      makerSender: maker.address,
+      maker: maker.address,
       minBidAmount: ethers.parseEther("15"),
       desiredTaker: taker.address,
       expireAt: expireAt,
@@ -115,7 +116,7 @@ describe("AtomicSwap: MakeSwap", () => {
         token: await usdc.getAddress(),
         amount: ethers.parseEther("20"),
       },
-      makerSender: maker.address,
+      maker: maker.address,
       minBidAmount: ethers.parseEther("15"),
       desiredTaker: taker.address,
       expireAt: expireAt,

@@ -32,10 +32,10 @@ describe("AtomicSwap: UpdateBid", () => {
       await atomicSwap.getAddress(),
       bidPayload.bidAmount
     );
-
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
+      bidder: taker.address,
       addition: ethers.parseEther("1"),
     };
     await expect(
@@ -77,6 +77,7 @@ describe("AtomicSwap: UpdateBid", () => {
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
+      bidder: taker.address,
       addition: ethers.parseEther("1"),
     };
     await usdt
@@ -124,6 +125,7 @@ describe("AtomicSwap: UpdateBid", () => {
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
+      bidder: taker.address,
       addition: ethers.parseEther("2"),
     };
 
@@ -208,6 +210,7 @@ describe("AtomicSwap: UpdateBid", () => {
     // Add updates.
     const updatePayload2 = {
       orderID: orderID,
+      bidder: taker.address,
       addition: ethers.parseEther("6"),
     };
     await usdt

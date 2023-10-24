@@ -13,5 +13,5 @@
     "./utils",
     "../../contracts-typechain/typechain"
   ],
-  "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts", "./utils/Utils.1.ts"]
 }

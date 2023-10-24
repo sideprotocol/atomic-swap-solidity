@@ -31,18 +31,6 @@ export declare namespace IAtomicSwapBase {
     bidder: string;
   };
 
-  export type CounterOfferMsgStruct = {
-    orderID: BytesLike;
-    bidder: AddressLike;
-    amount: BigNumberish;
-  };
-
-  export type CounterOfferMsgStructOutput = [
-    orderID: string,
-    bidder: string,
-    amount: bigint
-  ] & { orderID: string; bidder: string; amount: bigint };
-
   export type CancelSwapMsgStruct = { orderID: BytesLike };
 
   export type CancelSwapMsgStructOutput = [orderID: string] & {
@@ -87,6 +75,7 @@ export declare namespace IAtomicSwapBase {
   export type PlaceBidMsgStruct = {
     bidAmount: BigNumberish;
     bidder: AddressLike;
+    bidderReceiver: AddressLike;
     orderID: BytesLike;
     expireTimestamp: BigNumberish;
   };
@@ -94,11 +83,13 @@ export declare namespace IAtomicSwapBase {
   export type PlaceBidMsgStructOutput = [
     bidAmount: bigint,
     bidder: string,
+    bidderReceiver: string,
     orderID: string,
     expireTimestamp: bigint
   ] & {
     bidAmount: bigint;
     bidder: string;
+    bidderReceiver: string;
     orderID: string;
     expireTimestamp: bigint;
   };
@@ -115,13 +106,15 @@ export declare namespace IAtomicSwapBase {
 
   export type UpdateBidMsgStruct = {
     orderID: BytesLike;
+    bidder: AddressLike;
     addition: BigNumberish;
   };
 
-  export type UpdateBidMsgStructOutput = [orderID: string, addition: bigint] & {
-    orderID: string;
-    addition: bigint;
-  };
+  export type UpdateBidMsgStructOutput = [
+    orderID: string,
+    bidder: string,
+    addition: bigint
+  ] & { orderID: string; bidder: string; addition: bigint };
 }
 
 export declare namespace IInterchainAtomicSwap {
@@ -174,18 +167,15 @@ export interface InterchainAtomicSwapInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "acceptBid"
-      | "acceptCountOfffer"
       | "bids"
       | "bridge"
       | "buyerFeeRate"
       | "bytesToAddress"
       | "cancelBid"
       | "cancelSwap"
-      | "counteroffer"
       | "counteroffers"
       | "initialize"
       | "makeSwap"
-      | "onAcknowledgePacket"
       | "onReceivePacket"
       | "owner"
       | "placeBid"
@@ -217,10 +207,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
     values: [IAtomicSwapBase.AcceptBidMsgStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "acceptCountOfffer",
-    values: [IAtomicSwapBase.CounterOfferMsgStruct]
-  ): string;
-  encodeFunctionData(
     functionFragment: "bids",
     values: [BytesLike, AddressLike]
   ): string;
@@ -242,10 +228,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
     values: [IAtomicSwapBase.CancelSwapMsgStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "counteroffer",
-    values: [IAtomicSwapBase.CounterOfferMsgStruct]
-  ): string;
-  encodeFunctionData(
     functionFragment: "counteroffers",
     values: [BytesLike, AddressLike]
   ): string;
@@ -256,10 +238,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
   encodeFunctionData(
     functionFragment: "makeSwap",
     values: [IInterchainAtomicSwap.ICMakeSwapMsgStruct]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "onAcknowledgePacket",
-    values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "onReceivePacket",
@@ -304,10 +282,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "acceptBid", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "acceptCountOfffer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bridge", data: BytesLike): Result;
   decodeFunctionResult(
@@ -321,19 +295,11 @@ export interface InterchainAtomicSwapInterface extends Interface {
   decodeFunctionResult(functionFragment: "cancelBid", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "counteroffer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "counteroffers",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "onAcknowledgePacket",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "onReceivePacket",
     data: BytesLike
@@ -548,20 +514,15 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  acceptCountOfffer: TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
-  >;
-
   bids: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
-      [bigint, string, bigint, string, bigint, bigint] & {
+      [bigint, string, bigint, string, string, bigint, bigint] & {
         amount: bigint;
         order: string;
         status: bigint;
         bidder: string;
+        bidderReceiver: string;
         receiveTimestamp: bigint;
         expireTimestamp: bigint;
       }
@@ -583,12 +544,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  counteroffer: TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
-  >;
-
   counteroffers: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [bigint],
@@ -605,17 +560,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     [icMakeSwap: IInterchainAtomicSwap.ICMakeSwapMsgStruct],
     [void],
     "payable"
-  >;
-
-  onAcknowledgePacket: TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "nonpayable"
   >;
 
   onReceivePacket: TypedContractMethod<
@@ -721,22 +665,16 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "acceptCountOfffer"
-  ): TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
     nameOrSignature: "bids"
   ): TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
-      [bigint, string, bigint, string, bigint, bigint] & {
+      [bigint, string, bigint, string, string, bigint, bigint] & {
         amount: bigint;
         order: string;
         status: bigint;
         bidder: string;
+        bidderReceiver: string;
         receiveTimestamp: bigint;
         expireTimestamp: bigint;
       }
@@ -763,13 +701,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "counteroffer"
-  ): TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
     nameOrSignature: "counteroffers"
   ): TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
@@ -789,18 +720,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     [icMakeSwap: IInterchainAtomicSwap.ICMakeSwapMsgStruct],
     [void],
     "payable"
-  >;
-  getFunction(
-    nameOrSignature: "onAcknowledgePacket"
-  ): TypedContractMethod<
-    [
-      _srcChainId: BigNumberish,
-      _srcAddress: BytesLike,
-      _nonce: BigNumberish,
-      _payload: BytesLike
-    ],
-    [void],
-    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "onReceivePacket"

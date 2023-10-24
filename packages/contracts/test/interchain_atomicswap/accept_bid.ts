@@ -1,117 +1,137 @@
 import { ethers } from "hardhat";
-import { bidToDefaultITCAtomicOrder, encodePayload } from "../../utils/utils";
+import {
+  bidToDefaultITCAtomicOrder,
+  calcSwapAmount,
+  encodePayload,
+  safeFactor,
+} from "../../utils/utils";
 import { expect } from "chai";
 
-describe("AtomicSwap: AcceptBid", () => {
-  describe("Inter-chain", () => {
-    it("should accept bid with native token", async () => {
-      const {
-        atomicSwapA,
-        bridgeA,
-        maker,
-        makerReceiver,
-        chainID,
-        orderID,
-        bidAmount,
-        bidder,
-        bidderReceiver,
-        payload,
-      } = await bidToDefaultITCAtomicOrder(true, true);
+describe("ITCAtomicSwap: AcceptBid", () => {
+  it("should accept bid with native token", async () => {
+    const {
+      atomicSwapA,
+      bridgeA,
+      maker,
+      makerReceiver,
+      takerReceiver,
+      chainID,
+      orderID,
+      bidAmount,
+      bidder,
+      bidderReceiver,
+      payload,
+      sellTokenFeeRate,
+      buyTokenFeeRate,
+      treasury,
+      usdt,
+    } = await bidToDefaultITCAtomicOrder(true, true);
 
-      const balanceBeforeAcceptOfMaker = await ethers.provider.getBalance(
-        makerReceiver.address
-      );
-      const balanceBeforeAcceptOfBidder = await ethers.provider.getBalance(
-        bidderReceiver
-      );
-      const acceptPayloadBytes = encodePayload(
-        ["bytes32", "address"],
-        [orderID, bidder]
-      );
-      const fee = await bridgeA.estimateFee(
-        chainID,
-        false,
-        "0x",
-        acceptPayloadBytes
-      );
+    const acceptPayloadBytes = encodePayload(
+      ["bytes32", "address"],
+      [orderID, bidder]
+    );
+    const fee = await bridgeA.estimateFee(
+      chainID,
+      false,
+      "0x",
+      acceptPayloadBytes
+    );
 
-      await expect(
-        atomicSwapA.connect(maker).acceptBid(
-          { orderID, bidder },
-          {
-            value: fee.nativeFee.mul(20).div(10),
-          }
-        )
-      ).to.be.changeEtherBalance(makerReceiver.address, bidAmount);
+    const { amountAfterFee: amountAfterFeeAtA, feeAmount: feeAmountAtA } =
+      calcSwapAmount(payload.sellToken.amount, buyTokenFeeRate);
 
-      // check balance after accept bid
-      const balanceAfterAcceptOfBidder = await ethers.provider.getBalance(
-        bidderReceiver
-      );
-      expect(balanceAfterAcceptOfBidder - balanceBeforeAcceptOfBidder).to.equal(
-        payload.sellToken.amount
-      );
+    const { amountAfterFee: afterAfterFeeAtB, feeAmount: feeAmountAtB } =
+      calcSwapAmount(payload.sellToken.amount, sellTokenFeeRate);
 
-      const balanceAfterAcceptOfMaker = await ethers.provider.getBalance(
-        makerReceiver.address
-      );
-      expect(balanceAfterAcceptOfMaker - balanceBeforeAcceptOfMaker).to.equal(
-        bidAmount
-      );
-    });
-    it("should accept bid with erc20 token", async () => {
-      const {
-        atomicSwapA,
-        bridgeA,
-        chainID,
-        maker,
-        makerReceiver,
-        orderID,
-        usdc,
-        usdt,
-        bidAmount,
-        bidder,
-        bidderReceiver,
-        payload,
-      } = await bidToDefaultITCAtomicOrder(false, true);
+    const tx = atomicSwapA.connect(maker).acceptBid(
+      { orderID, bidder },
+      {
+        value: safeFactor(fee.nativeFee, 1.1),
+      }
+    );
+    await expect(tx).to.changeEtherBalances(
+      [takerReceiver.address, makerReceiver.address, treasury],
+      [amountAfterFeeAtA, afterAfterFeeAtB, feeAmountAtA + feeAmountAtB]
+    );
 
-      const balanceBeforeAcceptOfMaker = await usdt.balanceOf(
-        makerReceiver.address
-      );
-      const balanceBeforeAcceptOfBidder = await usdc.balanceOf(bidderReceiver);
+    // await expect(
+    //   atomicSwapA.connect(maker).acceptBid(
+    //     { orderID, bidder },
+    //     {
+    //       value: safeFactor(fee.nativeFee, 1.1),
+    //     }
+    //   )
+    // ).to.be.changeEtherBalance(makerReceiver.address, bidAmount);
 
-      const acceptPayloadBytes = encodePayload(
-        ["bytes32", "address"],
-        [orderID, bidder]
-      );
-      const fee = await bridgeA.estimateFee(
-        chainID,
-        false,
-        "0x",
-        acceptPayloadBytes
-      );
+    // // check balance after accept bid
+    // const balanceAfterAcceptOfBidder = await ethers.provider.getBalance(
+    //   bidderReceiver
+    // );
+    // expect(balanceAfterAcceptOfBidder - balanceBeforeAcceptOfBidder).to.equal(
+    //   payload.sellToken.amount
+    // );
 
-      await expect(
-        atomicSwapA.connect(maker).acceptBid(
-          { orderID, bidder },
-          {
-            value: fee.nativeFee.mul(11).div(10),
-          }
-        )
-      ).to.be.changeTokenBalance(usdt, makerReceiver.address, bidAmount);
+    // const balanceAfterAcceptOfMaker = await ethers.provider.getBalance(
+    //   makerReceiver.address
+    // );
+    // expect(balanceAfterAcceptOfMaker - balanceBeforeAcceptOfMaker).to.equal(
+    //   bidAmount
+    // );
+  });
+  it("should accept bid with erc20 token", async () => {
+    const {
+      atomicSwapA,
+      bridgeA,
+      chainID,
+      maker,
+      makerReceiver,
+      takerReceiver,
+      orderID,
+      usdc,
+      usdt,
+      bidAmount,
+      bidder,
+      bidderReceiver,
+      payload,
+      buyTokenFeeRate,
+      sellTokenFeeRate,
+      treasury,
+    } = await bidToDefaultITCAtomicOrder(false, true);
 
-      // check balance after accept bid
-      const balanceAfterAcceptOfMaker = await usdt.balanceOf(
-        makerReceiver.address
-      );
-      expect(
-        balanceAfterAcceptOfMaker.sub(balanceBeforeAcceptOfMaker)
-      ).to.equal(bidAmount);
+    const acceptPayloadBytes = encodePayload(
+      ["bytes32", "address"],
+      [orderID, bidder]
+    );
+    const fee = await bridgeA.estimateFee(
+      chainID,
+      false,
+      "0x",
+      acceptPayloadBytes
+    );
 
-      const balanceAfterAcceptOfBidder = await usdc.balanceOf(bidderReceiver);
-      expect(
-        balanceAfterAcceptOfBidder.sub(balanceBeforeAcceptOfBidder)
-      ).to.equal(payload.sellToken.amount);
-    });
+    const { amountAfterFee: usdtAmountAfterFee, feeAmount: usdtFeeAmount } =
+      calcSwapAmount(bidAmount, sellTokenFeeRate);
+
+    const { amountAfterFee: usdcAmountAfterFee, feeAmount: usdcFeeAmount } =
+      calcSwapAmount(payload.sellToken.amount, buyTokenFeeRate);
+
+    const tx = atomicSwapA.connect(maker).acceptBid(
+      { orderID, bidder },
+      {
+        value: safeFactor(fee.nativeFee, 1.1),
+      }
+    );
+    await expect(tx).to.be.changeTokenBalances(
+      usdt,
+      [makerReceiver.address, treasury],
+      [usdtAmountAfterFee, usdtFeeAmount]
+    );
+
+    await expect(tx).to.be.changeTokenBalances(
+      usdc,
+      [bidderReceiver, treasury],
+      [usdcAmountAfterFee, usdcFeeAmount]
+    );
   });
 });
