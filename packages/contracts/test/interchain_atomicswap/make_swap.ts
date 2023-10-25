@@ -99,7 +99,8 @@ describe("ITCAtomicSwap: MakeSwap", () => {
     const lockedAmount = await ethers.provider.getBalance(atomicSwapAAddress);
     expect(lockedAmount == BigInt(20)).to.equal(true);
 
-    const id = newAtomicSwapOrderID(accounts[0].address, 0);
+    const nonce = await atomicSwapA.nonces(maker.address);
+    const id = newAtomicSwapOrderID(maker.address, nonce - BigInt(1));
     const orderIDAtContractA = await atomicSwapA.swapOrder(id);
     expect(orderIDAtContractA.id).to.equal(id);
     const orderIDAtContractB = await atomicSwapB.swapOrder(id);
@@ -292,10 +293,7 @@ describe("ITCAtomicSwap: MakeSwap", () => {
         true,
       ]
     );
-    const amount = await usdc.allowance(
-      accounts[0].address,
-      await atomicSwapA.getAddress()
-    );
+
     await usdc.setFailTransferFrom(true);
     const estimateFee = await bridgeA.estimateFee(
       chainID,
@@ -315,7 +313,7 @@ describe("ITCAtomicSwap: MakeSwap", () => {
           value: (estimateFee.nativeFee * BigInt(11)) / BigInt(10),
         }
       )
-    ).to.revertedWith("Failed in Lock token");
+    ).to.revertedWith("Failed to transfer from");
   });
 
   it("should revert to create in-chain pool with not enough native token", async () => {

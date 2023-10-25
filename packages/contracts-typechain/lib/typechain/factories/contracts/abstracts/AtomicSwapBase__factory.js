@@ -52,6 +52,22 @@ const _abi = [
         inputs: [
             {
                 internalType: "address",
+                name: "account",
+                type: "address",
+            },
+            {
+                internalType: "uint256",
+                name: "currentNonce",
+                type: "uint256",
+            },
+        ],
+        name: "InvalidAccountNonce",
+        type: "error",
+    },
+    {
+        inputs: [
+            {
+                internalType: "address",
                 name: "contractAddress",
                 type: "address",
             },
@@ -490,6 +506,25 @@ const _abi = [
         type: "function",
     },
     {
+        inputs: [
+            {
+                internalType: "address",
+                name: "owner",
+                type: "address",
+            },
+        ],
+        name: "nonces",
+        outputs: [
+            {
+                internalType: "uint256",
+                name: "",
+                type: "uint256",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
         inputs: [],
         name: "owner",
         outputs: [
@@ -615,19 +650,6 @@ const _abi = [
                 internalType: "bool",
                 name: "acceptBid",
                 type: "bool",
-            },
-        ],
-        stateMutability: "view",
-        type: "function",
-    },
-    {
-        inputs: [],
-        name: "swapOrderCounter",
-        outputs: [
-            {
-                internalType: "uint256",
-                name: "",
-                type: "uint256",
             },
         ],
         stateMutability: "view",

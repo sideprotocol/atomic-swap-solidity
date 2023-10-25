@@ -9,6 +9,8 @@ export type { Initializable } from "./@openzeppelin/contracts-upgradeable/proxy/
 export { Initializable__factory } from "./factories/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable__factory";
 export type { ContextUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable";
 export { ContextUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable__factory";
+export type { NoncesUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable";
+export { NoncesUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable__factory";
 export type { ReentrancyGuardUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable";
 export { ReentrancyGuardUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable__factory";
 export type { IERC1155Errors } from "./@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC1155Errors";
@@ -45,6 +47,8 @@ export type { AtomicSwapBase } from "./contracts/abstracts/AtomicSwapBase";
 export { AtomicSwapBase__factory } from "./factories/contracts/abstracts/AtomicSwapBase__factory";
 export type { IAtomicSwapBase } from "./contracts/abstracts/interfaces/IAtomicSwapBase";
 export { IAtomicSwapBase__factory } from "./factories/contracts/abstracts/interfaces/IAtomicSwapBase__factory";
+export type { AtomicSwapHelper } from "./contracts/abstracts/libs/AtomicSwapHelper";
+export { AtomicSwapHelper__factory } from "./factories/contracts/abstracts/libs/AtomicSwapHelper__factory";
 export type { AtomicSwapMsgValidator } from "./contracts/abstracts/libs/AtomicSwapMsgValidator";
 export { AtomicSwapMsgValidator__factory } from "./factories/contracts/abstracts/libs/AtomicSwapMsgValidator__factory";
 export type { InchainAtomicSwap } from "./contracts/inchain_atomicswap/InchainAtomicSwap";

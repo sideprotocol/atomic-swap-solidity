@@ -29,18 +29,32 @@ export const Utils = {
     const accounts = await ethers.getSigners();
     const [owner] = accounts;
 
+    // deploy libraries
+    const atomicSwapHelperFactory = await ethers.getContractFactory(
+      "AtomicSwapHelper"
+    );
+    const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
+
     // AtomicSwap contract deploy
     const atomicSwapFactory = await ethers.getContractFactory(
-      "InchainAtomicSwap"
+      "InchainAtomicSwap",
+      {
+        libraries: {
+          AtomicSwapHelper: await atomicSwapHelper.getAddress(),
+        },
+      }
     );
     const sellTokenFeeRate = 10;
     const buyTokenFeeRate = 12;
     const treasury = accounts[10].address;
+
+    // deploy contract
     const atomicSwap = await upgrades.deployProxy(
       atomicSwapFactory,
       [owner.address, treasury, sellTokenFeeRate, buyTokenFeeRate],
       {
         initializer: "initialize",
+        unsafeAllowLinkedLibraries: true,
       }
     );
 
@@ -113,6 +127,11 @@ export const Utils = {
     const sideBridgeAtBAddress = await sideBridgeAtChainB.getAddress();
 
     // Deploy libraries
+    const atomicSwapHelperFactory = await ethers.getContractFactory(
+      "AtomicSwapHelper"
+    );
+    const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
+
     const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
       "AtomicSwapMsgValidator"
     );
@@ -130,6 +149,7 @@ export const Utils = {
       "InterchainAtomicSwap",
       {
         libraries: {
+          AtomicSwapHelper: await atomicSwapHelper.getAddress(),
           AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
           InterchainAtomicSwapLogic:
             await interchainAtomicSwapLogic.getAddress(),
@@ -342,8 +362,8 @@ export const createDefaultAtomicOrder = async (
       value: nativeTokenAmount,
     })
   ).to.emit(atomicSwap, "AtomicSwapOrderCreated");
-
-  const id = newAtomicSwapOrderID(accounts[0].address, 0);
+  const nonce = await atomicSwap.nonces(maker.address);
+  const id = newAtomicSwapOrderID(accounts[0].address, nonce - BigInt(1));
   const orderIDAtContractA = await atomicSwap.swapOrder(id);
   expect(orderIDAtContractA.id).to.equal(id);
 
@@ -511,7 +531,8 @@ export const createDefaultITCAtomicOrder = async (
     expect(balanceOfUSDC.toString()).to.equal(payload.sellToken.amount);
   }
 
-  const id = newAtomicSwapOrderID(accounts[0].address, 0);
+  const nonce = await atomicSwapA.nonces(maker.address);
+  const id = newAtomicSwapOrderID(accounts[0].address, nonce - BigInt(1));
   const orderIDAtContractA = await atomicSwapA.swapOrder(id);
   expect(orderIDAtContractA.id).to.equal(id);
 
@@ -660,7 +681,7 @@ export const encodePayload = (types: string[], values: any[]): string => {
 
 export function newAtomicSwapOrderID(
   sender: string,
-  swapOrderCounter: number
+  swapOrderCounter: bigint
 ): string {
   const encoder = new ethers.AbiCoder();
   const id = keccak256(

@@ -176,13 +176,13 @@ export interface InterchainAtomicSwapInterface extends Interface {
       | "counteroffers"
       | "initialize"
       | "makeSwap"
+      | "nonces"
       | "onReceivePacket"
       | "owner"
       | "placeBid"
       | "renounceOwnership"
       | "sellerFeeRate"
       | "swapOrder"
-      | "swapOrderCounter"
       | "swapOrderITCParams"
       | "takeSwap"
       | "transferOwnership"
@@ -239,6 +239,7 @@ export interface InterchainAtomicSwapInterface extends Interface {
     functionFragment: "makeSwap",
     values: [IInterchainAtomicSwap.ICMakeSwapMsgStruct]
   ): string;
+  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "onReceivePacket",
     values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
@@ -259,10 +260,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
   encodeFunctionData(
     functionFragment: "swapOrder",
     values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "swapOrderCounter",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "swapOrderITCParams",
@@ -300,6 +297,7 @@ export interface InterchainAtomicSwapInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "onReceivePacket",
     data: BytesLike
@@ -315,10 +313,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "swapOrderCounter",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "swapOrderITCParams",
     data: BytesLike
@@ -562,6 +556,8 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
+  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+
   onReceivePacket: TypedContractMethod<
     [
       _srcChainID: BigNumberish,
@@ -618,8 +614,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     ],
     "view"
   >;
-
-  swapOrderCounter: TypedContractMethod<[], [bigint], "view">;
 
   swapOrderITCParams: TypedContractMethod<
     [arg0: BytesLike],
@@ -722,6 +716,9 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
+    nameOrSignature: "nonces"
+  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "onReceivePacket"
   ): TypedContractMethod<
     [
@@ -784,9 +781,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     ],
     "view"
   >;
-  getFunction(
-    nameOrSignature: "swapOrderCounter"
-  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "swapOrderITCParams"
   ): TypedContractMethod<

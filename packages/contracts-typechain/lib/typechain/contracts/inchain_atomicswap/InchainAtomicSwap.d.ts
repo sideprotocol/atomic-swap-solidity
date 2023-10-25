@@ -110,7 +110,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface InchainAtomicSwapInterface extends Interface {
-    getFunction(nameOrSignature: "acceptBid" | "acceptCountOfffer" | "bids" | "buyerFeeRate" | "cancelBid" | "cancelSwap" | "counteroffer" | "counteroffers" | "initialize" | "makeSwap" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderCounter" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
+    getFunction(nameOrSignature: "acceptBid" | "acceptCountOfffer" | "bids" | "buyerFeeRate" | "cancelBid" | "cancelSwap" | "counteroffer" | "counteroffers" | "initialize" | "makeSwap" | "nonces" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "OwnershipTransferred" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
     encodeFunctionData(functionFragment: "acceptBid", values: [IAtomicSwapBase.AcceptBidMsgStruct]): string;
     encodeFunctionData(functionFragment: "acceptCountOfffer", values: [IAtomicSwapBase.CounterOfferMsgStruct]): string;
@@ -122,12 +122,12 @@ export interface InchainAtomicSwapInterface extends Interface {
     encodeFunctionData(functionFragment: "counteroffers", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "makeSwap", values: [IAtomicSwapBase.MakeSwapMsgStruct]): string;
+    encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "placeBid", values: [IAtomicSwapBase.PlaceBidMsgStruct]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "sellerFeeRate", values?: undefined): string;
     encodeFunctionData(functionFragment: "swapOrder", values: [BytesLike]): string;
-    encodeFunctionData(functionFragment: "swapOrderCounter", values?: undefined): string;
     encodeFunctionData(functionFragment: "takeSwap", values: [IAtomicSwapBase.TakeSwapMsgStruct]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "updateBid", values: [IAtomicSwapBase.UpdateBidMsgStruct]): string;
@@ -141,12 +141,12 @@ export interface InchainAtomicSwapInterface extends Interface {
     decodeFunctionResult(functionFragment: "counteroffers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "sellerFeeRate", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "swapOrderCounter", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "takeSwap", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "updateBid", data: BytesLike): Result;
@@ -352,6 +352,7 @@ export interface InchainAtomicSwap extends BaseContract {
     ], [
         void
     ], "payable">;
+    nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     owner: TypedContractMethod<[], [string], "view">;
     placeBid: TypedContractMethod<[
         placeBidMsg: IAtomicSwapBase.PlaceBidMsgStruct
@@ -391,7 +392,6 @@ export interface InchainAtomicSwap extends BaseContract {
             acceptBid: boolean;
         }
     ], "view">;
-    swapOrderCounter: TypedContractMethod<[], [bigint], "view">;
     takeSwap: TypedContractMethod<[
         takeswap: IAtomicSwapBase.TakeSwapMsgStruct
     ], [
@@ -471,6 +471,7 @@ export interface InchainAtomicSwap extends BaseContract {
     ], [
         void
     ], "payable">;
+    getFunction(nameOrSignature: "nonces"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "placeBid"): TypedContractMethod<[
         placeBidMsg: IAtomicSwapBase.PlaceBidMsgStruct
@@ -510,7 +511,6 @@ export interface InchainAtomicSwap extends BaseContract {
             acceptBid: boolean;
         }
     ], "view">;
-    getFunction(nameOrSignature: "swapOrderCounter"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "takeSwap"): TypedContractMethod<[
         takeswap: IAtomicSwapBase.TakeSwapMsgStruct
     ], [

@@ -7,7 +7,10 @@ import "hardhat/console.sol";
 import "./libs/InterchainAtomicSwapLogic.sol";
 import "../abstracts/libs/AtomicSwapMsgValidator.sol";
 
+import "../abstracts/libs/AtomicSwapHelper.sol";
+
 contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
+    using AtomicSwapHelper for *;
     using InterchainAtomicSwapLogic for *;
     using AtomicSwapMsgValidator for *;
     ISideLzAppUpgradable public bridge;
@@ -16,6 +19,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
     function initialize(InitialParams calldata _params) external initializer {
         __Ownable_init_unchained(_params.admin);
+        __Nonces_init_unchained();
         _params._validateInitializeParams(maxFee);
         sellerFeeRate = _params.sellerFee;
         buyerFeeRate = _params.buyerFee;
@@ -24,6 +28,10 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         bridge = ISideLzAppUpgradable(_params.bridge);
     }
 
+    // /**
+    //  * @notice Creates a new swap order in the contract.
+    //  * @param makeswap Struct containing the details of the swap order to be created.
+    //  */
     function makeSwap(
         ICMakeSwapMsg calldata icMakeSwap
     ) external payable nonReentrant {
@@ -32,9 +40,9 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         // validate
         makeswap._validateMakeSwapParams();
         // Generate a unique ID and add the new swap order to the contract's state.
-        bytes32 id = _generateNewAtomicSwapID(msg.sender);
-
-        _addNewSwapOrder(id, msg.sender, makeswap);
+        bytes32 id = _useNonce(msg.sender).generateNewAtomicSwapID(msg.sender);
+        //_addNewSwapOrder(id, msg.sender, makeswap);
+        swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
         ASITCParams memory _params = ASITCParams(
             Side.NATIVE,
             icMakeSwap.makerReceiver,
@@ -42,7 +50,6 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             chainID,
             icMakeSwap.dstChainID
         );
-
         swapOrderITCParams[id] = _params;
 
         uint nativeFee = msg.value;
@@ -52,22 +59,10 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             nativeFee = nativeFee - makeswap.sellToken.amount;
         } else {
             // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
-            IERC20 sellToken = IERC20(makeswap.sellToken.token);
-            uint256 allowance = sellToken.allowance(msg.sender, address(this));
-            if (allowance < makeswap.sellToken.amount) {
-                revert NotAllowedTransferAmount(
-                    makeswap.sellToken.amount,
-                    allowance
-                );
-            }
-
-            require(
-                sellToken.transferFrom(
-                    msg.sender,
-                    address(this),
-                    makeswap.sellToken.amount
-                ),
-                "Failed in Lock token"
+            makeswap.sellToken.token.safeTransferFrom(
+                msg.sender,
+                address(this),
+                makeswap.sellToken.amount
             );
         }
 
@@ -91,6 +86,10 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         emit AtomicSwapOrderCreated(id);
     }
 
+    // /**
+    //  * @notice Allows a taker to complete a swap order by exchanging tokens.
+    //  * @param takeswap A struct containing the ID of the swap order to be taken.
+    //  */
     function takeSwap(
         TakeSwapMsg calldata takeswap
     )
@@ -119,12 +118,13 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Exchange the tokens
         // If buying with ERC20 tokens
-        _processTransferFrom(
-            order.buyToken.token,
+        order.buyToken.token.processTransferFrom(
             msg.sender,
             makerReceiver,
             order.buyToken.amount,
-            sellerFeeRate
+            sellerFeeRate,
+            maxFee,
+            treasury
         );
 
         // Prepare the payload for the interchain message
@@ -140,6 +140,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         emit AtomicSwapOrderTook(order.maker, order.taker, takeswap.orderID);
     }
 
+    // /**
+    //  * @notice Allows the maker of a swap order to cancel it.
+    //  * @dev The function documentation mentions an upcoming update with EIP 1193 to improve user readability regarding transaction messages.
+    //  * @param cancelswap A struct containing the ID of the swap order to be canceled.
+    //  */
     function cancelSwap(
         CancelSwapMsg calldata cancelswap
     )
@@ -173,7 +178,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             cancelswap.orderID
         );
 
-        _removeAtomicSwapOrder(cancelswap.orderID);
+        swapOrder.removeAtomicSwapOrder(cancelswap.orderID);
         // Send the interchain cancellation message
         bridge.sendLzMsg{value: msg.value}(
             chainID,
@@ -185,9 +190,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         emit AtomicSwapOrderCanceled(cancelswap.orderID);
     }
 
-    // Generate AtomicOrder ID
-
-    // Refactored functions
+    // /**
+    //  * @notice Allows a user to place a bid on a specific order.
+    //  * @dev This function is designed to be called only on the taker chain.
+    //  * @param placeBidMsg A struct containing details of the bid being placed.
+    //  */
     function placeBid(
         PlaceBidMsg calldata placeBidMsg
     ) external payable nonReentrant onlyExist(placeBidMsg.orderID) {
@@ -219,8 +226,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         if (_buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
             // Transfer the additional bid amount from the bidder to this contract
-            _safeTransferFrom(
-                _buyToken.token,
+            _buyToken.token.safeTransferFrom(
                 msg.sender,
                 address(this),
                 tokenAmount
@@ -234,7 +240,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         }
 
         // Record the new bid
-        _addNewBid(placeBidMsg);
+        bids.addNewBid(placeBidMsg);
 
         // Encode the bid message into a payload
         bytes memory payload = abi.encode(0, MsgType.PLACEBID, placeBidMsg);
@@ -287,10 +293,8 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         // Check if the bid is in ERC20 tokens or in Ether
         if (_buyToken.token != address(0)) {
             // Bidding with ERC20 token
-
             // Safely transfer the additional bid amount from the bidder to this contract
-            _safeTransferFrom(
-                _buyToken.token,
+            _buyToken.token.safeTransferFrom(
                 msg.sender,
                 address(this),
                 _addition
@@ -360,11 +364,12 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Process sell token transfers
         Coin storage _sellToken = _order.sellToken;
-        _processTransfer(
-            _sellToken.token,
+        _sellToken.token.processTransfer(
             selectedBid.bidderReceiver,
             _sellToken.amount,
-            buyerFeeRate
+            buyerFeeRate,
+            maxFee,
+            treasury
         );
 
         // Encode the bid message into a payload
@@ -403,8 +408,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // If buy token is an ERC20 token, transfer it back to the bidder
         if (_buyToken.token != address(0)) {
-            _safeTransfer(
-                _buyToken.token,
+            _buyToken.token.safeTransfer(
                 selectedBid.bidder,
                 selectedBid.amount
             );
@@ -452,13 +456,13 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             // send token
         } else if (msgType == MsgType.CANCELSWAP) {
             bytes32 id = bytes32(_payload[32:]);
-            _removeAtomicSwapOrder(id);
+            swapOrder.removeAtomicSwapOrder(id);
         } else if (msgType == MsgType.PLACEBID) {
             PlaceBidMsg memory _bidMsg = abi.decode(
                 _payload[32:],
                 (PlaceBidMsg)
             );
-            _addNewBid(_bidMsg);
+            bids.addNewBid(_bidMsg);
         } else if (msgType == MsgType.ACCEPTBID) {
             AcceptBidMsg memory _acceptBidMsg = abi.decode(
                 _payload[32:],
@@ -470,11 +474,12 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             Coin storage _buyToken = swapOrder[_orderID].buyToken;
             address _makerReceiver = swapOrderITCParams[_orderID].makerReceiver;
 
-            _processTransfer(
-                _buyToken.token,
+            _buyToken.token.processTransfer(
                 _makerReceiver,
                 _buyToken.amount,
-                sellerFeeRate
+                sellerFeeRate,
+                maxFee,
+                treasury
             );
             bids[_orderID][_bidder].status = BidStatus.Executed;
         } else if (msgType == MsgType.UPDATEBID) {

@@ -96,7 +96,7 @@ describe("AtomicSwap: MakeSwap", () => {
     await usdc.setFailTransferFrom(true);
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWith(
-      "Failed in Lock token"
+      "Failed to transfer from"
     );
   });
 

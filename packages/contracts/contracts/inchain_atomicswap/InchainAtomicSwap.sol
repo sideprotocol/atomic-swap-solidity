@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 import "../abstracts/AtomicSwapBase.sol";
+import "../abstracts/libs/AtomicSwapHelper.sol";
 import "./interfaces/IInchainAtomicSwap.sol";
 import "hardhat/console.sol";
 
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
+    using AtomicSwapHelper for *;
+
     function initialize(
         address _admin,
         address _treasury,
@@ -12,6 +15,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         uint _buyerFee
     ) external initializer {
         __Ownable_init_unchained(_admin);
+        __Nonces_init_unchained();
         require(_sellerFee < maxFee, "sellerFee has to be smaller than maxFee");
         require(_buyerFee < maxFee, "sellerFee has to be smaller than maxFee");
         require(_treasury != address(0), "invalid treasury address");
@@ -19,6 +23,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         buyerFeeRate = _buyerFee;
         treasury = _treasury;
     }
+
+    // /**
+    //  * @notice Creates a new swap order in the contract.
+    //  * @param makeswap Struct containing the details of the swap order to be created.
+    //  */
 
     function makeSwap(
         MakeSwapMsg calldata makeswap
@@ -44,29 +53,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Generate a unique ID and add the new swap order to the contract's state.
-        bytes32 id = _generateNewAtomicSwapID(msg.sender);
-        _addNewSwapOrder(id, msg.sender, makeswap);
+        bytes32 id = _useNonce(msg.sender).generateNewAtomicSwapID(msg.sender);
+        swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
 
         if (makeswap.sellToken.token == address(0)) {
             // If selling Ether, ensure sufficient Ether was sent with the transaction.
             require(msg.value >= makeswap.sellToken.amount, "Not enough ether");
         } else {
             // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
-            IERC20 sellToken = IERC20(makeswap.sellToken.token);
-            uint256 allowance = sellToken.allowance(msg.sender, address(this));
-            if (allowance < makeswap.sellToken.amount) {
-                revert NotAllowedTransferAmount(
-                    makeswap.sellToken.amount,
-                    allowance
-                );
-            }
-            require(
-                sellToken.transferFrom(
-                    msg.sender,
-                    address(this),
-                    makeswap.sellToken.amount
-                ),
-                "Failed in Lock token"
+            makeswap.sellToken.token.safeTransferFrom(
+                msg.sender,
+                address(this),
+                makeswap.sellToken.amount
             );
         }
 
@@ -74,6 +72,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         emit AtomicSwapOrderCreated(id);
     }
 
+    // /**
+    //  * @notice Allows a taker to complete a swap order by exchanging tokens.
+    //  * @param takeswap A struct containing the ID of the swap order to be taken.
+    //  */
     function takeSwap(
         TakeSwapMsg calldata takeswap
     )
@@ -104,24 +106,31 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Exchange the tokens
         // If buying with ERC20 tokens
-        _processTransfer(
-            order.sellToken.token,
+        order.sellToken.token.processTransfer(
             takeswap.takerReceiver,
             order.sellToken.amount,
-            buyerFeeRate
+            buyerFeeRate,
+            maxFee,
+            treasury
         );
 
-        _processTransferFrom(
-            order.buyToken.token,
+        order.buyToken.token.processTransferFrom(
             msg.sender,
             order.maker,
             order.buyToken.amount,
-            sellerFeeRate
+            sellerFeeRate,
+            maxFee,
+            treasury
         );
         // Emit an event signaling the swap was completed
         emit AtomicSwapOrderTook(order.maker, order.taker, takeswap.orderID);
     }
 
+    // /**
+    //  * @notice Allows the maker of a swap order to cancel it.
+    //  * @dev The function documentation mentions an upcoming update with EIP 1193 to improve user readability regarding transaction messages.
+    //  * @param cancelswap A struct containing the ID of the swap order to be canceled.
+    //  */
     function cancelSwap(
         CancelSwapMsg calldata cancelswap
     )
@@ -164,10 +173,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         delete swapOrder[cancelswap.orderID];
     }
 
-    // Generate AtomicOrder ID
-
-    // Refactored functions
-
+    // /**
+    //  * @notice Allows a user to place a bid on a specific order.
+    //  * @dev This function is designed to be called only on the taker chain.
+    //  * @param placeBidMsg A struct containing details of the bid being placed.
+    //  */
     function placeBid(
         PlaceBidMsg calldata placeBidMsg
     ) external payable nonReentrant onlyExist(placeBidMsg.orderID) {
@@ -197,8 +207,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
             // Transfer the additional bid amount from the bidder to this contract
-            _safeTransferFrom(
-                _buyToken.token,
+            _buyToken.token.safeTransferFrom(
                 msg.sender,
                 address(this),
                 tokenAmount
@@ -211,7 +220,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Record the new bid
-        _addNewBid(placeBidMsg);
+        bids.addNewBid(placeBidMsg);
     }
 
     function updateBid(
@@ -256,8 +265,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             // Bidding with ERC20 token
 
             // Safely transfer the additional bid amount from the bidder to this contract
-            _safeTransferFrom(
-                _buyToken.token,
+            _buyToken.token.safeTransferFrom(
                 msg.sender,
                 address(this),
                 _addition
@@ -309,20 +317,22 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Process sell token transfers
         Coin storage _sellToken = _order.sellToken;
-        _processTransfer(
-            _sellToken.token,
+        _sellToken.token.processTransfer(
             selectedBid.bidder,
             _sellToken.amount,
-            buyerFeeRate
+            buyerFeeRate,
+            maxFee,
+            treasury
         );
 
         // Process buy token transfers
         Coin storage _buyToken = _order.buyToken;
-        _processTransfer(
-            _buyToken.token,
+        _buyToken.token.processTransfer(
             _order.maker,
             selectedBid.amount,
-            sellerFeeRate
+            sellerFeeRate,
+            maxFee,
+            treasury
         );
     }
 
@@ -352,8 +362,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // If buy token is an ERC20 token, transfer it back to the bidder
         if (_buyToken.token != address(0)) {
-            _safeTransfer(
-                _buyToken.token,
+            _buyToken.token.safeTransfer(
                 selectedBid.bidder,
                 selectedBid.amount
             );
