@@ -5,15 +5,13 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "declaration": true,
+    "declaration": true
   },
   "include": [
     "./scripts",
     "./test",
     "./utils",
     "../../contracts-typechain/typechain"
-, "../contracts-typechain/node_modules/ecdsa.ts"  ],
-  "files": [
-    "./hardhat.config.ts"
-  ]
+  ],
+  "files": ["./hardhat.config.ts"]
 }

@@ -2,7 +2,7 @@
   "name": "@sideprotocol/contracts-typechain",
   "version": "1.0.0",
   "main": "lib/index.js",
-  "author": "Oleg S",
+  "author": "Marian Z",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "peerDependencies": {
     "@ethersproject/providers": "*",
-    "@typechain/ethers-v5": "*",
+    "@typechain/ethers-v6": "*",
     "ethers": "*",
     "typechain": "*",
     "typescript": "*"

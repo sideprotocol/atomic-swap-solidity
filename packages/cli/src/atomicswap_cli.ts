@@ -55,7 +55,7 @@ export class AtomicSwapCli {
       },
       maker: this.maker.address,
       minBidAmount: minBidAmount,
-      desiredTaker: ethers.constants.AddressZero,
+      desiredTaker: ethers.ZeroAddress,
       expireAt: orderExpireAt,
       acceptBid: acceptBid,
     };

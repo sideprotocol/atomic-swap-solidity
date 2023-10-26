@@ -6,6 +6,7 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomicfoundation/hardhat-chai-matchers";
+import "hardhat-contract-sizer";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.9",
+        version: "0.8.20",
       },
     ],
     settings: {
@@ -49,7 +50,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: "../contracts-typechain/typechain",
-    target: "ethers-v5",
+    target: "ethers-v6",
   },
   networks: {
     hardhat: {
@@ -74,6 +75,12 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: true,
+    strict: true,
   },
 };
 
