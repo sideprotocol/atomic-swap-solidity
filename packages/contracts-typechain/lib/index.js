@@ -28,7 +28,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Settings = void 0;
 __exportStar(require("./typechain"), exports);
-__exportStar(require("./eip/eip2612"), exports);
 const contractSettings = __importStar(require("./settings/settings.json"));
 exports.Settings = contractSettings;
 //# sourceMappingURL=index.js.map
