@@ -691,8 +691,8 @@ export function newAtomicSwapOrderID(
 }
 export const saveDeployedAddress = async (
   atomicswap: string,
-  usdc: string,
-  usdt: string
+  usdc?: string,
+  usdt?: string
 ) => {
   const settingInfo: {
     atomicswap: string;
@@ -704,8 +704,8 @@ export const saveDeployedAddress = async (
     mockUSDT: "",
   };
   settingInfo.atomicswap = atomicswap;
-  settingInfo.mockUSDC = usdc;
-  settingInfo.mockUSDT = usdt;
+  settingInfo.mockUSDC = usdc ?? "";
+  settingInfo.mockUSDT = usdt ?? "";
   const settingsPath = "../contracts-typechain/settings";
   if (!existsSync(settingsPath)) {
     mkdirSync(settingsPath, { recursive: true });
@@ -716,6 +716,8 @@ export const saveDeployedAddress = async (
   const json = JSON.stringify(settingInfo);
   writeFileSync(`${settingsPath}/settings.json`, json, "utf-8");
 };
+
+
 
 export function generateRandomString(length: number) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

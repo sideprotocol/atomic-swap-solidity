@@ -1,7 +1,14 @@
 export * from "./typechain";
-export * from "./eip/eip2612";
 export declare const Settings: {
-    atomicswap: string;
     mockUSDC: string;
     mockUSDT: string;
+    atomicSwapHelper: string;
+    atomicSwapMsgValidator: string;
+    interchainAtomicSwapLogic: string;
+    inChainAtomicSwap: string;
+    interChainAtomicSwap: string;
+    atomicSwapHelper_sepolia: string;
+    inChainAtomicSwap_mumbai: string;
+    mockUSDC_mumbai: string;
+    mockUSDT_mumbai: string;
 };
