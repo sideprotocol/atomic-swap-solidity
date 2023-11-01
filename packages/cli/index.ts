@@ -1,7 +1,7 @@
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { AtomicSwapCli } from "./src/atomicswap_cli"; // Adjust the path accordingly
-import { BigNumber } from "ethers";
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -25,9 +25,9 @@ yargs(hideBin(process.argv))
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       try {
         await cli.makeSwap(
-          BigNumber.from(args.tokenA),
-          BigNumber.from(args.tokenB),
-          args.minBidAmount ? BigNumber.from(args.minBidAmount) : undefined,
+          BigInt(args.tokenA),
+          BigInt(args.tokenB),
+          args.minBidAmount ? BigInt(args.minBidAmount) : undefined,
           args.acceptBid,
           args.expireAt
         );
@@ -69,7 +69,7 @@ yargs(hideBin(process.argv))
     },
     async (args) => {
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
-      await cli.placeBid(args.orderID, BigNumber.from(args.amount), args.expireAt);
+      await cli.placeBid(args.orderID, BigInt(args.amount), args.expireAt);
     }
   )
   .command(
@@ -81,7 +81,7 @@ yargs(hideBin(process.argv))
     },
     async (args) => {
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
-      await cli.updateBid(args.orderID, BigNumber.from(args.addition));
+      await cli.updateBid(args.orderID, BigInt(args.addition));
     }
   )
   .command(

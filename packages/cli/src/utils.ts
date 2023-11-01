@@ -1,16 +1,15 @@
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { ethers } from "ethers";
-import { keccak256 } from "ethers/lib/utils";
+import { ethers, keccak256 } from "ethers";
 
 export function newAtomicSwapOrderID(sender: string, swapOrderCounter: number): string {
-  const id = keccak256(ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [sender, swapOrderCounter]));
+  const encoder = new ethers.AbiCoder();
+  const id = keccak256(encoder.encode(["address", "uint256"], [sender, swapOrderCounter]));
   return id;
 }
 
 export class BlockTimer {
-  protected provider: JsonRpcProvider;
+  protected provider: ethers.JsonRpcProvider;
   constructor(providerUrl: string) {
-    this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
+    this.provider = new ethers.JsonRpcProvider(providerUrl);
   }
   async Now() {
     const blockNumber = await this.provider.getBlockNumber();
