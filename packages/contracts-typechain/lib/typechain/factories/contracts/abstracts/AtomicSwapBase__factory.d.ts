@@ -36,18 +36,6 @@ export declare class AtomicSwapBase__factory {
     }, {
         readonly inputs: readonly [{
             readonly internalType: "address";
-            readonly name: "account";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "currentNonce";
-            readonly type: "uint256";
-        }];
-        readonly name: "InvalidAccountNonce";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
             readonly name: "contractAddress";
             readonly type: "address";
         }];
@@ -380,20 +368,6 @@ export declare class AtomicSwapBase__factory {
             readonly type: "address";
         }];
         readonly name: "counteroffers";
-        readonly outputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "";
-            readonly type: "uint256";
-        }];
-        readonly stateMutability: "view";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "owner";
-            readonly type: "address";
-        }];
-        readonly name: "nonces";
         readonly outputs: readonly [{
             readonly internalType: "uint256";
             readonly name: "";

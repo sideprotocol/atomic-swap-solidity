@@ -15,7 +15,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         uint _buyerFee
     ) external initializer {
         __Ownable_init_unchained(_admin);
-        __Nonces_init_unchained();
         require(_sellerFee < maxFee, "sellerFee has to be smaller than maxFee");
         require(_buyerFee < maxFee, "sellerFee has to be smaller than maxFee");
         require(_treasury != address(0), "invalid treasury address");
@@ -36,26 +35,21 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (makeswap.sellToken.token == makeswap.buyToken.token) {
             revert UnsupportedTokenPair();
         }
-
         // Ensure the sell token and buy token are not the same non-zero address.
         if (makeswap.minBidAmount <= 0) {
             revert InvalidMinimumBidLimit();
         }
-
         // Ensure the caller is the maker of the swap order.
         if (msg.sender == address(0)) {
             revert UnauthorizedSender();
         }
-
         // Ensure the expireAt is the future time.
         if (makeswap.expireAt < block.timestamp) {
             revert InvalidExpirationTime(makeswap.expireAt, block.timestamp);
         }
-
         // Generate a unique ID and add the new swap order to the contract's state.
-        bytes32 id = _useNonce(msg.sender).generateNewAtomicSwapID(msg.sender);
+        bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
-
         if (makeswap.sellToken.token == address(0)) {
             // If selling Ether, ensure sufficient Ether was sent with the transaction.
             require(msg.value >= makeswap.sellToken.amount, "Not enough ether");
@@ -67,7 +61,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 makeswap.sellToken.amount
             );
         }
-
         // Emit an event signaling the creation of a new swap order.
         emit AtomicSwapOrderCreated(id);
     }

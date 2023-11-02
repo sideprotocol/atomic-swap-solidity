@@ -1,9 +1,11 @@
 import { ethers } from "hardhat";
-import { createDefaultAtomicOrder } from "../../utils/utils";
+import { createDefaultAtomicOrder, generateOrderID } from "../../utils/utils";
 import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { randomUUID } from "crypto";
+import { keccak256 } from "ethers";
 
 describe("AtomicSwap: MakeSwap", () => {
   it("create in-chain swap with native token", async () =>
@@ -19,7 +21,10 @@ describe("AtomicSwap: MakeSwap", () => {
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
     const expireAt = await BlockTime.AfterSeconds(100);
     const usdcAddress = await usdc.getAddress();
+
+    const uuid = generateOrderID();
     const payload = {
+      uuid: uuid,
       sellToken: {
         token: usdcAddress,
         amount: "20",
@@ -49,7 +54,9 @@ describe("AtomicSwap: MakeSwap", () => {
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
     const expireAt = await BlockTime.AfterSeconds(100);
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: await usdc.getAddress(),
         amount: "90",
@@ -77,7 +84,9 @@ describe("AtomicSwap: MakeSwap", () => {
     const accounts = await ethers.getSigners();
     const [maker, taker] = accounts;
     const expireAt = await BlockTime.AfterSeconds(30);
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: await usdc.getAddress(),
         amount: "90",
@@ -107,7 +116,9 @@ describe("AtomicSwap: MakeSwap", () => {
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
     const expireAt = await BlockTime.AfterSeconds(10);
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: ethers.ZeroAddress,
         amount: ethers.parseEther("20"),

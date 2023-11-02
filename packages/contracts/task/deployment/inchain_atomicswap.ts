@@ -15,7 +15,7 @@ task("deploy:in-chain:lib", "deploy libraries")
     await saveItemsToSetting(
       [
         {
-          title: `atomicSwapHelper`,
+          title: `atomicSwapHelper_${network.name}`,
           value: atomicSwapHelperAddress,
         },
       ],
@@ -32,8 +32,9 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
     const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
     const buyTokenFeeRate = process.env.BUY_TOKEN_FEE_RATE;
 
-    let atomicSwapHelperAddress = Settings.atomicSwapHelper;
-    if (!ethers.isAddress(Settings.atomicSwapHelper)) {
+    let atomicSwapHelperAddress =
+      Settings[`atomicSwapHelper_${network.name}` as keyof typeof Settings];
+    if (!ethers.isAddress(atomicSwapHelperAddress)) {
       const atomicSwapHelperFactory = await ethers.getContractFactory(
         `AtomicSwapHelper`
       );

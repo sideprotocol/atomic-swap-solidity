@@ -57,6 +57,7 @@ export declare namespace IAtomicSwapBase {
   };
 
   export type MakeSwapMsgStruct = {
+    uuid: BytesLike;
     sellToken: IAtomicSwapBase.CoinStruct;
     buyToken: IAtomicSwapBase.CoinStruct;
     maker: AddressLike;
@@ -67,6 +68,7 @@ export declare namespace IAtomicSwapBase {
   };
 
   export type MakeSwapMsgStructOutput = [
+    uuid: string,
     sellToken: IAtomicSwapBase.CoinStructOutput,
     buyToken: IAtomicSwapBase.CoinStructOutput,
     maker: string,
@@ -75,6 +77,7 @@ export declare namespace IAtomicSwapBase {
     expireAt: bigint,
     acceptBid: boolean
   ] & {
+    uuid: string;
     sellToken: IAtomicSwapBase.CoinStructOutput;
     buyToken: IAtomicSwapBase.CoinStructOutput;
     maker: string;
@@ -142,7 +145,6 @@ export interface InchainAtomicSwapInterface extends Interface {
       | "counteroffers"
       | "initialize"
       | "makeSwap"
-      | "nonces"
       | "owner"
       | "placeBid"
       | "renounceOwnership"
@@ -206,7 +208,6 @@ export interface InchainAtomicSwapInterface extends Interface {
     functionFragment: "makeSwap",
     values: [IAtomicSwapBase.MakeSwapMsgStruct]
   ): string;
-  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "placeBid",
@@ -259,7 +260,6 @@ export interface InchainAtomicSwapInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
@@ -523,8 +523,6 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
-
   owner: TypedContractMethod<[], [string], "view">;
 
   placeBid: TypedContractMethod<
@@ -670,9 +668,6 @@ export interface InchainAtomicSwap extends BaseContract {
     [void],
     "payable"
   >;
-  getFunction(
-    nameOrSignature: "nonces"
-  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;

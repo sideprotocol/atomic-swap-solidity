@@ -101,11 +101,10 @@ library AtomicSwapHelper {
     }
 
     function generateNewAtomicSwapID(
-        uint swapOrderCounter,
-        address sender
+        bytes32 uuid,
+        address contractAddress
     ) external pure returns (bytes32 id) {
-        id = keccak256(abi.encode(sender, swapOrderCounter));
-        swapOrderCounter++;
+        id = keccak256(abi.encode(contractAddress, uuid));
     }
 
     function safeTransferFrom(
@@ -115,7 +114,7 @@ library AtomicSwapHelper {
         uint256 amount
     ) internal {
         IERC20 _token = IERC20(token);
-        uint allowalnce = _token.allowance(msg.sender, address(this));
+        uint allowalnce = _token.allowance(from, address(this));
         if (allowalnce < amount) {
             revert IAtomicSwapBase.NotAllowedTransferAmount(allowalnce, amount);
         }

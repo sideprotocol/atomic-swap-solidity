@@ -11,12 +11,11 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface AtomicSwapBaseInterface extends Interface {
-    getFunction(nameOrSignature: "bids" | "buyerFeeRate" | "counteroffers" | "nonces" | "owner" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "transferOwnership"): FunctionFragment;
+    getFunction(nameOrSignature: "bids" | "buyerFeeRate" | "counteroffers" | "owner" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "transferOwnership"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "OwnershipTransferred" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
     encodeFunctionData(functionFragment: "bids", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "buyerFeeRate", values?: undefined): string;
     encodeFunctionData(functionFragment: "counteroffers", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "sellerFeeRate", values?: undefined): string;
@@ -25,7 +24,6 @@ export interface AtomicSwapBaseInterface extends Interface {
     decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyerFeeRate", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "counteroffers", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "sellerFeeRate", data: BytesLike): Result;
@@ -199,7 +197,6 @@ export interface AtomicSwapBase extends BaseContract {
     ], [
         bigint
     ], "view">;
-    nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     owner: TypedContractMethod<[], [string], "view">;
     renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
     sellerFeeRate: TypedContractMethod<[], [bigint], "view">;
@@ -269,7 +266,6 @@ export interface AtomicSwapBase extends BaseContract {
     ], [
         bigint
     ], "view">;
-    getFunction(nameOrSignature: "nonces"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "sellerFeeRate"): TypedContractMethod<[], [bigint], "view">;

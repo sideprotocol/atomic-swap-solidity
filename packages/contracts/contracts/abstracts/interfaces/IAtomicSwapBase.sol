@@ -61,6 +61,7 @@ interface IAtomicSwapBase {
 
     // Struct for making an atomic swap order.
     struct MakeSwapMsg {
+        bytes32 uuid; // UUID from frontend.
         Coin sellToken; // Details of the token/coin to be sold.
         Coin buyToken; // Details of the token/coin to be bought.
         address maker;

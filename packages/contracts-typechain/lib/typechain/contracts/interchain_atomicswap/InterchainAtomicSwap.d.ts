@@ -24,6 +24,7 @@ export declare namespace IAtomicSwapBase {
         amount: bigint;
     };
     type MakeSwapMsgStruct = {
+        uuid: BytesLike;
         sellToken: IAtomicSwapBase.CoinStruct;
         buyToken: IAtomicSwapBase.CoinStruct;
         maker: AddressLike;
@@ -33,6 +34,7 @@ export declare namespace IAtomicSwapBase {
         acceptBid: boolean;
     };
     type MakeSwapMsgStructOutput = [
+        uuid: string,
         sellToken: IAtomicSwapBase.CoinStructOutput,
         buyToken: IAtomicSwapBase.CoinStructOutput,
         maker: string,
@@ -41,6 +43,7 @@ export declare namespace IAtomicSwapBase {
         expireAt: bigint,
         acceptBid: boolean
     ] & {
+        uuid: string;
         sellToken: IAtomicSwapBase.CoinStructOutput;
         buyToken: IAtomicSwapBase.CoinStructOutput;
         maker: string;
@@ -138,7 +141,7 @@ export declare namespace IInterchainAtomicSwap {
     };
 }
 export interface InterchainAtomicSwapInterface extends Interface {
-    getFunction(nameOrSignature: "acceptBid" | "bids" | "bridge" | "buyerFeeRate" | "bytesToAddress" | "cancelBid" | "cancelSwap" | "counteroffers" | "initialize" | "makeSwap" | "nonces" | "onReceivePacket" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderITCParams" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
+    getFunction(nameOrSignature: "acceptBid" | "bids" | "bridge" | "buyerFeeRate" | "bytesToAddress" | "cancelBid" | "cancelSwap" | "counteroffers" | "initialize" | "makeSwap" | "onReceivePacket" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderITCParams" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "OwnershipTransferred" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
     encodeFunctionData(functionFragment: "acceptBid", values: [IAtomicSwapBase.AcceptBidMsgStruct]): string;
     encodeFunctionData(functionFragment: "bids", values: [BytesLike, AddressLike]): string;
@@ -150,7 +153,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
     encodeFunctionData(functionFragment: "counteroffers", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [IInterchainAtomicSwap.InitialParamsStruct]): string;
     encodeFunctionData(functionFragment: "makeSwap", values: [IInterchainAtomicSwap.ICMakeSwapMsgStruct]): string;
-    encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "onReceivePacket", values: [BigNumberish, BytesLike, BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "placeBid", values: [IAtomicSwapBase.PlaceBidMsgStruct]): string;
@@ -171,7 +173,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
     decodeFunctionResult(functionFragment: "counteroffers", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "onReceivePacket", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
@@ -373,7 +374,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     ], [
         void
     ], "payable">;
-    nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     onReceivePacket: TypedContractMethod<[
         _srcChainID: BigNumberish,
         _srcAddress: BytesLike,
@@ -506,7 +506,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     ], [
         void
     ], "payable">;
-    getFunction(nameOrSignature: "nonces"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "onReceivePacket"): TypedContractMethod<[
         _srcChainID: BigNumberish,
         _srcAddress: BytesLike,
