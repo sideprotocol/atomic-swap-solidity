@@ -19,7 +19,6 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
     function initialize(InitialParams calldata _params) external initializer {
         __Ownable_init_unchained(_params.admin);
-        __Nonces_init_unchained();
         _params._validateInitializeParams(maxFee);
         sellerFeeRate = _params.sellerFee;
         buyerFeeRate = _params.buyerFee;
@@ -40,7 +39,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         // validate
         makeswap._validateMakeSwapParams();
         // Generate a unique ID and add the new swap order to the contract's state.
-        bytes32 id = _useNonce(msg.sender).generateNewAtomicSwapID(msg.sender);
+        bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
         //_addNewSwapOrder(id, msg.sender, makeswap);
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
         ASITCParams memory _params = ASITCParams(

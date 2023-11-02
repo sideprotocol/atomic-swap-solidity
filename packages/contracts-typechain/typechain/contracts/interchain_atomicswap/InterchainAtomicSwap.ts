@@ -45,6 +45,7 @@ export declare namespace IAtomicSwapBase {
   };
 
   export type MakeSwapMsgStruct = {
+    uuid: BytesLike;
     sellToken: IAtomicSwapBase.CoinStruct;
     buyToken: IAtomicSwapBase.CoinStruct;
     maker: AddressLike;
@@ -55,6 +56,7 @@ export declare namespace IAtomicSwapBase {
   };
 
   export type MakeSwapMsgStructOutput = [
+    uuid: string,
     sellToken: IAtomicSwapBase.CoinStructOutput,
     buyToken: IAtomicSwapBase.CoinStructOutput,
     maker: string,
@@ -63,6 +65,7 @@ export declare namespace IAtomicSwapBase {
     expireAt: bigint,
     acceptBid: boolean
   ] & {
+    uuid: string;
     sellToken: IAtomicSwapBase.CoinStructOutput;
     buyToken: IAtomicSwapBase.CoinStructOutput;
     maker: string;
@@ -176,7 +179,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
       | "counteroffers"
       | "initialize"
       | "makeSwap"
-      | "nonces"
       | "onReceivePacket"
       | "owner"
       | "placeBid"
@@ -239,7 +241,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
     functionFragment: "makeSwap",
     values: [IInterchainAtomicSwap.ICMakeSwapMsgStruct]
   ): string;
-  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "onReceivePacket",
     values: [BigNumberish, BytesLike, BigNumberish, BytesLike]
@@ -297,7 +298,6 @@ export interface InterchainAtomicSwapInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "onReceivePacket",
     data: BytesLike
@@ -556,8 +556,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
-
   onReceivePacket: TypedContractMethod<
     [
       _srcChainID: BigNumberish,
@@ -715,9 +713,6 @@ export interface InterchainAtomicSwap extends BaseContract {
     [void],
     "payable"
   >;
-  getFunction(
-    nameOrSignature: "nonces"
-  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "onReceivePacket"
   ): TypedContractMethod<

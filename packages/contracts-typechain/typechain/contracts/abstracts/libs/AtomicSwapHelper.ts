@@ -3,7 +3,6 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumberish,
   BytesLike,
   FunctionFragment,
   Result,
@@ -26,7 +25,7 @@ export interface AtomicSwapHelperInterface extends Interface {
 
   encodeFunctionData(
     functionFragment: "generateNewAtomicSwapID",
-    values: [BigNumberish, AddressLike]
+    values: [BytesLike, AddressLike]
   ): string;
 
   decodeFunctionResult(
@@ -79,7 +78,7 @@ export interface AtomicSwapHelper extends BaseContract {
   ): Promise<this>;
 
   generateNewAtomicSwapID: TypedContractMethod<
-    [swapOrderCounter: BigNumberish, sender: AddressLike],
+    [uuid: BytesLike, contractAddress: AddressLike],
     [string],
     "view"
   >;
@@ -91,7 +90,7 @@ export interface AtomicSwapHelper extends BaseContract {
   getFunction(
     nameOrSignature: "generateNewAtomicSwapID"
   ): TypedContractMethod<
-    [swapOrderCounter: BigNumberish, sender: AddressLike],
+    [uuid: BytesLike, contractAddress: AddressLike],
     [string],
     "view"
   >;

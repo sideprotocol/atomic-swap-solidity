@@ -44,7 +44,9 @@ export class AtomicSwapCli {
 
     const orderExpireAt = expireAt ?? (await this.timer.AfterSeconds(10000));
     console.log("expireAt:", orderExpireAt);
+    const uuid = ethers.keccak256(ethers.randomBytes(32));
     const payload = {
+      uuid,
       sellToken: {
         token: ethers.ZeroAddress, //Settings.mockUSDC_sepolia,
         amount: tokenA,

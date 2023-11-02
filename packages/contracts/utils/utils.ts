@@ -12,8 +12,8 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { keccak256 } from "ethers";
 import { BlockTime } from "./time";
-import { BigNumberish } from "ethers";
-
+import { randomUUID } from "crypto";
+import { time } from "console";
 export const ERC20_MINT_AMOUNT = 100000000;
 // stable coins
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
@@ -296,7 +296,9 @@ export const createDefaultAtomicOrder = async (
   const accounts = await ethers.getSigners();
   const [maker, taker] = accounts;
   const expireAt = await BlockTime.AfterSeconds(10000);
+  const uuid = generateOrderID();
   const payload = {
+    uuid,
     sellToken: {
       token: withNativeSellToken ? ethers.ZeroAddress : await usdc.getAddress(),
       amount: ethers.parseEther("20"),
@@ -350,20 +352,16 @@ export const createDefaultAtomicOrder = async (
     );
     await expect(tx).to.emit(atomicSwap, "AtomicSwapOrderCreated");
   } else {
-    await expect(atomicSwap.makeSwap(payload)).to.changeTokenBalance(
+    const tx = atomicSwap.makeSwap(payload);
+    await expect(tx).to.changeTokenBalance(
       usdc,
       await atomicSwap.getAddress(),
       payload.sellToken.amount
     );
-    //.emit(atomicSwap, "AtomicSwapOrderCreated");
+    await expect(tx).emit(atomicSwap, "AtomicSwapOrderCreated");
   }
-  await expect(
-    atomicSwap.makeSwap(payload, {
-      value: nativeTokenAmount,
-    })
-  ).to.emit(atomicSwap, "AtomicSwapOrderCreated");
-  const nonce = await atomicSwap.nonces(maker.address);
-  const id = newAtomicSwapOrderID(accounts[0].address, nonce - BigInt(1));
+
+  const id = newAtomicSwapOrderID(await atomicSwap.getAddress(), payload.uuid);
   const orderIDAtContractA = await atomicSwap.swapOrder(id);
   expect(orderIDAtContractA.id).to.equal(id);
 
@@ -449,7 +447,9 @@ export const createDefaultITCAtomicOrder = async (
   } = await loadFixture(Utils.prepareITCAtomicSwapTest);
   const accounts = await ethers.getSigners();
   const [maker, taker, makerReceiver, takerReceiver] = accounts;
+  const uuid = generateOrderID();
   const payload = {
+    uuid,
     sellToken: {
       token: withNativeToken ? ethers.ZeroAddress : await usdc.getAddress(),
       amount: ethers.parseEther("20"),
@@ -531,8 +531,7 @@ export const createDefaultITCAtomicOrder = async (
     expect(balanceOfUSDC.toString()).to.equal(payload.sellToken.amount);
   }
 
-  const nonce = await atomicSwapA.nonces(maker.address);
-  const id = newAtomicSwapOrderID(accounts[0].address, nonce - BigInt(1));
+  const id = newAtomicSwapOrderID(await atomicSwapA.getAddress(), payload.uuid);
   const orderIDAtContractA = await atomicSwapA.swapOrder(id);
   expect(orderIDAtContractA.id).to.equal(id);
 
@@ -679,16 +678,21 @@ export const encodePayload = (types: string[], values: any[]): string => {
   return new ethers.AbiCoder().encode(types, values);
 };
 
-export function newAtomicSwapOrderID(
-  sender: string,
-  swapOrderCounter: bigint
-): string {
+export function newAtomicSwapOrderID(contract: string, uuid: string): string {
   const encoder = new ethers.AbiCoder();
   const id = keccak256(
-    encoder.encode(["address", "uint256"], [sender, swapOrderCounter])
+    encoder.encode(["address", "bytes32"], [contract, uuid])
   );
   return id;
 }
+
+export function generateOrderID(): string {
+  const uuidStr = ethers.randomBytes(32);
+  const encoder = new ethers.AbiCoder();
+  const id = keccak256(encoder.encode(["bytes"], [uuidStr]));
+  return id;
+}
+
 export const saveDeployedAddress = async (
   atomicswap: string,
   usdc?: string,
@@ -716,8 +720,6 @@ export const saveDeployedAddress = async (
   const json = JSON.stringify(settingInfo);
   writeFileSync(`${settingsPath}/settings.json`, json, "utf-8");
 };
-
-
 
 export function generateRandomString(length: number) {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

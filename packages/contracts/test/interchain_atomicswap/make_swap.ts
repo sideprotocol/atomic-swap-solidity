@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import {
   createDefaultAtomicOrder,
   createDefaultITCAtomicOrder,
+  generateOrderID,
   newAtomicSwapOrderID,
 } from "../../utils/utils";
 import { Utils } from "../../utils/utils";
@@ -31,7 +32,9 @@ describe("ITCAtomicSwap: MakeSwap", () => {
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
     const usdtAddress = await usdt.getAddress();
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: ethers.ZeroAddress,
         amount: "20",
@@ -99,8 +102,10 @@ describe("ITCAtomicSwap: MakeSwap", () => {
     const lockedAmount = await ethers.provider.getBalance(atomicSwapAAddress);
     expect(lockedAmount == BigInt(20)).to.equal(true);
 
-    const nonce = await atomicSwapA.nonces(maker.address);
-    const id = newAtomicSwapOrderID(maker.address, nonce - BigInt(1));
+    const id = newAtomicSwapOrderID(
+      await atomicSwapA.getAddress(),
+      payload.uuid
+    );
     const orderIDAtContractA = await atomicSwapA.swapOrder(id);
     expect(orderIDAtContractA.id).to.equal(id);
     const orderIDAtContractB = await atomicSwapB.swapOrder(id);
@@ -115,7 +120,9 @@ describe("ITCAtomicSwap: MakeSwap", () => {
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: ethers.ZeroAddress,
         amount: "20",
@@ -181,7 +188,9 @@ describe("ITCAtomicSwap: MakeSwap", () => {
       await loadFixture(Utils.prepareITCAtomicSwapTest);
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: usdcAddress,
         amount: ethers.parseEther("100"),
@@ -255,7 +264,9 @@ describe("ITCAtomicSwap: MakeSwap", () => {
     } = await loadFixture(Utils.prepareITCAtomicSwapTest);
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: usdcAddress,
         amount: "20",
@@ -321,7 +332,9 @@ describe("ITCAtomicSwap: MakeSwap", () => {
       await loadFixture(Utils.prepareITCAtomicSwapTest);
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const uuid = generateOrderID();
     const payload = {
+      uuid,
       sellToken: {
         token: ethers.ZeroAddress,
         amount: ethers.parseEther("20"),

@@ -30,6 +30,7 @@ export declare namespace IAtomicSwapBase {
   };
 
   export type MakeSwapMsgStruct = {
+    uuid: BytesLike;
     sellToken: IAtomicSwapBase.CoinStruct;
     buyToken: IAtomicSwapBase.CoinStruct;
     maker: AddressLike;
@@ -40,6 +41,7 @@ export declare namespace IAtomicSwapBase {
   };
 
   export type MakeSwapMsgStructOutput = [
+    uuid: string,
     sellToken: IAtomicSwapBase.CoinStructOutput,
     buyToken: IAtomicSwapBase.CoinStructOutput,
     maker: string,
@@ -48,6 +50,7 @@ export declare namespace IAtomicSwapBase {
     expireAt: bigint,
     acceptBid: boolean
   ] & {
+    uuid: string;
     sellToken: IAtomicSwapBase.CoinStructOutput;
     buyToken: IAtomicSwapBase.CoinStructOutput;
     maker: string;

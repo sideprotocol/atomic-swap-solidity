@@ -38,7 +38,6 @@ export interface AtomicSwapBaseInterface extends Interface {
       | "bids"
       | "buyerFeeRate"
       | "counteroffers"
-      | "nonces"
       | "owner"
       | "renounceOwnership"
       | "sellerFeeRate"
@@ -71,7 +70,6 @@ export interface AtomicSwapBaseInterface extends Interface {
     functionFragment: "counteroffers",
     values: [BytesLike, AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -99,7 +97,6 @@ export interface AtomicSwapBaseInterface extends Interface {
     functionFragment: "counteroffers",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -317,8 +314,6 @@ export interface AtomicSwapBase extends BaseContract {
     "view"
   >;
 
-  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
-
   owner: TypedContractMethod<[], [string], "view">;
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
@@ -396,9 +391,6 @@ export interface AtomicSwapBase extends BaseContract {
     [bigint],
     "view"
   >;
-  getFunction(
-    nameOrSignature: "nonces"
-  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;

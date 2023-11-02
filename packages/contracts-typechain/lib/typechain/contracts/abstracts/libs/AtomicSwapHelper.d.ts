@@ -1,8 +1,8 @@
-import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
+import type { BaseContract, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../../common";
 export interface AtomicSwapHelperInterface extends Interface {
     getFunction(nameOrSignature: "generateNewAtomicSwapID"): FunctionFragment;
-    encodeFunctionData(functionFragment: "generateNewAtomicSwapID", values: [BigNumberish, AddressLike]): string;
+    encodeFunctionData(functionFragment: "generateNewAtomicSwapID", values: [BytesLike, AddressLike]): string;
     decodeFunctionResult(functionFragment: "generateNewAtomicSwapID", data: BytesLike): Result;
 }
 export interface AtomicSwapHelper extends BaseContract {
@@ -19,15 +19,15 @@ export interface AtomicSwapHelper extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     generateNewAtomicSwapID: TypedContractMethod<[
-        swapOrderCounter: BigNumberish,
-        sender: AddressLike
+        uuid: BytesLike,
+        contractAddress: AddressLike
     ], [
         string
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "generateNewAtomicSwapID"): TypedContractMethod<[
-        swapOrderCounter: BigNumberish,
-        sender: AddressLike
+        uuid: BytesLike,
+        contractAddress: AddressLike
     ], [
         string
     ], "view">;
