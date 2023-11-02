@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
-import { Settings, InchainAtomicSwap, MockToken } from "@sideprotocol/contracts-typechain";
-import AtomicSwapABI from "@sideprotocol/contracts-typechain/abi/contracts/inchain_atomicswap/InchainAtomicSwap.sol/InchainAtomicSwap.json";
-import MockTokenABI from "@sideprotocol/contracts-typechain/abi/contracts/mocks/MockToken.sol/MockToken.json";
+import { Settings, MockToken__factory } from "@sideprotocol/contracts-typechain";
+import { InchainAtomicSwap__factory } from "@sideprotocol/contracts-typechain";
 import { BlockTimer } from "./utils";
 const enum AtomicSwapMsgType {
   MAKE_SWAP,
@@ -33,13 +32,10 @@ export class AtomicSwapCli {
     acceptBid: boolean = true,
     expireAt?: number
   ) {
-    const atomicSwap = new ethers.Contract(
-      Settings.inChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.maker
-    ) as unknown as InchainAtomicSwap;
-    const usdc = new ethers.Contract(Settings.mockUSDC, MockTokenABI.abi, this.maker) as unknown as MockToken;
-    const usdt = new ethers.Contract(Settings.mockUSDC, MockTokenABI.abi, this.taker) as unknown as MockToken;
+    console.log("contract address:", Settings.inChainAtomicSwap_sepolia);
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.maker);
+    const usdc = MockToken__factory.connect(Settings.mockUSDC_sepolia, this.maker);
+    const usdt = MockToken__factory.connect(Settings.mockUSDT_sepolia, this.taker);
 
     await usdc.mint(this.maker.address, tokenA);
     await usdt.mint(this.taker.address, tokenB);
@@ -47,14 +43,14 @@ export class AtomicSwapCli {
     await usdc.approve(await atomicSwap.getAddress(), tokenA);
 
     const orderExpireAt = expireAt ?? (await this.timer.AfterSeconds(10000));
-
+    console.log("expireAt:", orderExpireAt);
     const payload = {
       sellToken: {
-        token: Settings.mockUSDC,
+        token: ethers.ZeroAddress, //Settings.mockUSDC_sepolia,
         amount: tokenA,
       },
       buyToken: {
-        token: Settings.mockUSDT,
+        token: Settings.mockUSDT_sepolia,
         amount: tokenB,
       },
       maker: this.maker.address,
@@ -64,18 +60,15 @@ export class AtomicSwapCli {
       acceptBid: acceptBid,
     };
 
-    const estimateGas = await atomicSwap.makeSwap.estimateGas(payload);
-    const tx = await atomicSwap.makeSwap(payload, { value: estimateGas * BigInt(1000) });
+    const estimateGas = await atomicSwap.makeSwap.estimateGas(payload, { value: payload.sellToken.amount });
+    console.log("estimateGas:", estimateGas);
+    const tx = await atomicSwap.makeSwap(payload, { value: payload.sellToken.amount, gasLimit: estimateGas });
     await this.log(AtomicSwapMsgType.MAKE_SWAP, tx);
   }
 
   async takeSwap(orderID: string, receiver?: string) {
-    const atomicSwap = new ethers.Contract(
-      Settings.interChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.taker
-    ) as unknown as InchainAtomicSwap;
-    const usdt = new ethers.Contract(Settings.mockUSDC, MockTokenABI.abi, this.taker) as unknown as MockToken;
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.taker);
+    const usdt = MockToken__factory.connect(Settings.mockUSDC_sepolia, this.taker);
 
     const order = await atomicSwap.swapOrder(orderID);
     await usdt.approve(await atomicSwap.getAddress(), order.buyToken.amount);
@@ -96,11 +89,7 @@ export class AtomicSwapCli {
   }
 
   async cancelSwap(orderID: string) {
-    const atomicSwap = new ethers.Contract(
-      Settings.inChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.maker
-    ) as unknown as InchainAtomicSwap;
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.maker);
     const tx = await atomicSwap.cancelSwap({
       orderID,
     });
@@ -108,11 +97,7 @@ export class AtomicSwapCli {
   }
 
   async placeBid(orderID: string, amount?: BigInt, expireAt?: number) {
-    const atomicSwap = new ethers.Contract(
-      Settings.inChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.bidder
-    ) as unknown as InchainAtomicSwap;
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.bidder);
     const order = await atomicSwap.swapOrder(orderID);
     const bidAmount = amount ?? order.minBidAmount;
     const bidExpireAt = expireAt ?? (await this.timer.AfterSeconds(10000));
@@ -130,11 +115,7 @@ export class AtomicSwapCli {
   }
 
   async updateBid(orderID: string, additionalAmount?: bigint) {
-    const atomicSwap = new ethers.Contract(
-      Settings.inChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.maker
-    ) as unknown as InchainAtomicSwap;
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.maker);
     const updateBidAmount = additionalAmount ?? ethers.parseEther("0.1");
     // make bid
     const tx = await atomicSwap.updateBid({
@@ -147,11 +128,7 @@ export class AtomicSwapCli {
 
   async acceptBid(orderID: string) {
     // make bid
-    const atomicSwap = new ethers.Contract(
-      Settings.inChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.maker
-    ) as unknown as InchainAtomicSwap;
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.maker);
     const tx = await atomicSwap.connect(this.maker).acceptBid({
       orderID,
       bidder: this.bidder.address,
@@ -160,11 +137,7 @@ export class AtomicSwapCli {
   }
 
   async cancelBid(orderID: string) {
-    const atomicSwap = new ethers.Contract(
-      Settings.inChainAtomicSwap,
-      AtomicSwapABI.abi,
-      this.bidder
-    ) as unknown as InchainAtomicSwap;
+    const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.bidder);
     const tx = await atomicSwap.cancelBid(orderID);
     await this.log(AtomicSwapMsgType.CANCEL_BID, tx);
   }
