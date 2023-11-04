@@ -97,6 +97,7 @@ interface IAtomicSwapBase {
     struct AcceptBidMsg {
         bytes32 orderID; // ID of the associated order.
         address bidder; // Address of the bidder whose bid is accepted.
+        //address receiveAddress; // Address of the maker's token receive address on counter party chain
     }
 
     // Struct for canceling an atomic swap order.

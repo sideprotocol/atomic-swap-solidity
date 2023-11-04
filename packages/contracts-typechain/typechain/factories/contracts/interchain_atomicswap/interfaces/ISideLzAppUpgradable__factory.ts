@@ -13,7 +13,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint16",
-        name: "_srcChainId",
+        name: "_dstChainId",
         type: "uint16",
       },
       {

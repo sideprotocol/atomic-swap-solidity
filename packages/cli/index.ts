@@ -37,6 +37,51 @@ yargs(hideBin(process.argv))
     }
   )
   .command(
+    "InterChainMakeSwap",
+    "Make a inter-chain swap",
+    {
+      srcChain: { type: "string", demandOption: true, describe: "source chain name" },
+      targetChain: { type: "string", demandOption: true, describe: "target chain name" },
+      tokenA: { type: "string", demandOption: true, describe: "Token A amount" },
+      tokenB: { type: "string", demandOption: true, describe: "Token B amount" },
+      minBidAmount: { type: "string", default: "", describe: "Minimum bid amount" },
+      acceptBid: { type: "boolean", default: true, describe: "Accept bid or not" },
+      expireAt: { type: "number", describe: "Expire time" },
+    },
+    async (args) => {
+      const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
+      try {
+        await cli.interChainMakeSwap(
+          args.srcChain,
+          args.targetChain,
+          BigInt(args.tokenA),
+          BigInt(args.tokenB),
+          args.minBidAmount ? BigInt(args.minBidAmount) : undefined,
+          args.acceptBid,
+          args.expireAt
+        );
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  )
+  .command(
+    "getOrder",
+    "Get Order from contract",
+    {
+      chain: { type: "string", demandOption: true, describe: "source chain name" },
+      orderID: { type: "string", demandOption: true, describe: "order id" },
+    },
+    async (args) => {
+      const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
+      try {
+        await cli.getOrder(args.chain, args.orderID);
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  )
+  .command(
     "takeSwap",
     "Take a swap",
     {

@@ -70,7 +70,7 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
-    bnb_test: {
+    bnb: {
       url: process.env.BNB_TESTNET_URL,
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
@@ -81,7 +81,17 @@ const config: HardhatUserConfig = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY!,
+      sepolia: process.env.ETHERSCAN_API_KEY!,
+      bscTestnet: process.env.BNBSCAN_API_KEY!,
+      polygon: process.env.POLYGON_API_KEY!,
+      polygonMumbai: process.env.POLYGON_API_KEY!,
+    },
+    // additionalNetworks: {
+    //   bnb: process.env.ETHERSCAN_API_KEY,
+    //   fantom: "YOUR_FTMSCAN_API_KEY",
+    // },
   },
   contractSizer: {
     alphaSort: true,

@@ -1,7 +1,15 @@
 import { ethers } from "ethers";
-import { Settings, MockToken__factory } from "@sideprotocol/contracts-typechain";
+import {
+  Settings,
+  CONSTANTS,
+  MockToken__factory,
+  InterchainAtomicSwap__factory,
+  SideLzAppUpgradable__factory,
+} from "@sideprotocol/contracts-typechain";
 import { InchainAtomicSwap__factory } from "@sideprotocol/contracts-typechain";
+
 import { BlockTimer } from "./utils";
+
 const enum AtomicSwapMsgType {
   MAKE_SWAP,
   TAKE_SWAP,
@@ -65,6 +73,83 @@ export class AtomicSwapCli {
     const estimateGas = await atomicSwap.makeSwap.estimateGas(payload, { value: payload.sellToken.amount });
     console.log("estimateGas:", estimateGas);
     const tx = await atomicSwap.makeSwap(payload, { value: payload.sellToken.amount, gasLimit: estimateGas });
+    await this.log(AtomicSwapMsgType.MAKE_SWAP, tx);
+  }
+
+  async interChainMakeSwap(
+    srcChain: string,
+    targetChain: string,
+    tokenA: bigint,
+    tokenB: bigint,
+    minBidAmount: bigint = tokenA / BigInt(2),
+    acceptBid: boolean = true,
+    expireAt?: number
+  ) {
+    console.log("contract address:", Settings[`interChainAtomicSwap_${srcChain}`]);
+    const srcContractAddress = Settings[`interChainAtomicSwap_${srcChain}`];
+    const bridgeAddress = Settings[`sideBridgeAddress_${srcChain}`];
+    console.log("bridge address:", bridgeAddress);
+    //const srcChainInfo = CONSTANTS.getChainInfo(srcChain);
+    const targetChainInfo = CONSTANTS.getChainInfo(targetChain);
+
+    //const targetContractAddress = Settings[`interChainAtomicSwap_${targetChain}`];
+    const bridge = SideLzAppUpgradable__factory.connect(bridgeAddress, this.maker);
+    const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.maker);
+
+    const orderExpireAt = expireAt ?? (await this.timer.AfterSeconds(10000));
+    const uuid = ethers.keccak256(ethers.randomBytes(32));
+    const base = {
+      uuid,
+      sellToken: {
+        token: ethers.ZeroAddress, //Settings.mockUSDC_sepolia,
+        amount: tokenA,
+      },
+      buyToken: {
+        token: Settings.mockUSDT_sepolia,
+        amount: tokenB,
+      },
+      maker: this.maker.address,
+      minBidAmount: minBidAmount,
+      desiredTaker: ethers.ZeroAddress,
+      expireAt: orderExpireAt,
+      acceptBid: acceptBid,
+    };
+    const payload = {
+      base,
+      makerReceiver: this.maker,
+      desiredTaker: this.taker.address,
+      dstChainID: targetChainInfo.chainId,
+    };
+
+    const encoder = new ethers.AbiCoder();
+    const payloadBytes = encoder.encode(
+      [
+        "tuple(bytes32,tuple(address, uint256),tuple(address, uint256),address,address,address,uint256,bool)",
+        "address",
+        "address",
+        "uint256",
+      ],
+      [
+        [
+          base.uuid,
+          [base.sellToken.token, base.sellToken.amount.toString()],
+          [base.buyToken.token, base.buyToken.amount.toString()],
+          base.maker,
+          base.maker,
+          base.desiredTaker,
+          base.expireAt,
+          true,
+        ],
+        base.maker,
+        base.desiredTaker,
+        targetChainInfo.chainId,
+      ]
+    );
+    const estimateFee = await bridge.estimateFee(payload.dstChainID, false, "0x", payloadBytes);
+    const nativeFee = payload.base.sellToken.amount + estimateFee.nativeFee;
+    const tx = await atomicSwap.makeSwap(payload, {
+      value: nativeFee,
+    });
     await this.log(AtomicSwapMsgType.MAKE_SWAP, tx);
   }
 
@@ -182,5 +267,15 @@ export class AtomicSwapCli {
     keys.forEach((key) => {
       console.log(`${key}:==>`, event.args[key]);
     });
+  }
+
+  // queries
+  async getOrder(chain: string, orderIID: string) {
+    console.log("contract address:", Settings[`interChainAtomicSwap_${chain}`]);
+    const srcContractAddress = Settings[`interChainAtomicSwap_${chain}`];
+
+    const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.maker);
+    const order = await atomicSwap.swapOrder(orderIID);
+    console.log("newOrder", order);
   }
 }

@@ -26,10 +26,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ContextUpgradeable__factory>;
     getContractFactory(
-      name: "NoncesUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.NoncesUpgradeable__factory>;
-    getContractFactory(
       name: "ReentrancyGuardUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuardUpgradeable__factory>;
@@ -158,11 +154,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ContextUpgradeable>;
     getContractAt(
-      name: "NoncesUpgradeable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.NoncesUpgradeable>;
-    getContractAt(
       name: "ReentrancyGuardUpgradeable",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -316,10 +307,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ContextUpgradeable>;
     deployContract(
-      name: "NoncesUpgradeable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.NoncesUpgradeable>;
-    deployContract(
       name: "ReentrancyGuardUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuardUpgradeable>;
@@ -447,11 +434,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ContextUpgradeable>;
-    deployContract(
-      name: "NoncesUpgradeable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.NoncesUpgradeable>;
     deployContract(
       name: "ReentrancyGuardUpgradeable",
       args: any[],

@@ -1,4 +1,5 @@
 export * from "./typechain";
+import * as constants from "./constants/constants";
 export declare const Settings: {
     atomicSwapHelper_sepolia: string;
     inChainAtomicSwap_mumbai: string;
@@ -7,4 +8,14 @@ export declare const Settings: {
     inChainAtomicSwap_sepolia: string;
     mockUSDC_sepolia: string;
     mockUSDT_sepolia: string;
+    atomicSwapMsgValidator_sepolia: string;
+    interchainAtomicSwapLogic_sepolia: string;
+    sideBridgeAddress_sepolia: string;
+    interChainAtomicSwap_sepolia: string;
+    atomicSwapHelper_bnb: string;
+    atomicSwapMsgValidator_bnb: string;
+    interchainAtomicSwapLogic_bnb: string;
+    sideBridgeAddress_bnb: string;
+    interChainAtomicSwap_bnb: string;
 };
+export declare const CONSTANTS: typeof constants;

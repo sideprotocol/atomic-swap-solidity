@@ -7,7 +7,7 @@ import {
 } from "../../utils/utils";
 import { expect } from "chai";
 
-describe("ITCAtomicSwap: TakeSwap", () => {
+describe.only("ITCAtomicSwap: TakeSwap", () => {
   const testTakeSwap = async (withNativeToken?: boolean) => {
     const {
       orderID,

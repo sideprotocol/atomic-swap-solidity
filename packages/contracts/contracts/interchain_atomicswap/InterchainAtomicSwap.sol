@@ -76,7 +76,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         bytes memory payload = abi.encode(0, MsgType.MAKESWAP, id, lzmakeswap);
         // Send the interchain creation message.
         bridge.sendLzMsg{value: nativeFee}(
-            chainID,
+            icMakeSwap.dstChainID,
             payable(msg.sender),
             payload
         );
@@ -128,10 +128,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Prepare the payload for the interchain message
         bytes memory payload = abi.encode(0, MsgType.TAKESWAP, takeswap);
+        uint16 dstChainID = swapOrderITCParams[takeswap.orderID].dstChainID;
 
         // Send the interchain completion message
         bridge.sendLzMsg{value: nativeFee}(
-            chainID,
+            dstChainID,
             payable(msg.sender),
             payload
         );
@@ -179,8 +180,9 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         swapOrder.removeAtomicSwapOrder(cancelswap.orderID);
         // Send the interchain cancellation message
+        uint16 dstChainID = swapOrderITCParams[cancelswap.orderID].dstChainID;
         bridge.sendLzMsg{value: msg.value}(
-            chainID,
+            dstChainID,
             payable(msg.sender),
             payload
         );
@@ -243,10 +245,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Encode the bid message into a payload
         bytes memory payload = abi.encode(0, MsgType.PLACEBID, placeBidMsg);
+        uint16 dstChainID = swapOrderITCParams[placeBidMsg.orderID].dstChainID;
 
         // Send the interchain message with the necessary payload
         bridge.sendLzMsg{value: nativeFee}(
-            chainID,
+            dstChainID,
             payable(msg.sender),
             payload
         );
@@ -373,10 +376,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Encode the bid message into a payload
         bytes memory payload = abi.encode(0, MsgType.ACCEPTBID, acceptBidMsg);
+        uint16 dstChainID = swapOrderITCParams[_orderID].dstChainID;
 
         // Send the interchain message with the necessary payload
         bridge.sendLzMsg{value: msg.value}(
-            chainID,
+            dstChainID,
             payable(msg.sender),
             payload
         );
@@ -418,10 +422,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Encode the bid message into a payload
         bytes memory payload = abi.encode(0, MsgType.ACCEPTBID, _orderID);
+        uint16 dstChainID = swapOrderITCParams[_orderID].dstChainID;
 
         // Send the interchain message with the necessary payload
         bridge.sendLzMsg{value: msg.value}(
-            chainID,
+            dstChainID,
             payable(msg.sender),
             payload
         );
@@ -444,8 +449,9 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             swapOrder[id].acceptBid = makeswap.acceptBid;
             swapOrder[id].buyToken = makeswap.buyToken;
             //swapOrder[id].expiredAt = makeswap.expireAt;
-            swapOrder[id].taker = makeswap.desiredTaker;
+            //swapOrder[id].taker = makeswap.desiredTaker;
             swapOrderITCParams[id].makerReceiver = makeswap.makerReceiver;
+            swapOrderITCParams[id].dstChainID = _srcChainID;
         } else if (msgType == MsgType.TAKESWAP) {
             TakeSwapMsg memory takeswap = abi.decode(
                 _payload[32:],
