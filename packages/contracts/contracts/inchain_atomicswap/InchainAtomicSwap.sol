@@ -79,10 +79,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyExist(takeswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
-        // Ensure the caller is the designated taker of the swap order
-        if (order.acceptBid) {
-            revert OrderNotAllowTake();
-        }
 
         if (order.taker != address(0) && order.taker != msg.sender) {
             revert UnauthorizedTakeAction();
@@ -150,12 +146,15 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Return the funds/tokens to the maker
         if (order.sellToken.token == address(0)) {
             // Refund Ether if the sell token was Ether
-            payable(msg.sender).transfer(order.buyToken.amount);
+            (bool success, ) = payable(msg.sender).call{
+                value: order.sellToken.amount
+            }("");
+            require(success, "Transfer failed.");
         } else {
             // Refund ERC20 tokens if the sell token was an ERC20 token
             IERC20(order.sellToken.token).transfer(
                 msg.sender,
-                order.buyToken.amount
+                order.sellToken.amount
             );
         }
 
@@ -214,6 +213,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Record the new bid
         bids.addNewBid(placeBidMsg);
+        emit PlacedBid(_orderID, msg.sender, _bidAmount);
     }
 
     function updateBid(
@@ -269,6 +269,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 revert MismatchedBidAmount(msg.value);
             }
         }
+        emit UpdatedBid(_orderID, _currentBid.bidder, _currentBid.amount);
     }
 
     function acceptBid(
@@ -327,6 +328,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             maxFee,
             treasury
         );
+
+        emit AcceptedBid(_orderID, _bidder, selectedBid.amount);
     }
 
     function cancelBid(
@@ -361,8 +364,13 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             );
         } else {
             // If buy token is Ether, transfer it back to the bidder
-            payable(selectedBid.bidder).transfer(selectedBid.amount);
+            (bool success, ) = payable(msg.sender).call{
+                value: selectedBid.amount
+            }("");
+            require(success, "Transfer failed.");
         }
+
+        emit CanceledBid(_orderID, selectedBid.bidder);
     }
 
     function counteroffer(CounterOfferMsg calldata counterOfferMsg) external {

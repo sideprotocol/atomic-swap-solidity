@@ -384,6 +384,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             payable(msg.sender),
             payload
         );
+        emit AcceptedBid(_orderID, _bidder, selectedBid.amount);
     }
 
     function cancelBid(
@@ -430,6 +431,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             payable(msg.sender),
             payload
         );
+        emit CanceledBid(_orderID, selectedBid.bidder);
     }
 
     function onReceivePacket(

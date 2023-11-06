@@ -66,6 +66,23 @@ yargs(hideBin(process.argv))
     }
   )
   .command(
+    "InterChainTakeSwap",
+    "Make a inter-chain swap",
+    {
+      orderID: { type: "string", demandOption: true, describe: "orderID" },
+      chain: { type: "string", demandOption: true, describe: "chainID of taker chain" },
+      receiver: { type: "string", demandOption: true, describe: "Taker Receiver address" },
+    },
+    async (args) => {
+      const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
+      try {
+        await cli.interChainTakeSwap(args.orderID, args.chain, args.receiver);
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  )
+  .command(
     "getOrder",
     "Get Order from contract",
     {

@@ -33,6 +33,7 @@ export interface IInterchainAtomicSwapInterface extends Interface {
       | "AtomicSwapOrderCreated"
       | "AtomicSwapOrderTook"
       | "CanceledBid"
+      | "PlacedBid"
       | "ReceivedNewBid"
       | "UpdatedBid"
   ): EventFragment;
@@ -114,6 +115,24 @@ export namespace CanceledBidEvent {
   export interface OutputObject {
     orderID: string;
     bidder: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PlacedBidEvent {
+  export type InputTuple = [
+    orderID: BytesLike,
+    bidder: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
+  export interface OutputObject {
+    orderID: string;
+    bidder: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -264,6 +283,13 @@ export interface IInterchainAtomicSwap extends BaseContract {
     CanceledBidEvent.OutputObject
   >;
   getEvent(
+    key: "PlacedBid"
+  ): TypedContractEvent<
+    PlacedBidEvent.InputTuple,
+    PlacedBidEvent.OutputTuple,
+    PlacedBidEvent.OutputObject
+  >;
+  getEvent(
     key: "ReceivedNewBid"
   ): TypedContractEvent<
     ReceivedNewBidEvent.InputTuple,
@@ -332,6 +358,17 @@ export interface IInterchainAtomicSwap extends BaseContract {
       CanceledBidEvent.InputTuple,
       CanceledBidEvent.OutputTuple,
       CanceledBidEvent.OutputObject
+    >;
+
+    "PlacedBid(bytes32,address,uint256)": TypedContractEvent<
+      PlacedBidEvent.InputTuple,
+      PlacedBidEvent.OutputTuple,
+      PlacedBidEvent.OutputObject
+    >;
+    PlacedBid: TypedContractEvent<
+      PlacedBidEvent.InputTuple,
+      PlacedBidEvent.OutputTuple,
+      PlacedBidEvent.OutputObject
     >;
 
     "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<

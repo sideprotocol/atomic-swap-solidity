@@ -98,6 +98,7 @@ export class AtomicSwapCli {
 
     const orderExpireAt = expireAt ?? (await this.timer.AfterSeconds(10000));
     const uuid = ethers.keccak256(ethers.randomBytes(32));
+    const targetToken = Settings[`mockUSDT_${targetChain}`];
     const base = {
       uuid,
       sellToken: {
@@ -105,7 +106,7 @@ export class AtomicSwapCli {
         amount: tokenA,
       },
       buyToken: {
-        token: Settings.mockUSDT_sepolia,
+        token: targetToken,
         amount: tokenB,
       },
       maker: this.maker.address,
@@ -175,11 +176,43 @@ export class AtomicSwapCli {
     await this.log(AtomicSwapMsgType.TAKE_SWAP, tx);
   }
 
+  async interChainTakeSwap(orderID: string, network: string = "sepolia", receiver?: string) {
+    const srcContractAddress = Settings[`interChainAtomicSwap_${network}`];
+    const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.taker);
+
+    const buyToken = Settings[`mockUSDT_${network}`];
+    const usdt = MockToken__factory.connect(buyToken, this.taker);
+
+    const order = await atomicSwap.swapOrder(orderID);
+    await usdt.approve(await atomicSwap.getAddress(), order.buyToken.amount);
+    const takerReceiver = receiver ?? this.taker.address;
+
+    const estimateGas = await atomicSwap.takeSwap.estimateGas({
+      orderID,
+      takerReceiver,
+    });
+    const tx = await atomicSwap.takeSwap(
+      {
+        orderID,
+        takerReceiver,
+      },
+      { value: estimateGas }
+    );
+    await this.log(AtomicSwapMsgType.TAKE_SWAP, tx);
+  }
+
   async cancelSwap(orderID: string) {
     const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.maker);
-    const tx = await atomicSwap.cancelSwap({
-      orderID,
-    });
+    // const gas = await atomicSwap.cancelSwap.estimateGas({
+    //   orderID,
+    // });
+    const tx = await atomicSwap.cancelSwap(
+      {
+        orderID,
+      },
+      { gasLimit: 300000 }
+    );
+
     await this.log(AtomicSwapMsgType.CANCEL_SWAP, tx);
   }
 
@@ -270,12 +303,13 @@ export class AtomicSwapCli {
   }
 
   // queries
-  async getOrder(chain: string, orderIID: string) {
-    console.log("contract address:", Settings[`interChainAtomicSwap_${chain}`]);
-    const srcContractAddress = Settings[`interChainAtomicSwap_${chain}`];
+  async getOrder(chain: string, orderID: string) {
+    console.log("contract address:", Settings[`inChainAtomicSwap_${chain}`]);
+    const srcContractAddress = Settings[`inChainAtomicSwap_${chain}`];
 
-    const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.maker);
-    const order = await atomicSwap.swapOrder(orderIID);
+    const atomicSwap = InchainAtomicSwap__factory.connect(srcContractAddress, this.maker);
+    console.log("order", orderID);
+    const order = await atomicSwap.swapOrder(orderID);
     console.log("newOrder", order);
   }
 }

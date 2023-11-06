@@ -230,6 +230,26 @@ export declare class IInterchainAtomicSwap__factory {
             readonly name: "amount";
             readonly type: "uint256";
         }];
+        readonly name: "PlacedBid";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "bidder";
+            readonly type: "address";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
         readonly name: "ReceivedNewBid";
         readonly type: "event";
     }, {

@@ -74,8 +74,7 @@ library AtomicSwapHelper {
             safeTransfer(token, recipient, amountAfterFee);
             safeTransfer(token, treasury, fee);
         } else {
-            payable(recipient).transfer(amountAfterFee);
-            payable(treasury).transfer(fee);
+            _etherExchange(recipient, treasury, amountAfterFee, fee);
         }
     }
 
@@ -95,9 +94,22 @@ library AtomicSwapHelper {
             safeTransferFrom(token, from, recipient, amountAfterFee);
             safeTransferFrom(token, from, treasury, fee);
         } else {
-            payable(recipient).transfer(amountAfterFee);
-            payable(treasury).transfer(fee);
+            _etherExchange(recipient, treasury, amountAfterFee, fee);
         }
+    }
+
+    function _etherExchange(
+        address recipient,
+        address treasury,
+        uint amountAfterFee,
+        uint fee
+    ) internal {
+        (bool successToReceipient, ) = payable(recipient).call{
+            value: amountAfterFee
+        }("");
+        require(successToReceipient, "Transfer failed.");
+        (bool successToTreasury, ) = payable(treasury).call{value: fee}("");
+        require(successToTreasury, "Transfer failed.");
     }
 
     function generateNewAtomicSwapID(

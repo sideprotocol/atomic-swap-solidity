@@ -139,6 +139,12 @@ interface IAtomicSwapBase {
     );
     event CanceledBid(bytes32 indexed orderID, address indexed bidder);
 
+    event PlacedBid(
+        bytes32 indexed orderID,
+        address indexed bidder,
+        uint indexed amount
+    );
+
     // Custom error definitions for better clarity in revert messages.
     // Error indicating that the swap already exists.
     error OrderAlreadyExists();
