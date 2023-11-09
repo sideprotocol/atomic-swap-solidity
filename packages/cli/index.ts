@@ -8,7 +8,7 @@ dotenv.config();
 const makerPriv = process.env.MAKER_PRIV!;
 const takerPriv = process.env.TAKER_PRIV!;
 const bidderPriv = process.env.BIDDER_PRIV!;
-const providerUrl = process.env.PROVIDER_URL!;
+//const providerUrl = process.env.PROVIDER_URL!;
 
 yargs(hideBin(process.argv))
   .command(
@@ -22,6 +22,8 @@ yargs(hideBin(process.argv))
       expireAt: { type: "number", describe: "Expire time" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       try {
         await cli.makeSwap(
@@ -49,6 +51,7 @@ yargs(hideBin(process.argv))
       expireAt: { type: "number", describe: "Expire time" },
     },
     async (args) => {
+      const providerUrl = process.env[`PROVIDER_URL_${args.srcChain.toUpperCase()}`]!;
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       try {
         await cli.interChainMakeSwap(
@@ -74,6 +77,7 @@ yargs(hideBin(process.argv))
       receiver: { type: "string", demandOption: true, describe: "Taker Receiver address" },
     },
     async (args) => {
+      const providerUrl = process.env[`PROVIDER_URL_${args.chain.toUpperCase()}`]!;
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       try {
         await cli.interChainTakeSwap(args.orderID, args.chain, args.receiver);
@@ -90,6 +94,8 @@ yargs(hideBin(process.argv))
       orderID: { type: "string", demandOption: true, describe: "order id" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       try {
         await cli.getOrder(args.chain, args.orderID);
@@ -106,6 +112,8 @@ yargs(hideBin(process.argv))
       receiver: { type: "string", default: "", describe: "Receiver address" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       await cli.takeSwap(args.orderID, args.receiver == "" ? undefined : args.receiver);
     }
@@ -117,6 +125,8 @@ yargs(hideBin(process.argv))
       orderID: { type: "string", demandOption: true, describe: "Order ID" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       await cli.cancelSwap(args.orderID);
     }
@@ -130,6 +140,8 @@ yargs(hideBin(process.argv))
       expireAt: { type: "number", default: 0, describe: "Expire time" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       await cli.placeBid(args.orderID, BigInt(args.amount), args.expireAt);
     }
@@ -142,6 +154,8 @@ yargs(hideBin(process.argv))
       addition: { type: "string", default: "0.1", describe: "Bid amount" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       await cli.updateBid(args.orderID, BigInt(args.addition));
     }
@@ -153,6 +167,8 @@ yargs(hideBin(process.argv))
       orderID: { type: "string", demandOption: true, describe: "Order ID" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       await cli.acceptBid(args.orderID);
     }
@@ -164,6 +180,8 @@ yargs(hideBin(process.argv))
       orderID: { type: "string", demandOption: true, describe: "Order ID" },
     },
     async (args) => {
+      const providerUrl = process.env.PROVIDER_URL!;
+
       const cli = new AtomicSwapCli(makerPriv, takerPriv, bidderPriv, providerUrl);
       // Assuming you've added a cancelBid method to the AtomicSwapCli class
       await cli.cancelBid(args.orderID);

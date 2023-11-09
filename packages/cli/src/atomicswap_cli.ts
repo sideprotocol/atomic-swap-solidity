@@ -146,6 +146,7 @@ export class AtomicSwapCli {
         targetChainInfo.chainId,
       ]
     );
+
     const estimateFee = await bridge.estimateFee(payload.dstChainID, false, "0x", payloadBytes);
     const nativeFee = payload.base.sellToken.amount + estimateFee.nativeFee;
     const tx = await atomicSwap.makeSwap(payload, {
@@ -178,7 +179,9 @@ export class AtomicSwapCli {
 
   async interChainTakeSwap(orderID: string, network: string = "sepolia", receiver?: string) {
     const srcContractAddress = Settings[`interChainAtomicSwap_${network}`];
+    const bridgeAddress = Settings[`sideBridgeAddress_${network}`];
     const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.taker);
+    const bridge = SideLzAppUpgradable__factory.connect(bridgeAddress, this.maker);
 
     const buyToken = Settings[`mockUSDT_${network}`];
     const usdt = MockToken__factory.connect(buyToken, this.taker);
@@ -187,18 +190,30 @@ export class AtomicSwapCli {
     await usdt.approve(await atomicSwap.getAddress(), order.buyToken.amount);
     const takerReceiver = receiver ?? this.taker.address;
 
-    const estimateGas = await atomicSwap.takeSwap.estimateGas({
-      orderID,
-      takerReceiver,
-    });
-    const tx = await atomicSwap.takeSwap(
+    // const estimateGas = await atomicSwap.takeSwap.estimateGas({
+    //   orderID,
+    //   takerReceiver,
+    // });
+    const encoder = new ethers.AbiCoder();
+    const payloadBytes = encoder.encode(["bytes32", "address"], [orderID, receiver]);
+    const swapParams = await atomicSwap.swapOrderITCParams(orderID);
+    const estimateFee = await bridge.estimateFee(swapParams.dstChainID, false, "0x", payloadBytes);
+    const gas = await atomicSwap.takeSwap.estimateGas(
       {
         orderID,
         takerReceiver,
       },
-      { value: estimateGas }
+      { value: estimateFee.nativeFee * BigInt(20) }
     );
-    await this.log(AtomicSwapMsgType.TAKE_SWAP, tx);
+    console.log("Gas:", gas);
+    // const tx = await atomicSwap.takeSwap(
+    //   {
+    //     orderID,
+    //     takerReceiver,
+    //   },
+    //   { value: estimateFee.nativeFee, gasLimit: gas }
+    // );
+    // await this.log(AtomicSwapMsgType.TAKE_SWAP, tx);
   }
 
   async cancelSwap(orderID: string) {
