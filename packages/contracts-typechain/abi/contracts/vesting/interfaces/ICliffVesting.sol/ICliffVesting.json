@@ -1,0 +1,75 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ICliffVesting",
+  "sourceName": "contracts/vesting/interfaces/ICliffVesting.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "CliffNotEnded",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoVestedTokensAvailable",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        }
+      ],
+      "name": "VestingAlreadyStarted",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cliffDurationInHours",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "durationInHours",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "releaseIntervalInHours",
+          "type": "uint256"
+        }
+      ],
+      "name": "startVesting",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

@@ -7,10 +7,13 @@ import "hardhat/console.sol";
 import "./libs/InterchainAtomicSwapLogic.sol";
 import "../abstracts/libs/AtomicSwapMsgValidator.sol";
 
-import "../abstracts/libs/AtomicSwapHelper.sol";
+import "../abstracts/libs/AtomicSwapStateLogic.sol";
+import "../abstracts/libs/TokenTransferHelper.sol";
 
 contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
-    using AtomicSwapHelper for *;
+    using AtomicSwapStateLogic for *;
+    using TokenTransferHelper for *;
+
     using InterchainAtomicSwapLogic for *;
     using AtomicSwapMsgValidator for *;
     ISideLzAppUpgradable public bridge;

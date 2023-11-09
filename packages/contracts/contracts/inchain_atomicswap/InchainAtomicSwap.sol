@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 import "../abstracts/AtomicSwapBase.sol";
-import "../abstracts/libs/AtomicSwapHelper.sol";
+import "../abstracts/libs/AtomicSwapStateLogic.sol";
+import "../abstracts/libs/TokenTransferHelper.sol";
 import "./interfaces/IInchainAtomicSwap.sol";
 import "hardhat/console.sol";
 
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
-    using AtomicSwapHelper for *;
+    using AtomicSwapStateLogic for *;
+    using TokenTransferHelper for *;
 
     function initialize(
         address _admin,

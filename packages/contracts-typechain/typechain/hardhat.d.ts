@@ -62,13 +62,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IAtomicSwapBase__factory>;
     getContractFactory(
-      name: "AtomicSwapHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AtomicSwapHelper__factory>;
-    getContractFactory(
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
+    getContractFactory(
+      name: "AtomicSwapState",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AtomicSwapState__factory>;
+    getContractFactory(
+      name: "AtomicSwapStateLogic",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AtomicSwapStateLogic__factory>;
+    getContractFactory(
+      name: "TokenTransferHelper",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TokenTransferHelper__factory>;
     getContractFactory(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -137,6 +145,14 @@ declare module "hardhat/types/runtime" {
       name: "MockToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
+    getContractFactory(
+      name: "Vesting",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Vesting__factory>;
+    getContractFactory(
+      name: "ICliffVesting",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ICliffVesting__factory>;
 
     getContractAt(
       name: "OwnableUpgradeable",
@@ -199,15 +215,25 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IAtomicSwapBase>;
     getContractAt(
-      name: "AtomicSwapHelper",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AtomicSwapHelper>;
-    getContractAt(
       name: "AtomicSwapMsgValidator",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.AtomicSwapMsgValidator>;
+    getContractAt(
+      name: "AtomicSwapState",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AtomicSwapState>;
+    getContractAt(
+      name: "AtomicSwapStateLogic",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AtomicSwapStateLogic>;
+    getContractAt(
+      name: "TokenTransferHelper",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TokenTransferHelper>;
     getContractAt(
       name: "InchainAtomicSwap",
       address: string | ethers.Addressable,
@@ -293,6 +319,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
+    getContractAt(
+      name: "Vesting",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Vesting>;
+    getContractAt(
+      name: "ICliffVesting",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ICliffVesting>;
 
     deployContract(
       name: "OwnableUpgradeable",
@@ -343,13 +379,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAtomicSwapBase>;
     deployContract(
-      name: "AtomicSwapHelper",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapHelper>;
-    deployContract(
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
+      name: "AtomicSwapState",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapState>;
+    deployContract(
+      name: "AtomicSwapStateLogic",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapStateLogic>;
+    deployContract(
+      name: "TokenTransferHelper",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TokenTransferHelper>;
     deployContract(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -418,6 +462,14 @@ declare module "hardhat/types/runtime" {
       name: "MockToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
+    deployContract(
+      name: "Vesting",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Vesting>;
+    deployContract(
+      name: "ICliffVesting",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ICliffVesting>;
 
     deployContract(
       name: "OwnableUpgradeable",
@@ -480,15 +532,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAtomicSwapBase>;
     deployContract(
-      name: "AtomicSwapHelper",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapHelper>;
-    deployContract(
       name: "AtomicSwapMsgValidator",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
+      name: "AtomicSwapState",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapState>;
+    deployContract(
+      name: "AtomicSwapStateLogic",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapStateLogic>;
+    deployContract(
+      name: "TokenTransferHelper",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TokenTransferHelper>;
     deployContract(
       name: "InchainAtomicSwap",
       args: any[],
@@ -574,6 +636,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
+    deployContract(
+      name: "Vesting",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Vesting>;
+    deployContract(
+      name: "ICliffVesting",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ICliffVesting>;
 
     // default types
     getContractFactory(
