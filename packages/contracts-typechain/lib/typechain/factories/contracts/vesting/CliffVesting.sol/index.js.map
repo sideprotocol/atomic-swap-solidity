@@ -1,1 +1,1 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../../../../typechain/factories/contracts/vesting/CliffVesting.sol/index.ts"],"names":[],"mappings":";;;AAAA,+CAA+C;AAC/C,oBAAoB;AACpB,oBAAoB;AACpB,uDAAsD;AAA7C,oHAAA,gBAAgB,OAAA"}
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../../../../../typechain/factories/contracts/vesting/CliffVesting.sol/index.ts"],"names":[],"mappings":";;;AAAA,+CAA+C;AAC/C,oBAAoB;AACpB,oBAAoB;AACpB,iEAAgE;AAAvD,8HAAA,qBAAqB,OAAA;AAC9B,uDAAsD;AAA7C,oHAAA,gBAAgB,OAAA"}

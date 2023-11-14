@@ -42,6 +42,7 @@ export interface AtomicSwapBaseInterface extends Interface {
       | "renounceOwnership"
       | "sellerFeeRate"
       | "swapOrder"
+      | "swapOrderVestingParams"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -85,6 +86,10 @@ export interface AtomicSwapBaseInterface extends Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "swapOrderVestingParams",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
@@ -108,6 +113,10 @@ export interface AtomicSwapBaseInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "swapOrderVestingParams",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -373,6 +382,12 @@ export interface AtomicSwapBase extends BaseContract {
     "view"
   >;
 
+  swapOrderVestingParams: TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
+    "view"
+  >;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -452,6 +467,13 @@ export interface AtomicSwapBase extends BaseContract {
         acceptBid: boolean;
       }
     ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "swapOrderVestingParams"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
     "view"
   >;
   getFunction(

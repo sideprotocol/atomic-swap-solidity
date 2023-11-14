@@ -58,6 +58,10 @@ export declare class IInchainAtomicSwap__factory {
         readonly name: "InvalidMinimumBidLimit";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidTotalPercentage";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "uint256";
             readonly name: "amount";
@@ -110,6 +114,10 @@ export declare class IInchainAtomicSwap__factory {
         readonly name: "OrderNotAllowTake";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "OverMaximumReleaseStep";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "caller";
@@ -136,6 +144,10 @@ export declare class IInchainAtomicSwap__factory {
     }, {
         readonly inputs: readonly [];
         readonly name: "UnsupportedTokenPair";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "ZeroReleaseSchedule";
         readonly type: "error";
     }, {
         readonly anonymous: false;

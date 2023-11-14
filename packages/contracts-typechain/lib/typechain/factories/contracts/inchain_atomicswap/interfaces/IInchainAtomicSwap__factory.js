@@ -81,6 +81,11 @@ const _abi = [
         type: "error",
     },
     {
+        inputs: [],
+        name: "InvalidTotalPercentage",
+        type: "error",
+    },
+    {
         inputs: [
             {
                 internalType: "uint256",
@@ -149,6 +154,11 @@ const _abi = [
         type: "error",
     },
     {
+        inputs: [],
+        name: "OverMaximumReleaseStep",
+        type: "error",
+    },
+    {
         inputs: [
             {
                 internalType: "address",
@@ -182,6 +192,11 @@ const _abi = [
     {
         inputs: [],
         name: "UnsupportedTokenPair",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "ZeroReleaseSchedule",
         type: "error",
     },
     {

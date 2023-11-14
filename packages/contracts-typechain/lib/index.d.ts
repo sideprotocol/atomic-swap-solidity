@@ -17,5 +17,8 @@ export declare const Settings: {
     interchainAtomicSwapLogic_bnb: string;
     sideBridgeAddress_bnb: string;
     interChainAtomicSwap_bnb: string;
+    vesting_sepolia: string;
+    atomicSwapStateLogic_sepolia: string;
+    tokenTransferHelper_sepolia: string;
 };
 export declare const CONSTANTS: typeof constants;

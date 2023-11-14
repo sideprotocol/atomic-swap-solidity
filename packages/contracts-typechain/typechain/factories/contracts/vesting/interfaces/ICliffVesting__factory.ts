@@ -11,12 +11,27 @@ import type {
 const _abi = [
   {
     inputs: [],
-    name: "CliffNotEnded",
+    name: "InvalidTotalPercentage",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidVesting",
     type: "error",
   },
   {
     inputs: [],
     name: "NoVestedTokensAvailable",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NoVestedTokensForRelease",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "OverMaximumReleaseStep",
     type: "error",
   },
   {
@@ -31,26 +46,54 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "VestingNotStarted",
+    type: "error",
+  },
+  {
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Received",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "beneficiary",
         type: "address",
       },
       {
+        indexed: true,
         internalType: "uint256",
-        name: "start",
+        name: "amount",
         type: "uint256",
       },
+    ],
+    name: "Released",
+    type: "event",
+  },
+  {
+    inputs: [
       {
-        internalType: "uint256",
-        name: "cliffDurationInHours",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "durationInHours",
-        type: "uint256",
+        internalType: "address",
+        name: "beneficiary",
+        type: "address",
       },
       {
         internalType: "address",
@@ -63,9 +106,21 @@ const _abi = [
         type: "uint256",
       },
       {
-        internalType: "uint256",
-        name: "releaseIntervalInHours",
-        type: "uint256",
+        components: [
+          {
+            internalType: "uint256",
+            name: "durationInHours",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "percentage",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IAtomicSwapBase.Release[]",
+        name: "releases",
+        type: "tuple[]",
       },
     ],
     name: "startVesting",

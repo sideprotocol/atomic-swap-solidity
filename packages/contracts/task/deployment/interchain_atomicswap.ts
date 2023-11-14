@@ -17,23 +17,32 @@ task("deploy:inter-chain:lib", "deploy libraries")
   .setAction(async ({ f }, { ethers, upgrades, network }) => {
     // AtomicSwap contract deploy
     // deploy libraries
-    let atomicSwapHelperAddress =
-      Settings[`atomicSwapHelper_${network.name}` as keyof typeof Settings];
+    let atomicSwapStateLogicAddress =
+      Settings[`atomicSwapStateLogic_${network.name}` as keyof typeof Settings];
+    let tokenTransferHelperAddress =
+      Settings[`tokenTransferHelper_${network.name}` as keyof typeof Settings];
+    let interchainAtomicSwapLogicAddress =
+      Settings[
+        `interchainAtomicSwapLogic_${network.name}` as keyof typeof Settings
+      ];
     let atomicSwapMsgValidatorAddress =
       Settings[
         `atomicSwapMsgValidator_${network.name}` as keyof typeof Settings
       ];
 
-    let interchainAtomicSwapLogicAddress =
-      Settings[
-        `interchainAtomicSwapLogic_${network.name}` as keyof typeof Settings
-      ];
-
     if (f) {
-      const atomicSwapHelperFactory = await ethers.getContractFactory(
-        "AtomicSwapHelper"
+      const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+        `AtomicSwapStateLogic`
       );
-      const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
+      const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+      atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
+
+      const tokenTransferHelperFactory = await ethers.getContractFactory(
+        `TokenTransferHelper`
+      );
+      const tokenTransferHelper = await tokenTransferHelperFactory.deploy();
+      tokenTransferHelperAddress = await tokenTransferHelper.getAddress();
+
       const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
         "AtomicSwapMsgValidator"
       );
@@ -45,15 +54,18 @@ task("deploy:inter-chain:lib", "deploy libraries")
       const interchainAtomicSwapLogic =
         await ITCAtomicSwapLogicFactory.deploy();
 
-      atomicSwapHelperAddress = await atomicSwapHelper.getAddress();
       atomicSwapMsgValidatorAddress = await atomicSwapMsgValidator.getAddress();
       interchainAtomicSwapLogicAddress =
         await interchainAtomicSwapLogic.getAddress();
 
       await saveItemsToSetting([
         {
-          title: `atomicSwapHelper_${network.name}`,
-          value: atomicSwapHelperAddress,
+          title: `atomicSwapStateLogic_${network.name}`,
+          value: atomicSwapStateLogicAddress,
+        },
+        {
+          title: `tokenTransferHelper_${network.name}`,
+          value: tokenTransferHelperAddress,
         },
         {
           title: `atomicSwapMsgValidator_${network.name}`,
@@ -66,7 +78,14 @@ task("deploy:inter-chain:lib", "deploy libraries")
       ]);
     }
 
-    console.log(`atomicSwapHelper_${network.name}`, atomicSwapHelperAddress);
+    console.log(
+      `atomicSwapStateLogic_${network.name}`,
+      atomicSwapStateLogicAddress
+    );
+    console.log(
+      `tokenTransferHelper_${network.name}`,
+      tokenTransferHelperAddress
+    );
     console.log(
       `atomicSwapMsgValidator_${network.name}`,
       atomicSwapMsgValidatorAddress
@@ -98,8 +117,18 @@ task("deploy:inter-chain:contract", "deploy contracts")
     // AtomicSwap contract deploy
     // deploy libraries
 
-    let atomicSwapHelperAddress =
-      Settings[`atomicSwapHelper_${network.name}` as keyof typeof Settings];
+    let vestingAddress =
+      Settings[`vesting_${network.name}` as keyof typeof Settings];
+
+    if (!ethers.isAddress(vestingAddress)) {
+      console.error("Please deploy vesting contract first of all");
+      return;
+    }
+
+    let atomicSwapStateLogicAddress =
+      Settings[`atomicSwapStateLogic_${network.name}` as keyof typeof Settings];
+    let tokenTransferHelperAddress =
+      Settings[`tokenTransferHelper_${network.name}` as keyof typeof Settings];
     let atomicSwapMsgValidatorAddress =
       Settings[
         `atomicSwapMsgValidator_${network.name}` as keyof typeof Settings
@@ -110,10 +139,18 @@ task("deploy:inter-chain:contract", "deploy contracts")
       ];
 
     if (f) {
-      const atomicSwapHelperFactory = await ethers.getContractFactory(
-        "AtomicSwapHelper"
+      const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+        `AtomicSwapStateLogic`
       );
-      const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
+      const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+      atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
+
+      const tokenTransferHelperFactory = await ethers.getContractFactory(
+        `TokenTransferHelper`
+      );
+      const tokenTransferHelper = await tokenTransferHelperFactory.deploy();
+      tokenTransferHelperAddress = await tokenTransferHelper.getAddress();
+
       const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
         "AtomicSwapMsgValidator"
       );
@@ -125,19 +162,18 @@ task("deploy:inter-chain:contract", "deploy contracts")
       const interchainAtomicSwapLogic =
         await ITCAtomicSwapLogicFactory.deploy();
 
-      atomicSwapHelperAddress = await atomicSwapHelper.getAddress();
       atomicSwapMsgValidatorAddress = await atomicSwapMsgValidator.getAddress();
       interchainAtomicSwapLogicAddress =
         await interchainAtomicSwapLogic.getAddress();
 
       await saveItemsToSetting([
         {
-          title: `atomicSwapHelper_${network.name}`,
-          value: atomicSwapHelperAddress,
+          title: `atomicSwapStateLogic_${network.name}`,
+          value: atomicSwapStateLogicAddress,
         },
         {
-          title: `atomicSwapMsgValidator_${network.name}`,
-          value: atomicSwapMsgValidatorAddress,
+          title: `tokenTransferHelper_${network.name}`,
+          value: tokenTransferHelperAddress,
         },
         {
           title: `interchainAtomicSwapLogic_${network.name}`,
@@ -146,7 +182,8 @@ task("deploy:inter-chain:contract", "deploy contracts")
       ]);
     }
 
-    console.log("atomicSwapHelper", atomicSwapHelperAddress);
+    console.log("atomicSwapStateLogic", atomicSwapStateLogicAddress);
+    console.log("tokenTransfer", tokenTransferHelperAddress);
     console.log("atomicSwapMsgValidator", atomicSwapMsgValidatorAddress);
     console.log("interchainAtomicSwapLogic", interchainAtomicSwapLogicAddress);
 
@@ -183,7 +220,8 @@ task("deploy:inter-chain:contract", "deploy contracts")
       "InterchainAtomicSwap",
       {
         libraries: {
-          AtomicSwapHelper: atomicSwapHelperAddress,
+          AtomicSwapStateLogic: atomicSwapStateLogicAddress,
+          TokenTransferHelper: tokenTransferHelperAddress,
           AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
           InterchainAtomicSwapLogic: interchainAtomicSwapLogicAddress,
         },
@@ -192,6 +230,7 @@ task("deploy:inter-chain:contract", "deploy contracts")
 
     const initialAParams = {
       admin: admin,
+      vestingManager: vestingAddress,
       chainID: chainInfo.chainId,
       bridge: sideBridgeAddress,
       treasury: treasury,

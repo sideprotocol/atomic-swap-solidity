@@ -41,7 +41,7 @@ export interface VestingInterface extends Interface {
 
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [AddressLike, AddressLike, AddressLike, AddressLike, BigNumberish]
+    values: [AddressLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -176,13 +176,7 @@ export interface Vesting extends BaseContract {
   ): Promise<this>;
 
   initialize: TypedContractMethod<
-    [
-      _admin: AddressLike,
-      _inChainAtomicswap: AddressLike,
-      _interChainAtomicswap: AddressLike,
-      _treasury: AddressLike,
-      _sellerFee: BigNumberish
-    ],
+    [_admin: AddressLike, _treasury: AddressLike, _sellerFee: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -241,13 +235,7 @@ export interface Vesting extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [
-      _admin: AddressLike,
-      _inChainAtomicswap: AddressLike,
-      _interChainAtomicswap: AddressLike,
-      _treasury: AddressLike,
-      _sellerFee: BigNumberish
-    ],
+    [_admin: AddressLike, _treasury: AddressLike, _sellerFee: BigNumberish],
     [void],
     "nonpayable"
   >;

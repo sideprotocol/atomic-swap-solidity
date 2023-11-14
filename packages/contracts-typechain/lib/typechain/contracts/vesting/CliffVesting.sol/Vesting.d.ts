@@ -3,7 +3,7 @@ import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, Typed
 export interface VestingInterface extends Interface {
     getFunction(nameOrSignature: "initialize" | "owner" | "release" | "renounceOwnership" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "OwnershipTransferred" | "Released"): EventFragment;
-    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "release", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
@@ -76,8 +76,6 @@ export interface Vesting extends BaseContract {
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     initialize: TypedContractMethod<[
         _admin: AddressLike,
-        _inChainAtomicswap: AddressLike,
-        _interChainAtomicswap: AddressLike,
         _treasury: AddressLike,
         _sellerFee: BigNumberish
     ], [
@@ -132,8 +130,6 @@ export interface Vesting extends BaseContract {
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
         _admin: AddressLike,
-        _inChainAtomicswap: AddressLike,
-        _interChainAtomicswap: AddressLike,
         _treasury: AddressLike,
         _sellerFee: BigNumberish
     ], [

@@ -3,6 +3,7 @@ import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, Typed
 export declare namespace IInterchainAtomicSwap {
     type InitialParamsStruct = {
         admin: AddressLike;
+        vestingManager: AddressLike;
         chainID: BigNumberish;
         bridge: AddressLike;
         treasury: AddressLike;
@@ -11,6 +12,7 @@ export declare namespace IInterchainAtomicSwap {
     };
     type InitialParamsStructOutput = [
         admin: string,
+        vestingManager: string,
         chainID: bigint,
         bridge: string,
         treasury: string,
@@ -18,6 +20,7 @@ export declare namespace IInterchainAtomicSwap {
         buyerFee: bigint
     ] & {
         admin: string;
+        vestingManager: string;
         chainID: bigint;
         bridge: string;
         treasury: string;
@@ -45,14 +48,14 @@ export interface InterchainAtomicSwapLogic extends BaseContract {
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     _validateInitializeParams: TypedContractMethod<[
         _params: IInterchainAtomicSwap.InitialParamsStruct,
-        maxFee: BigNumberish
+        maxFeeRateScale: BigNumberish
     ], [
         void
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "_validateInitializeParams"): TypedContractMethod<[
         _params: IInterchainAtomicSwap.InitialParamsStruct,
-        maxFee: BigNumberish
+        maxFeeRateScale: BigNumberish
     ], [
         void
     ], "view">;

@@ -71,6 +71,16 @@ interface IAtomicSwapBase {
         bool acceptBid; // If set to true, the order can accept bids.
     }
 
+    struct Release {
+        uint256 durationInHours; // When the release should happen
+        uint256 percentage; // Percentage of totalAmount to be released
+    }
+
+    // struct VestingParams {
+    //     uint cliffDurationInHours;
+    //     Release[] releases;
+    // }
+
     // Struct for taking an existing atomic swap order.
     struct TakeSwapMsg {
         bytes32 orderID; // ID of the order to be taken.
@@ -201,4 +211,8 @@ interface IAtomicSwapBase {
     error NotAllowedTransferAmount(uint amount, uint allowance);
 
     error NotEnoughFund(uint real, uint expected);
+
+    error ZeroReleaseSchedule();
+    error InvalidTotalPercentage();
+    error OverMaximumReleaseStep();
 }

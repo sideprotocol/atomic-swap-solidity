@@ -5,10 +5,10 @@ import "./interfaces/IInterchainAtomicSwap.sol";
 import "./interfaces/ISideLzAppUpgradable.sol";
 import "hardhat/console.sol";
 import "./libs/InterchainAtomicSwapLogic.sol";
-import "../abstracts/libs/AtomicSwapMsgValidator.sol";
+import "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 
-import "../abstracts/libs/AtomicSwapStateLogic.sol";
-import "../abstracts/libs/TokenTransferHelper.sol";
+import "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
+import "../abstracts/libs/utils/TokenTransferHelper.sol";
 
 contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
     using AtomicSwapStateLogic for *;
@@ -22,7 +22,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
     function initialize(InitialParams calldata _params) external initializer {
         __Ownable_init_unchained(_params.admin);
-        _params._validateInitializeParams(maxFee);
+        _params._validateInitializeParams(maxFeeRateScale);
         sellerFeeRate = _params.sellerFee;
         buyerFeeRate = _params.buyerFee;
         treasury = _params.treasury;
@@ -40,7 +40,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         // Ensure the sell token and buy token are not the same non-zero address.
         MakeSwapMsg memory makeswap = icMakeSwap.base;
         // validate
-        makeswap._validateMakeSwapParams();
+        makeswap.validateMakeSwapParams();
         // Generate a unique ID and add the new swap order to the contract's state.
         bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
         //_addNewSwapOrder(id, msg.sender, makeswap);
@@ -105,7 +105,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         address makerReceiver = swapOrderITCParams[takeswap.orderID]
             .makerReceiver;
 
-        takeswap._validateTakeSwapParams(swapOrder);
+        takeswap.validateTakeSwapParams(swapOrder);
         // Update order details
         order.status = OrderStatus.COMPLETE;
         order.completedAt = block.timestamp;
@@ -120,12 +120,12 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Exchange the tokens
         // If buying with ERC20 tokens
-        order.buyToken.token.processTransferFrom(
+        order.buyToken.token.transferFromWithFee(
             msg.sender,
             makerReceiver,
             order.buyToken.amount,
             sellerFeeRate,
-            maxFee,
+            maxFeeRateScale,
             treasury
         );
 
@@ -158,7 +158,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         onlyExist(cancelswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage order = swapOrder[cancelswap.orderID];
-        order._validateCancelSwap();
+        order.validateCancelSwap();
 
         // Update the status of the swap order to 'CANCEL'
         order.status = OrderStatus.CANCEL;
@@ -369,11 +369,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
 
         // Process sell token transfers
         Coin storage _sellToken = _order.sellToken;
-        _sellToken.token.processTransfer(
+        _sellToken.token.transferWithFee(
             selectedBid.bidderReceiver,
             _sellToken.amount,
             buyerFeeRate,
-            maxFee,
+            maxFeeRateScale,
             treasury
         );
 
@@ -484,11 +484,11 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
             Coin storage _buyToken = swapOrder[_orderID].buyToken;
             address _makerReceiver = swapOrderITCParams[_orderID].makerReceiver;
 
-            _buyToken.token.processTransfer(
+            _buyToken.token.transferWithFee(
                 _makerReceiver,
                 _buyToken.amount,
                 sellerFeeRate,
-                maxFee,
+                maxFeeRateScale,
                 treasury
             );
             bids[_orderID][_bidder].status = BidStatus.Executed;

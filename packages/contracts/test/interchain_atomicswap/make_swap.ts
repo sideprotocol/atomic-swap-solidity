@@ -11,7 +11,7 @@ import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
-describe.only("ITCAtomicSwap: MakeSwap", () => {
+describe("ITCAtomicSwap: MakeSwap", () => {
   let accounts: HardhatEthersSigner[];
   beforeEach(async () => {
     accounts = await ethers.getSigners();

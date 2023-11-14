@@ -101,6 +101,7 @@ export declare namespace IAtomicSwapBase {
 export declare namespace IInterchainAtomicSwap {
     type InitialParamsStruct = {
         admin: AddressLike;
+        vestingManager: AddressLike;
         chainID: BigNumberish;
         bridge: AddressLike;
         treasury: AddressLike;
@@ -109,6 +110,7 @@ export declare namespace IInterchainAtomicSwap {
     };
     type InitialParamsStructOutput = [
         admin: string,
+        vestingManager: string,
         chainID: bigint,
         bridge: string,
         treasury: string,
@@ -116,6 +118,7 @@ export declare namespace IInterchainAtomicSwap {
         buyerFee: bigint
     ] & {
         admin: string;
+        vestingManager: string;
         chainID: bigint;
         bridge: string;
         treasury: string;
@@ -141,7 +144,7 @@ export declare namespace IInterchainAtomicSwap {
     };
 }
 export interface InterchainAtomicSwapInterface extends Interface {
-    getFunction(nameOrSignature: "acceptBid" | "bids" | "bridge" | "buyerFeeRate" | "bytesToAddress" | "cancelBid" | "cancelSwap" | "counteroffers" | "initialize" | "makeSwap" | "onReceivePacket" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderITCParams" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
+    getFunction(nameOrSignature: "acceptBid" | "bids" | "bridge" | "buyerFeeRate" | "bytesToAddress" | "cancelBid" | "cancelSwap" | "counteroffers" | "initialize" | "makeSwap" | "onReceivePacket" | "owner" | "placeBid" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderITCParams" | "swapOrderVestingParams" | "takeSwap" | "transferOwnership" | "updateBid"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "OwnershipTransferred" | "PlacedBid" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
     encodeFunctionData(functionFragment: "acceptBid", values: [IAtomicSwapBase.AcceptBidMsgStruct]): string;
     encodeFunctionData(functionFragment: "bids", values: [BytesLike, AddressLike]): string;
@@ -160,6 +163,7 @@ export interface InterchainAtomicSwapInterface extends Interface {
     encodeFunctionData(functionFragment: "sellerFeeRate", values?: undefined): string;
     encodeFunctionData(functionFragment: "swapOrder", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "swapOrderITCParams", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "swapOrderVestingParams", values: [BytesLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "takeSwap", values: [IAtomicSwapBase.TakeSwapMsgStruct]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "updateBid", values: [IAtomicSwapBase.UpdateBidMsgStruct]): string;
@@ -180,6 +184,7 @@ export interface InterchainAtomicSwapInterface extends Interface {
     decodeFunctionResult(functionFragment: "sellerFeeRate", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "swapOrderITCParams", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "swapOrderVestingParams", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "takeSwap", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "updateBid", data: BytesLike): Result;
@@ -455,6 +460,15 @@ export interface InterchainAtomicSwap extends BaseContract {
             dstChainID: bigint;
         }
     ], "view">;
+    swapOrderVestingParams: TypedContractMethod<[
+        arg0: BytesLike,
+        arg1: BigNumberish
+    ], [
+        [bigint, bigint] & {
+            durationInHours: bigint;
+            percentage: bigint;
+        }
+    ], "view">;
     takeSwap: TypedContractMethod<[
         takeswap: IAtomicSwapBase.TakeSwapMsgStruct
     ], [
@@ -585,6 +599,15 @@ export interface InterchainAtomicSwap extends BaseContract {
             takerReceiver: string;
             srcChainID: bigint;
             dstChainID: bigint;
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "swapOrderVestingParams"): TypedContractMethod<[
+        arg0: BytesLike,
+        arg1: BigNumberish
+    ], [
+        [bigint, bigint] & {
+            durationInHours: bigint;
+            percentage: bigint;
         }
     ], "view">;
     getFunction(nameOrSignature: "takeSwap"): TypedContractMethod<[

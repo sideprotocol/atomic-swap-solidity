@@ -3,11 +3,23 @@ import type { ICliffVesting, ICliffVestingInterface } from "../../../../contract
 export declare class ICliffVesting__factory {
     static readonly abi: readonly [{
         readonly inputs: readonly [];
-        readonly name: "CliffNotEnded";
+        readonly name: "InvalidTotalPercentage";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidVesting";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
         readonly name: "NoVestedTokensAvailable";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "NoVestedTokensForRelease";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "OverMaximumReleaseStep";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
@@ -18,22 +30,44 @@ export declare class ICliffVesting__factory {
         readonly name: "VestingAlreadyStarted";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "VestingNotStarted";
+        readonly type: "error";
+    }, {
+        readonly anonymous: false;
         readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "sender";
+            readonly type: "address";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "Received";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
             readonly internalType: "address";
             readonly name: "beneficiary";
             readonly type: "address";
         }, {
+            readonly indexed: true;
             readonly internalType: "uint256";
-            readonly name: "start";
+            readonly name: "amount";
             readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "cliffDurationInHours";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "durationInHours";
-            readonly type: "uint256";
+        }];
+        readonly name: "Released";
+        readonly type: "event";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "beneficiary";
+            readonly type: "address";
         }, {
             readonly internalType: "address";
             readonly name: "token";
@@ -43,9 +77,18 @@ export declare class ICliffVesting__factory {
             readonly name: "totalAmount";
             readonly type: "uint256";
         }, {
-            readonly internalType: "uint256";
-            readonly name: "releaseIntervalInHours";
-            readonly type: "uint256";
+            readonly components: readonly [{
+                readonly internalType: "uint256";
+                readonly name: "durationInHours";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "percentage";
+                readonly type: "uint256";
+            }];
+            readonly internalType: "struct IAtomicSwapBase.Release[]";
+            readonly name: "releases";
+            readonly type: "tuple[]";
         }];
         readonly name: "startVesting";
         readonly outputs: readonly [];

@@ -11,6 +11,7 @@ interface IInterchainAtomicSwap is IAtomicSwapBase {
     // }
     struct InitialParams {
         address admin;
+        address vestingManager;
         uint16 chainID;
         address bridge;
         address treasury;

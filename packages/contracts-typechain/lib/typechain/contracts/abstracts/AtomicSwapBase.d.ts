@@ -11,7 +11,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface AtomicSwapBaseInterface extends Interface {
-    getFunction(nameOrSignature: "bids" | "buyerFeeRate" | "counteroffers" | "owner" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "transferOwnership"): FunctionFragment;
+    getFunction(nameOrSignature: "bids" | "buyerFeeRate" | "counteroffers" | "owner" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderVestingParams" | "transferOwnership"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "OwnershipTransferred" | "PlacedBid" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
     encodeFunctionData(functionFragment: "bids", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "buyerFeeRate", values?: undefined): string;
@@ -20,6 +20,7 @@ export interface AtomicSwapBaseInterface extends Interface {
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "sellerFeeRate", values?: undefined): string;
     encodeFunctionData(functionFragment: "swapOrder", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "swapOrderVestingParams", values: [BytesLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyerFeeRate", data: BytesLike): Result;
@@ -28,6 +29,7 @@ export interface AtomicSwapBaseInterface extends Interface {
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "sellerFeeRate", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "swapOrderVestingParams", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
 }
 export declare namespace AcceptedBidEvent {
@@ -248,6 +250,15 @@ export interface AtomicSwapBase extends BaseContract {
             acceptBid: boolean;
         }
     ], "view">;
+    swapOrderVestingParams: TypedContractMethod<[
+        arg0: BytesLike,
+        arg1: BigNumberish
+    ], [
+        [bigint, bigint] & {
+            durationInHours: bigint;
+            percentage: bigint;
+        }
+    ], "view">;
     transferOwnership: TypedContractMethod<[
         newOwner: AddressLike
     ], [
@@ -315,6 +326,15 @@ export interface AtomicSwapBase extends BaseContract {
             completedAt: bigint;
             expiredAt: bigint;
             acceptBid: boolean;
+        }
+    ], "view">;
+    getFunction(nameOrSignature: "swapOrderVestingParams"): TypedContractMethod<[
+        arg0: BytesLike,
+        arg1: BigNumberish
+    ], [
+        [bigint, bigint] & {
+            durationInHours: bigint;
+            percentage: bigint;
         }
     ], "view">;
     getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;

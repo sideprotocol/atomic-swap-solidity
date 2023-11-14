@@ -78,6 +78,11 @@
       "type": "error"
     },
     {
+      "inputs": [],
+      "name": "InvalidTotalPercentage",
+      "type": "error"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -146,6 +151,11 @@
       "type": "error"
     },
     {
+      "inputs": [],
+      "name": "OverMaximumReleaseStep",
+      "type": "error"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -179,6 +189,11 @@
     {
       "inputs": [],
       "name": "UnsupportedTokenPair",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroReleaseSchedule",
       "type": "error"
     },
     {
