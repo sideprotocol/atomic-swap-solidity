@@ -1,4 +1,4 @@
-# Cliff Vesting Contract Specification
+# Vesting Contract Specification
 
 ### Motivation
 
@@ -7,7 +7,6 @@ To provide a decentralized, secure, and flexible mechanism for managing token ve
 ### Definitions
 
 - `Vesting`: The process by which a beneficiary gradually gains access to a certain amount of tokens.
-- `Cliff Period`: A period during which the tokens cannot be accessed by the beneficiary.
 - `Vesting Schedule`: A predefined timeline that outlines when and how much of the vested tokens become accessible to the beneficiary.
 - `Beneficiary`: The individual or entity that is eligible to receive the vested tokens.
 - `Releases`: Periodic events where a certain percentage of vested tokens become available to the beneficiary.
@@ -83,4 +82,4 @@ Beneficiaries claim their vested tokens through the `release` function, which ha
 
 ### Conclusion
 
-The Cliff Vesting Contract provides a secure, transparent, and flexible way to manage token vesting, ensuring a fair and predictable release of assets.
+The Vesting Contract provides a secure, transparent, and flexible way to manage token vesting, ensuring a fair and predictable release of assets.
