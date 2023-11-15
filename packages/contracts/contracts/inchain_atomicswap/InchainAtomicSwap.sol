@@ -1,26 +1,39 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 import "../abstracts/AtomicSwapBase.sol";
-import "../abstracts/libs/AtomicSwapHelper.sol";
+import "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
+import "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
+import "../abstracts/libs/utils/TokenTransferHelper.sol";
 import "./interfaces/IInchainAtomicSwap.sol";
+import "../vesting/interfaces/ICliffVesting.sol";
 import "hardhat/console.sol";
 
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
-    using AtomicSwapHelper for *;
+    using AtomicSwapMsgValidator for *;
+    using AtomicSwapStateLogic for *;
+    using TokenTransferHelper for *;
 
     function initialize(
         address _admin,
+        address _vestingManager,
         address _treasury,
         uint _sellerFee,
         uint _buyerFee
     ) external initializer {
         __Ownable_init_unchained(_admin);
-        require(_sellerFee < maxFee, "sellerFee has to be smaller than maxFee");
-        require(_buyerFee < maxFee, "sellerFee has to be smaller than maxFee");
+        require(
+            _sellerFee < maxFeeRateScale,
+            "sellerFee has to be smaller than maxFee"
+        );
+        require(
+            _buyerFee < maxFeeRateScale,
+            "sellerFee has to be smaller than maxFee"
+        );
         require(_treasury != address(0), "invalid treasury address");
         sellerFeeRate = _sellerFee;
         buyerFeeRate = _buyerFee;
         treasury = _treasury;
+        vestingManager = ICliffVesting(_vestingManager);
     }
 
     // /**
@@ -30,23 +43,13 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     function makeSwap(
         MakeSwapMsg calldata makeswap
-    ) external payable nonReentrant {
+    ) public payable nonReentrant returns (bytes32) {
         // Ensure the sell token and buy token are not the same non-zero address.
         if (makeswap.sellToken.token == makeswap.buyToken.token) {
             revert UnsupportedTokenPair();
         }
-        // Ensure the sell token and buy token are not the same non-zero address.
-        if (makeswap.minBidAmount <= 0) {
-            revert InvalidMinimumBidLimit();
-        }
-        // Ensure the caller is the maker of the swap order.
-        if (msg.sender == address(0)) {
-            revert UnauthorizedSender();
-        }
-        // Ensure the expireAt is the future time.
-        if (makeswap.expireAt < block.timestamp) {
-            revert InvalidExpirationTime(makeswap.expireAt, block.timestamp);
-        }
+        // Validate makeswap message
+        makeswap.validateMakeSwapParams();
         // Generate a unique ID and add the new swap order to the contract's state.
         bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
@@ -63,6 +66,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
         // Emit an event signaling the creation of a new swap order.
         emit AtomicSwapOrderCreated(id);
+        return id;
+    }
+
+    function makeSwapWithVesting(
+        MakeSwapMsg calldata makeswap,
+        Release[] calldata releases
+    ) external payable {
+        releases.validateVestingParams();
+        bytes32 orderId = makeSwap(makeswap);
+        for (uint i = 0; i < releases.length; i++) {
+            swapOrderVestingParams[orderId].push(releases[i]);
+        }
     }
 
     // /**
@@ -79,10 +94,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyExist(takeswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
-        // Ensure the caller is the designated taker of the swap order
-        if (order.acceptBid) {
-            revert OrderNotAllowTake();
-        }
 
         if (order.taker != address(0) && order.taker != msg.sender) {
             revert UnauthorizedTakeAction();
@@ -97,24 +108,46 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         order.status = OrderStatus.COMPLETE;
         order.completedAt = block.timestamp;
 
-        // Exchange the tokens
-        // If buying with ERC20 tokens
-        order.sellToken.token.processTransfer(
-            takeswap.takerReceiver,
-            order.sellToken.amount,
-            buyerFeeRate,
-            maxFee,
-            treasury
-        );
+        // Check vesting parameter is exist or not.
+        Release[] memory releases = swapOrderVestingParams[order.id];
+        if (releases.length == 0) {
+            // Exchange the tokens
+            // If buying with ERC20 tokens
+            order.sellToken.token.transferWithFee(
+                takeswap.takerReceiver,
+                order.sellToken.amount,
+                buyerFeeRate,
+                maxFeeRateScale,
+                treasury
+            );
+            order.buyToken.token.transferFromWithFee(
+                msg.sender,
+                order.maker,
+                order.buyToken.amount,
+                sellerFeeRate,
+                maxFeeRateScale,
+                treasury
+            );
+        } else {
+            // Transfer sell token to vesting contract
+            if (order.sellToken.token == address(0)) {
+                (bool successToRecipient, ) = payable(address(vestingManager))
+                    .call{value: order.sellToken.amount}("");
+                require(successToRecipient, "Transfer failed.");
+            } else {
+                order.sellToken.token.safeTransfer(
+                    address(vestingManager),
+                    order.sellToken.amount
+                );
+            }
 
-        order.buyToken.token.processTransferFrom(
-            msg.sender,
-            order.maker,
-            order.buyToken.amount,
-            sellerFeeRate,
-            maxFee,
-            treasury
-        );
+            vestingManager.startVesting(
+                takeswap.takerReceiver,
+                order.sellToken.token,
+                order.sellToken.amount,
+                releases
+            );
+        }
         // Emit an event signaling the swap was completed
         emit AtomicSwapOrderTook(order.maker, order.taker, takeswap.orderID);
     }
@@ -150,20 +183,24 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Return the funds/tokens to the maker
         if (order.sellToken.token == address(0)) {
             // Refund Ether if the sell token was Ether
-            payable(msg.sender).transfer(order.buyToken.amount);
+            (bool success, ) = payable(msg.sender).call{
+                value: order.sellToken.amount
+            }("");
+            require(success, "Transfer failed.");
         } else {
             // Refund ERC20 tokens if the sell token was an ERC20 token
-            IERC20(order.sellToken.token).transfer(
-                msg.sender,
-                order.buyToken.amount
+            require(
+                IERC20(order.sellToken.token).transfer(
+                    msg.sender,
+                    order.sellToken.amount
+                ),
+                "Transfer failed."
             );
         }
-
-        // Emit an event to notify that the swap order has been canceled
-        emit AtomicSwapOrderCanceled(cancelswap.orderID);
-
         // Clean up storage (optimize gas by nullifying order details)
         delete swapOrder[cancelswap.orderID];
+        // Emit an event to notify that the swap order has been canceled
+        emit AtomicSwapOrderCanceled(cancelswap.orderID);
     }
 
     // /**
@@ -214,6 +251,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Record the new bid
         bids.addNewBid(placeBidMsg);
+        emit PlacedBid(_orderID, msg.sender, _bidAmount);
     }
 
     function updateBid(
@@ -269,6 +307,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 revert MismatchedBidAmount(msg.value);
             }
         }
+        emit UpdatedBid(_orderID, _currentBid.bidder, _currentBid.amount);
     }
 
     function acceptBid(
@@ -310,23 +349,25 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Process sell token transfers
         Coin storage _sellToken = _order.sellToken;
-        _sellToken.token.processTransfer(
+        _sellToken.token.transferWithFee(
             selectedBid.bidder,
             _sellToken.amount,
             buyerFeeRate,
-            maxFee,
+            maxFeeRateScale,
             treasury
         );
 
         // Process buy token transfers
         Coin storage _buyToken = _order.buyToken;
-        _buyToken.token.processTransfer(
+        _buyToken.token.transferWithFee(
             _order.maker,
             selectedBid.amount,
             sellerFeeRate,
-            maxFee,
+            maxFeeRateScale,
             treasury
         );
+
+        emit AcceptedBid(_orderID, _bidder, selectedBid.amount);
     }
 
     function cancelBid(
@@ -361,8 +402,13 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             );
         } else {
             // If buy token is Ether, transfer it back to the bidder
-            payable(selectedBid.bidder).transfer(selectedBid.amount);
+            (bool success, ) = payable(msg.sender).call{
+                value: selectedBid.amount
+            }("");
+            require(success, "Transfer failed.");
         }
+
+        emit CanceledBid(_orderID, selectedBid.bidder);
     }
 
     function counteroffer(CounterOfferMsg calldata counterOfferMsg) external {

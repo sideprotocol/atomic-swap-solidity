@@ -1,9 +1,21 @@
 {
-    "atomicSwapHelper_sepolia": "0x129Ad8E7d863A13adC3C893F234E2fb7f7Aa23A9",
+    "atomicSwapHelper_sepolia": "0x09DA5311e45afdf3B5a3b412707870575641Eb47",
     "inChainAtomicSwap_mumbai": "0x6ac6dF3907Cf1fC4158CFB2f76517B5A139531C9",
     "mockUSDC_mumbai": "0x6B74954243e25B354d4B24F409c37a4DfE91DAdB",
     "mockUSDT_mumbai": "0xC6c8E162b4Fe3288348D0D7cD2b19239386c1035",
-    "inChainAtomicSwap_sepolia": "0x8fE4F0d65038CA86a830a1602F8915CDd330e6b1",
-    "mockUSDC_sepolia": "0xD4a15b6401a55a55220D0De77727dbF00b606619",
-    "mockUSDT_sepolia": "0x913963B9E2eF7372a74F43eCee0971d85608A8Ec"
+    "inChainAtomicSwap_sepolia": "0xd6Fbf783181D5aA5adda3f0D1B8CD24F72D0bB25",
+    "mockUSDC_sepolia": "0x47f362694A6ad8A09A852D8D3589f0182e90e0Ba",
+    "mockUSDT_sepolia": "0xAD7afD5b3D4a665fE1928Abbe061212A6B1A4F8E",
+    "atomicSwapMsgValidator_sepolia": "0x9235a0314bD11e17205FcE2F0b509Bb0Ae862846",
+    "interchainAtomicSwapLogic_sepolia": "0x13061187C08747428c260cEe4c417BFEbecF0F23",
+    "sideBridgeAddress_sepolia": "0x1461D9332B5e096126E26528Db216b95aB371d8a",
+    "interChainAtomicSwap_sepolia": "0x8Ad7628730188d7bfF7c3dA7C8ACA5b00c283094",
+    "atomicSwapHelper_bnb": "0x0F9Ed5d6D1Ca587CC922fD1FB3A6FdBF784c8917",
+    "atomicSwapMsgValidator_bnb": "0x4FD9F61935c98893006cbcA6382e19f05D89C490",
+    "interchainAtomicSwapLogic_bnb": "0x194Bd45e1a2045d34FfAdfF323aA57A5473E73Fc",
+    "sideBridgeAddress_bnb": "0x669BA9D3E56A48b42f3178720d733DBAf04a847d",
+    "interChainAtomicSwap_bnb": "0xF4DEFbAd78558C44F7b4dAc09B1Dd51d5F7222E7",
+    "vesting_sepolia": "0x6eDd6C62A8443Fd32c894554F2A684fd234B2FBb",
+    "atomicSwapStateLogic_sepolia": "0x65F9f6bE2E4d4BA9a38fe84744d2eC6c4f756f6B",
+    "tokenTransferHelper_sepolia": "0x4396796061573E6203A5aE778B93bcc26c7b855d"
 }

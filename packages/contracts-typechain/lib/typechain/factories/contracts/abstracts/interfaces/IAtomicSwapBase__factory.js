@@ -81,6 +81,11 @@ const _abi = [
         type: "error",
     },
     {
+        inputs: [],
+        name: "InvalidTotalPercentage",
+        type: "error",
+    },
+    {
         inputs: [
             {
                 internalType: "uint256",
@@ -149,6 +154,11 @@ const _abi = [
         type: "error",
     },
     {
+        inputs: [],
+        name: "OverMaximumReleaseStep",
+        type: "error",
+    },
+    {
         inputs: [
             {
                 internalType: "address",
@@ -182,6 +192,11 @@ const _abi = [
     {
         inputs: [],
         name: "UnsupportedTokenPair",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "ZeroReleaseSchedule",
         type: "error",
     },
     {
@@ -277,6 +292,31 @@ const _abi = [
             },
         ],
         name: "CanceledBid",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            {
+                indexed: true,
+                internalType: "bytes32",
+                name: "orderID",
+                type: "bytes32",
+            },
+            {
+                indexed: true,
+                internalType: "address",
+                name: "bidder",
+                type: "address",
+            },
+            {
+                indexed: true,
+                internalType: "uint256",
+                name: "amount",
+                type: "uint256",
+            },
+        ],
+        name: "PlacedBid",
         type: "event",
     },
     {

@@ -42,6 +42,7 @@ export interface AtomicSwapBaseInterface extends Interface {
       | "renounceOwnership"
       | "sellerFeeRate"
       | "swapOrder"
+      | "swapOrderVestingParams"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -54,6 +55,7 @@ export interface AtomicSwapBaseInterface extends Interface {
       | "CanceledBid"
       | "Initialized"
       | "OwnershipTransferred"
+      | "PlacedBid"
       | "ReceivedNewBid"
       | "UpdatedBid"
   ): EventFragment;
@@ -84,6 +86,10 @@ export interface AtomicSwapBaseInterface extends Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "swapOrderVestingParams",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
@@ -107,6 +113,10 @@ export interface AtomicSwapBaseInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "swapOrderVestingParams",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -204,6 +214,24 @@ export namespace OwnershipTransferredEvent {
   export interface OutputObject {
     previousOwner: string;
     newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PlacedBidEvent {
+  export type InputTuple = [
+    orderID: BytesLike,
+    bidder: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
+  export interface OutputObject {
+    orderID: string;
+    bidder: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -354,6 +382,12 @@ export interface AtomicSwapBase extends BaseContract {
     "view"
   >;
 
+  swapOrderVestingParams: TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
+    "view"
+  >;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -436,6 +470,13 @@ export interface AtomicSwapBase extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "swapOrderVestingParams"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
 
@@ -487,6 +528,13 @@ export interface AtomicSwapBase extends BaseContract {
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "PlacedBid"
+  ): TypedContractEvent<
+    PlacedBidEvent.InputTuple,
+    PlacedBidEvent.OutputTuple,
+    PlacedBidEvent.OutputObject
   >;
   getEvent(
     key: "ReceivedNewBid"
@@ -579,6 +627,17 @@ export interface AtomicSwapBase extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "PlacedBid(bytes32,address,uint256)": TypedContractEvent<
+      PlacedBidEvent.InputTuple,
+      PlacedBidEvent.OutputTuple,
+      PlacedBidEvent.OutputObject
+    >;
+    PlacedBid: TypedContractEvent<
+      PlacedBidEvent.InputTuple,
+      PlacedBidEvent.OutputTuple,
+      PlacedBidEvent.OutputObject
     >;
 
     "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<

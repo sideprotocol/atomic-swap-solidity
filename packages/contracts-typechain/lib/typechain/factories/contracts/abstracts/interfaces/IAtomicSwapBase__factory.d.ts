@@ -58,6 +58,10 @@ export declare class IAtomicSwapBase__factory {
         readonly name: "InvalidMinimumBidLimit";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidTotalPercentage";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "uint256";
             readonly name: "amount";
@@ -110,6 +114,10 @@ export declare class IAtomicSwapBase__factory {
         readonly name: "OrderNotAllowTake";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "OverMaximumReleaseStep";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "caller";
@@ -136,6 +144,10 @@ export declare class IAtomicSwapBase__factory {
     }, {
         readonly inputs: readonly [];
         readonly name: "UnsupportedTokenPair";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "ZeroReleaseSchedule";
         readonly type: "error";
     }, {
         readonly anonymous: false;
@@ -211,6 +223,26 @@ export declare class IAtomicSwapBase__factory {
             readonly type: "address";
         }];
         readonly name: "CanceledBid";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "bidder";
+            readonly type: "address";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "PlacedBid";
         readonly type: "event";
     }, {
         readonly anonymous: false;

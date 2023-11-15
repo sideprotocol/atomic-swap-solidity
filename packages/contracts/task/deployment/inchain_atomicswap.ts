@@ -7,21 +7,54 @@ task("deploy:in-chain:lib", "deploy libraries")
   .addOptionalParam("f", "force write")
   .setAction(async ({ f }, { ethers, upgrades, network }) => {
     // deploy libraries
-    const atomicSwapHelperFactory = await ethers.getContractFactory(
-      "AtomicSwapHelper"
+    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+      "AtomicSwapStateLogic"
     );
-    const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
-    const atomicSwapHelperAddress = await atomicSwapHelper.getAddress();
+    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+    const atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
+
+    const tokenTransferHelperFactory = await ethers.getContractFactory(
+      `TokenTransferHelper`
+    );
+    const tokenTransferHelper = await tokenTransferHelperFactory.deploy();
+    const tokenTransferHelperAddress = await tokenTransferHelper.getAddress();
+
+    const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
+      "AtomicSwapMsgValidator"
+    );
+    const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
+    const atomicSwapMsgValidatorAddress =
+      await atomicSwapMsgValidator.getAddress();
     await saveItemsToSetting(
       [
         {
-          title: `atomicSwapHelper_${network.name}`,
-          value: atomicSwapHelperAddress,
+          title: `atomicSwapStateLogic_${network.name}`,
+          value: atomicSwapStateLogicAddress,
+        },
+        {
+          title: `tokenTransferHelper_${network.name}`,
+          value: tokenTransferHelperAddress,
+        },
+        {
+          title: `atomicSwapMsgValidator_${network.name}`,
+          value: atomicSwapMsgValidatorAddress,
         },
       ],
       f
     );
-    console.log("atomicSwapHelper", atomicSwapHelperAddress);
+    console.log(
+      `atomicSwapStateLogic_${network.name}`,
+      atomicSwapStateLogicAddress
+    );
+
+    console.log(
+      `tokenTransferHelper_${network.name}`,
+      tokenTransferHelperAddress
+    );
+    console.log(
+      `atomicSwapMsgValidator_${network.name}`,
+      atomicSwapMsgValidatorAddress
+    );
   });
 
 task("deploy:in-chain:contract", "deploy in chain ").setAction(
@@ -32,21 +65,75 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
     const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
     const buyTokenFeeRate = process.env.BUY_TOKEN_FEE_RATE;
 
-    let atomicSwapHelperAddress =
-      Settings[`atomicSwapHelper_${network.name}` as keyof typeof Settings];
-    if (!ethers.isAddress(atomicSwapHelperAddress)) {
-      const atomicSwapHelperFactory = await ethers.getContractFactory(
-        `AtomicSwapHelper`
+    let atomicSwapStateLogicAddress =
+      Settings[`atomicSwapStateLogic_${network.name}` as keyof typeof Settings];
+    if (!ethers.isAddress(atomicSwapStateLogicAddress)) {
+      const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+        `AtomicSwapStateLogic`
       );
-      const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
-      atomicSwapHelperAddress = await atomicSwapHelper.getAddress();
+      const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+      atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
+      saveItemsToSetting([
+        {
+          title: `atomicSwapStateLogic_${network.name}`,
+          value: atomicSwapStateLogicAddress,
+        },
+      ]);
     }
+
+    let tokenTransferHelperAddress =
+      Settings[`tokenTransferHelper_${network.name}` as keyof typeof Settings];
+
+    if (!ethers.isAddress(tokenTransferHelperAddress)) {
+      const tokenTransferHelperFactory = await ethers.getContractFactory(
+        `TokenTransferHelper`
+      );
+      const tokenTransferHelper = await tokenTransferHelperFactory.deploy();
+      tokenTransferHelperAddress = await tokenTransferHelper.getAddress();
+      saveItemsToSetting([
+        {
+          title: `tokenTransferHelper_${network.name}`,
+          value: tokenTransferHelperAddress,
+        },
+      ]);
+    }
+
+    let atomicSwapMsgValidatorAddress =
+      Settings[
+        `atomicSwapMsgValidator_${network.name}` as keyof typeof Settings
+      ];
+
+    if (!ethers.isAddress(tokenTransferHelperAddress)) {
+      const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
+        "AtomicSwapMsgValidator"
+      );
+      const atomicSwapMsgValidator =
+        await atomicSwapMsgValidatorFactory.deploy();
+      atomicSwapMsgValidatorAddress = await atomicSwapMsgValidator.getAddress();
+      saveItemsToSetting([
+        {
+          title: `atomicSwapMsgValidator_${network.name}`,
+          value: atomicSwapMsgValidatorAddress,
+        },
+      ]);
+    }
+
+    let vestingAddress =
+      Settings[`vesting_${network.name}` as keyof typeof Settings];
+
+    if (!ethers.isAddress(vestingAddress)) {
+      console.error("Please deploy vesting contract first of all");
+      return;
+    }
+
     // AtomicSwap contract deploy
     const atomicSwapFactory = await ethers.getContractFactory(
       `InchainAtomicSwap`,
       {
         libraries: {
-          AtomicSwapHelper: atomicSwapHelperAddress,
+          AtomicSwapStateLogic: atomicSwapStateLogicAddress,
+          TokenTransferHelper: tokenTransferHelperAddress,
+          AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
         },
       }
     );
@@ -54,7 +141,7 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
     // deploy contract
     const atomicSwap = await upgrades.deployProxy(
       atomicSwapFactory,
-      [admin, treasury, sellTokenFeeRate, buyTokenFeeRate],
+      [admin, vestingAddress, treasury, sellTokenFeeRate, buyTokenFeeRate],
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,

@@ -1,0 +1,240 @@
+import { ContractFactory, ContractTransactionResponse } from "ethers";
+import type { Signer, ContractDeployTransaction, ContractRunner } from "ethers";
+import type { NonPayableOverrides } from "../../../../common";
+import type { Vesting, VestingInterface } from "../../../../contracts/vesting/CliffVesting.sol/Vesting";
+type VestingConstructorParams = [linkLibraryAddresses: VestingLibraryAddresses, signer?: Signer] | ConstructorParameters<typeof ContractFactory>;
+export declare class Vesting__factory extends ContractFactory {
+    constructor(...args: VestingConstructorParams);
+    static linkBytecode(linkLibraryAddresses: VestingLibraryAddresses): string;
+    getDeployTransaction(overrides?: NonPayableOverrides & {
+        from?: string;
+    }): Promise<ContractDeployTransaction>;
+    deploy(overrides?: NonPayableOverrides & {
+        from?: string;
+    }): Promise<Vesting & {
+        deploymentTransaction(): ContractTransactionResponse;
+    }>;
+    connect(runner: ContractRunner | null): Vesting__factory;
+    static readonly bytecode = "0x608060405234801561001057600080fd5b506111c2806100206000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146100c4578063a815badc146100e2578063f2fde38b146100fe578063fdb20ccb1461011a5761007d565b80631794bb3c14610082578063191655871461009e578063715018a6146100ba575b600080fd5b61009c60048036038101906100979190610c72565b610151565b005b6100b860048036038101906100b39190610cc5565b61032a565b005b6100c26105b0565b005b6100cc6105c4565b6040516100d99190610d01565b60405180910390f35b6100fc60048036038101906100f79190610d1c565b6105fc565b005b61011860048036038101906101139190610cc5565b61082f565b005b610134600480360381019061012f9190610cc5565b6108b5565b604051610148989796959493929190610dcd565b60405180910390f35b600061015b61093d565b905060008160000160089054906101000a900460ff1615905060008260000160009054906101000a900467ffffffffffffffff1690506000808267ffffffffffffffff161480156101a95750825b9050600060018367ffffffffffffffff161480156101de575060003073ffffffffffffffffffffffffffffffffffffffff163b145b9050811580156101ec575080155b15610223576040517ff92ee8a900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60018560000160006101000a81548167ffffffffffffffff021916908367ffffffffffffffff16021790555083156102735760018560000160086101000a81548160ff0219169083151502179055505b61027c88610965565b8560028190555086600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555083156103205760008560000160086101000a81548160ff0219169083151502179055507fc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d260016040516103179190610ea4565b60405180910390a15b5050505050505050565b60008060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020905080600201544210156103aa576040517fa8f0b2c500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600081600701548260020154426103c19190610eee565b6103cb9190610f51565b90506000826003015483600701548385600501546103e99190610f82565b6103f39190610f82565b6103fd9190610f51565b905060008360060154826104119190610eee565b905060008111610456576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161044d90611047565b60405180910390fd5b8084600601600082825461046a9190611067565b9250508190555060008460040160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1690508073ffffffffffffffffffffffffffffffffffffffff1673__$b9ebb88af43d68d18cc83c52d00a91a1a0$__6311f1248b90918760000160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1689866002546103e8600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff166040518863ffffffff1660e01b815260040161053f97969594939291906110f4565b60006040518083038186803b15801561055757600080fd5b505af415801561056b573d6000803e3d6000fd5b505050507fb21fb52d5749b80f3182f8c6992236b5e5576681880914484d7f4c9b062e619e86836040516105a0929190611163565b60405180910390a1505050505050565b6105b86109eb565b6105c26000610a72565b565b6000806105cf610b49565b90508060000160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1691505090565b60008060008973ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600101541461068257866040517fdd4b5de60000000000000000000000000000000000000000000000000000000081526004016106799190610d01565b60405180910390fd5b6040518061010001604052803373ffffffffffffffffffffffffffffffffffffffff168152602001878152602001610e10876106be9190610f82565b886106c99190611067565b8152602001610e10866106dc9190610f82565b81526020018473ffffffffffffffffffffffffffffffffffffffff16815260200183815260200160008152602001610e10836107189190610f82565b8152506000808973ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160010155604082015181600201556060820151816003015560808201518160040160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060a0820151816005015560c0820151816006015560e0820151816007015590505050505050505050565b6108376109eb565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16036108a95760006040517f1e4fbdf70000000000000000000000000000000000000000000000000000000081526004016108a09190610d01565b60405180910390fd5b6108b281610a72565b50565b60006020528060005260406000206000915090508060000160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16908060010154908060020154908060030154908060040160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16908060050154908060060154908060070154905088565b60007ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00905090565b61096d610b71565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff16036109df5760006040517f1e4fbdf70000000000000000000000000000000000000000000000000000000081526004016109d69190610d01565b60405180910390fd5b6109e881610a72565b50565b6109f3610bb1565b73ffffffffffffffffffffffffffffffffffffffff16610a116105c4565b73ffffffffffffffffffffffffffffffffffffffff1614610a7057610a34610bb1565b6040517f118cdaa7000000000000000000000000000000000000000000000000000000008152600401610a679190610d01565b60405180910390fd5b565b6000610a7c610b49565b905060008160000160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff169050828260000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508273ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3505050565b60007f9016d09d72d40fdae2fd8ceac6b6234c7706214fd39c1cd1e609a0528c199300905090565b610b79610bb9565b610baf576040517fd7e6bcf800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b565b600033905090565b6000610bc361093d565b60000160089054906101000a900460ff16905090565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000610c0982610bde565b9050919050565b610c1981610bfe565b8114610c2457600080fd5b50565b600081359050610c3681610c10565b92915050565b6000819050919050565b610c4f81610c3c565b8114610c5a57600080fd5b50565b600081359050610c6c81610c46565b92915050565b600080600060608486031215610c8b57610c8a610bd9565b5b6000610c9986828701610c27565b9350506020610caa86828701610c27565b9250506040610cbb86828701610c5d565b9150509250925092565b600060208284031215610cdb57610cda610bd9565b5b6000610ce984828501610c27565b91505092915050565b610cfb81610bfe565b82525050565b6000602082019050610d166000830184610cf2565b92915050565b600080600080600080600060e0888a031215610d3b57610d3a610bd9565b5b6000610d498a828b01610c27565b9750506020610d5a8a828b01610c5d565b9650506040610d6b8a828b01610c5d565b9550506060610d7c8a828b01610c5d565b9450506080610d8d8a828b01610c27565b93505060a0610d9e8a828b01610c5d565b92505060c0610daf8a828b01610c5d565b91505092959891949750929550565b610dc781610c3c565b82525050565b600061010082019050610de3600083018b610cf2565b610df0602083018a610dbe565b610dfd6040830189610dbe565b610e0a6060830188610dbe565b610e176080830187610cf2565b610e2460a0830186610dbe565b610e3160c0830185610dbe565b610e3e60e0830184610dbe565b9998505050505050505050565b6000819050919050565b600067ffffffffffffffff82169050919050565b6000819050919050565b6000610e8e610e89610e8484610e4b565b610e69565b610e55565b9050919050565b610e9e81610e73565b82525050565b6000602082019050610eb96000830184610e95565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000610ef982610c3c565b9150610f0483610c3c565b9250828203905081811115610f1c57610f1b610ebf565b5b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b6000610f5c82610c3c565b9150610f6783610c3c565b925082610f7757610f76610f22565b5b828204905092915050565b6000610f8d82610c3c565b9150610f9883610c3c565b9250828202610fa681610c3c565b91508282048414831517610fbd57610fbc610ebf565b5b5092915050565b600082825260208201905092915050565b7f4e6f2076657374656420746f6b656e7320617661696c61626c6520666f72207260008201527f656c656173650000000000000000000000000000000000000000000000000000602082015250565b6000611031602683610fc4565b915061103c82610fd5565b604082019050919050565b6000602082019050818103600083015261106081611024565b9050919050565b600061107282610c3c565b915061107d83610c3c565b925082820190508082111561109557611094610ebf565b5b92915050565b6110a481610bfe565b82525050565b6110b381610c3c565b82525050565b6000819050919050565b60006110de6110d96110d4846110b9565b610e69565b610c3c565b9050919050565b6110ee816110c3565b82525050565b600060e082019050611109600083018a61109b565b611116602083018961109b565b611123604083018861109b565b61113060608301876110aa565b61113d60808301866110aa565b61114a60a08301856110e5565b61115760c083018461109b565b98975050505050505050565b60006040820190506111786000830185610cf2565b6111856020830184610dbe565b939250505056fea2646970667358221220541962f413106422a876214017b60abd84b15c2dd6055b54ae7620935c9aa82564736f6c63430008140033";
+    static readonly abi: readonly [{
+        readonly inputs: readonly [];
+        readonly name: "CliffNotEnded";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidInitialization";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "NoVestedTokensAvailable";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "NotInitializing";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "owner";
+            readonly type: "address";
+        }];
+        readonly name: "OwnableInvalidOwner";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "account";
+            readonly type: "address";
+        }];
+        readonly name: "OwnableUnauthorizedAccount";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "ReentrancyGuardReentrantCall";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "beneficiary";
+            readonly type: "address";
+        }];
+        readonly name: "VestingAlreadyStarted";
+        readonly type: "error";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: false;
+            readonly internalType: "uint64";
+            readonly name: "version";
+            readonly type: "uint64";
+        }];
+        readonly name: "Initialized";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "previousOwner";
+            readonly type: "address";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "newOwner";
+            readonly type: "address";
+        }];
+        readonly name: "OwnershipTransferred";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: false;
+            readonly internalType: "address";
+            readonly name: "beneficiary";
+            readonly type: "address";
+        }, {
+            readonly indexed: false;
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "Released";
+        readonly type: "event";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "_admin";
+            readonly type: "address";
+        }, {
+            readonly internalType: "address";
+            readonly name: "_treasury";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "_sellerFee";
+            readonly type: "uint256";
+        }];
+        readonly name: "initialize";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "owner";
+        readonly outputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "";
+            readonly type: "address";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "beneficiary";
+            readonly type: "address";
+        }];
+        readonly name: "release";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "renounceOwnership";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "beneficiary";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "start";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "cliffDurationInHours";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "durationInHours";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "address";
+            readonly name: "token";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "totalAmount";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "releaseIntervalInHours";
+            readonly type: "uint256";
+        }];
+        readonly name: "startVesting";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "newOwner";
+            readonly type: "address";
+        }];
+        readonly name: "transferOwnership";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "";
+            readonly type: "address";
+        }];
+        readonly name: "vestingSchedules";
+        readonly outputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "from";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "start";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "cliff";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "duration";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "address";
+            readonly name: "token";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "totalAmount";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "amountReleased";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "releaseInterval";
+            readonly type: "uint256";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }];
+    static createInterface(): VestingInterface;
+    static connect(address: string, runner?: ContractRunner | null): Vesting;
+}
+export interface VestingLibraryAddresses {
+    ["contracts/abstracts/libs/utils/TokenTransferHelper.sol:TokenTransferHelper"]: string;
+}
+export {};

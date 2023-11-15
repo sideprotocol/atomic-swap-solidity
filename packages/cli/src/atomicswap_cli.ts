@@ -1,7 +1,15 @@
 import { ethers } from "ethers";
-import { Settings, MockToken__factory } from "@sideprotocol/contracts-typechain";
+import {
+  Settings,
+  CONSTANTS,
+  MockToken__factory,
+  InterchainAtomicSwap__factory,
+  SideLzAppUpgradable__factory,
+} from "@sideprotocol/contracts-typechain";
 import { InchainAtomicSwap__factory } from "@sideprotocol/contracts-typechain";
+
 import { BlockTimer } from "./utils";
+
 const enum AtomicSwapMsgType {
   MAKE_SWAP,
   TAKE_SWAP,
@@ -68,6 +76,85 @@ export class AtomicSwapCli {
     await this.log(AtomicSwapMsgType.MAKE_SWAP, tx);
   }
 
+  async interChainMakeSwap(
+    srcChain: string,
+    targetChain: string,
+    tokenA: bigint,
+    tokenB: bigint,
+    minBidAmount: bigint = tokenA / BigInt(2),
+    acceptBid: boolean = true,
+    expireAt?: number
+  ) {
+    console.log("contract address:", Settings[`interChainAtomicSwap_${srcChain}`]);
+    const srcContractAddress = Settings[`interChainAtomicSwap_${srcChain}`];
+    const bridgeAddress = Settings[`sideBridgeAddress_${srcChain}`];
+    console.log("bridge address:", bridgeAddress);
+    //const srcChainInfo = CONSTANTS.getChainInfo(srcChain);
+    const targetChainInfo = CONSTANTS.getChainInfo(targetChain);
+
+    //const targetContractAddress = Settings[`interChainAtomicSwap_${targetChain}`];
+    const bridge = SideLzAppUpgradable__factory.connect(bridgeAddress, this.maker);
+    const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.maker);
+
+    const orderExpireAt = expireAt ?? (await this.timer.AfterSeconds(10000));
+    const uuid = ethers.keccak256(ethers.randomBytes(32));
+    const targetToken = Settings[`mockUSDT_${targetChain}`];
+    const base = {
+      uuid,
+      sellToken: {
+        token: ethers.ZeroAddress, //Settings.mockUSDC_sepolia,
+        amount: tokenA,
+      },
+      buyToken: {
+        token: targetToken,
+        amount: tokenB,
+      },
+      maker: this.maker.address,
+      minBidAmount: minBidAmount,
+      desiredTaker: ethers.ZeroAddress,
+      expireAt: orderExpireAt,
+      acceptBid: acceptBid,
+    };
+    const payload = {
+      base,
+      makerReceiver: this.maker,
+      desiredTaker: this.taker.address,
+      dstChainID: targetChainInfo.chainId,
+    };
+
+    const encoder = new ethers.AbiCoder();
+    const payloadBytes = encoder.encode(
+      [
+        "tuple(bytes32,tuple(address, uint256),tuple(address, uint256),address,address,address,uint256,bool)",
+        "address",
+        "address",
+        "uint256",
+      ],
+      [
+        [
+          base.uuid,
+          [base.sellToken.token, base.sellToken.amount.toString()],
+          [base.buyToken.token, base.buyToken.amount.toString()],
+          base.maker,
+          base.maker,
+          base.desiredTaker,
+          base.expireAt,
+          true,
+        ],
+        base.maker,
+        base.desiredTaker,
+        targetChainInfo.chainId,
+      ]
+    );
+
+    const estimateFee = await bridge.estimateFee(payload.dstChainID, false, "0x", payloadBytes);
+    const nativeFee = payload.base.sellToken.amount + estimateFee.nativeFee;
+    const tx = await atomicSwap.makeSwap(payload, {
+      value: nativeFee,
+    });
+    await this.log(AtomicSwapMsgType.MAKE_SWAP, tx);
+  }
+
   async takeSwap(orderID: string, receiver?: string) {
     const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.taker);
     const usdt = MockToken__factory.connect(Settings.mockUSDC_sepolia, this.taker);
@@ -90,11 +177,57 @@ export class AtomicSwapCli {
     await this.log(AtomicSwapMsgType.TAKE_SWAP, tx);
   }
 
+  async interChainTakeSwap(orderID: string, network: string = "sepolia", receiver?: string) {
+    const srcContractAddress = Settings[`interChainAtomicSwap_${network}`];
+    const bridgeAddress = Settings[`sideBridgeAddress_${network}`];
+    const atomicSwap = InterchainAtomicSwap__factory.connect(srcContractAddress, this.taker);
+    const bridge = SideLzAppUpgradable__factory.connect(bridgeAddress, this.maker);
+
+    const buyToken = Settings[`mockUSDT_${network}`];
+    const usdt = MockToken__factory.connect(buyToken, this.taker);
+
+    const order = await atomicSwap.swapOrder(orderID);
+    await usdt.approve(await atomicSwap.getAddress(), order.buyToken.amount);
+    const takerReceiver = receiver ?? this.taker.address;
+
+    // const estimateGas = await atomicSwap.takeSwap.estimateGas({
+    //   orderID,
+    //   takerReceiver,
+    // });
+    const encoder = new ethers.AbiCoder();
+    const payloadBytes = encoder.encode(["bytes32", "address"], [orderID, receiver]);
+    const swapParams = await atomicSwap.swapOrderITCParams(orderID);
+    const estimateFee = await bridge.estimateFee(swapParams.dstChainID, false, "0x", payloadBytes);
+    const gas = await atomicSwap.takeSwap.estimateGas(
+      {
+        orderID,
+        takerReceiver,
+      },
+      { value: estimateFee.nativeFee * BigInt(20) }
+    );
+    console.log("Gas:", gas);
+    // const tx = await atomicSwap.takeSwap(
+    //   {
+    //     orderID,
+    //     takerReceiver,
+    //   },
+    //   { value: estimateFee.nativeFee, gasLimit: gas }
+    // );
+    // await this.log(AtomicSwapMsgType.TAKE_SWAP, tx);
+  }
+
   async cancelSwap(orderID: string) {
     const atomicSwap = InchainAtomicSwap__factory.connect(Settings.inChainAtomicSwap_sepolia, this.maker);
-    const tx = await atomicSwap.cancelSwap({
-      orderID,
-    });
+    // const gas = await atomicSwap.cancelSwap.estimateGas({
+    //   orderID,
+    // });
+    const tx = await atomicSwap.cancelSwap(
+      {
+        orderID,
+      },
+      { gasLimit: 300000 }
+    );
+
     await this.log(AtomicSwapMsgType.CANCEL_SWAP, tx);
   }
 
@@ -182,5 +315,16 @@ export class AtomicSwapCli {
     keys.forEach((key) => {
       console.log(`${key}:==>`, event.args[key]);
     });
+  }
+
+  // queries
+  async getOrder(chain: string, orderID: string) {
+    console.log("contract address:", Settings[`inChainAtomicSwap_${chain}`]);
+    const srcContractAddress = Settings[`inChainAtomicSwap_${chain}`];
+
+    const atomicSwap = InchainAtomicSwap__factory.connect(srcContractAddress, this.maker);
+    console.log("order", orderID);
+    const order = await atomicSwap.swapOrder(orderID);
+    console.log("newOrder", order);
   }
 }

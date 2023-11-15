@@ -89,6 +89,11 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "InvalidTotalPercentage",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -162,6 +167,11 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "OverMaximumReleaseStep",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -222,6 +232,11 @@ const _abi = [
   {
     inputs: [],
     name: "UnsupportedTokenPair",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ZeroReleaseSchedule",
     type: "error",
   },
   {
@@ -349,6 +364,31 @@ const _abi = [
       },
     ],
     name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "orderID",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "bidder",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "PlacedBid",
     type: "event",
   },
   {
@@ -618,6 +658,35 @@ const _abi = [
         internalType: "bool",
         name: "acceptBid",
         type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "swapOrderVestingParams",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "durationInHours",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "percentage",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

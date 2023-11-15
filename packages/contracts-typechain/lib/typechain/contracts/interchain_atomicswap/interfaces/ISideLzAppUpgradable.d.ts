@@ -19,7 +19,7 @@ export interface ISideLzAppUpgradable extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     sendLzMsg: TypedContractMethod<[
-        _srcChainId: BigNumberish,
+        _dstChainId: BigNumberish,
         sender: AddressLike,
         _payload: BytesLike
     ], [
@@ -27,7 +27,7 @@ export interface ISideLzAppUpgradable extends BaseContract {
     ], "payable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "sendLzMsg"): TypedContractMethod<[
-        _srcChainId: BigNumberish,
+        _dstChainId: BigNumberish,
         sender: AddressLike,
         _payload: BytesLike
     ], [

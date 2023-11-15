@@ -4,8 +4,6 @@ import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { randomUUID } from "crypto";
-import { keccak256 } from "ethers";
 
 describe("AtomicSwap: MakeSwap", () => {
   it("create in-chain swap with native token", async () =>
@@ -105,7 +103,7 @@ describe("AtomicSwap: MakeSwap", () => {
     await usdc.setFailTransferFrom(true);
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWith(
-      "Failed to transfer from"
+      "TransferFrom failed."
     );
   });
 

@@ -2,7 +2,10 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 
 import { ethers, upgrades } from "hardhat";
 import {
+  CliffVesting,
+  IAtomicSwapBase,
   InchainAtomicSwap as ICAtomicSwap,
+  ICliffVesting,
   InterchainAtomicSwap as ITCAtomicSwap,
   LZEndpointMock,
   MockToken,
@@ -12,8 +15,6 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { keccak256 } from "ethers";
 import { BlockTime } from "./time";
-import { randomUUID } from "crypto";
-import { time } from "console";
 export const ERC20_MINT_AMOUNT = 100000000;
 // stable coins
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
@@ -30,28 +31,66 @@ export const Utils = {
     const [owner] = accounts;
 
     // deploy libraries
-    const atomicSwapHelperFactory = await ethers.getContractFactory(
-      "AtomicSwapHelper"
+    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+      "AtomicSwapStateLogic"
     );
-    const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
+    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+
+    const TokenTransferHelperFactory = await ethers.getContractFactory(
+      "TokenTransferHelper"
+    );
+    const tokenTransferHelper = await TokenTransferHelperFactory.deploy();
+
+    const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
+      "AtomicSwapMsgValidator"
+    );
+    const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
+
+    const sellTokenFeeRate = 10;
+    const buyTokenFeeRate = 12;
+    const treasury = accounts[10].address;
+
+    // Deploy vesting contract.
+    const vestingManagerFactory = await ethers.getContractFactory(
+      "CliffVesting",
+      {
+        libraries: {
+          TokenTransferHelper: await tokenTransferHelper.getAddress(),
+        },
+      }
+    );
+    const vestingManager = await upgrades.deployProxy(
+      vestingManagerFactory,
+      [owner.address, treasury, sellTokenFeeRate],
+      {
+        initializer: "initialize",
+        unsafeAllowLinkedLibraries: true,
+      }
+    );
+    const vestingManagerAddress = await vestingManager.getAddress();
 
     // AtomicSwap contract deploy
     const atomicSwapFactory = await ethers.getContractFactory(
       "InchainAtomicSwap",
       {
         libraries: {
-          AtomicSwapHelper: await atomicSwapHelper.getAddress(),
+          AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
+          TokenTransferHelper: await tokenTransferHelper.getAddress(),
+          AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       }
     );
-    const sellTokenFeeRate = 10;
-    const buyTokenFeeRate = 12;
-    const treasury = accounts[10].address;
 
     // deploy contract
     const atomicSwap = await upgrades.deployProxy(
       atomicSwapFactory,
-      [owner.address, treasury, sellTokenFeeRate, buyTokenFeeRate],
+      [
+        owner.address,
+        vestingManagerAddress,
+        treasury,
+        sellTokenFeeRate,
+        buyTokenFeeRate,
+      ],
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,
@@ -83,6 +122,7 @@ export const Utils = {
       usdc: mockUSDC as unknown as MockToken,
       usdt: mockUSDT as unknown as MockToken,
       dai: mockDAI as unknown as MockToken,
+      vestingManager: vestingManager as unknown as CliffVesting,
       sellTokenFeeRate,
       buyTokenFeeRate,
       treasury,
@@ -127,10 +167,15 @@ export const Utils = {
     const sideBridgeAtBAddress = await sideBridgeAtChainB.getAddress();
 
     // Deploy libraries
-    const atomicSwapHelperFactory = await ethers.getContractFactory(
-      "AtomicSwapHelper"
+    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+      "AtomicSwapStateLogic"
     );
-    const atomicSwapHelper = await atomicSwapHelperFactory.deploy();
+    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+
+    const TokenTransferHelperFactory = await ethers.getContractFactory(
+      "TokenTransferHelper"
+    );
+    const tokenTransferHelper = await TokenTransferHelperFactory.deploy();
 
     const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
       "AtomicSwapMsgValidator"
@@ -149,7 +194,8 @@ export const Utils = {
       "InterchainAtomicSwap",
       {
         libraries: {
-          AtomicSwapHelper: await atomicSwapHelper.getAddress(),
+          AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
+          TokenTransferHelper: await tokenTransferHelper.getAddress(),
           AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
           InterchainAtomicSwapLogic:
             await interchainAtomicSwapLogic.getAddress(),
@@ -378,6 +424,115 @@ export const createDefaultAtomicOrder = async (
     sellTokenFeeRate,
     buyTokenFeeRate,
     treasury,
+  };
+};
+
+export const createDefaultVestingAtomicOrder = async (
+  vestingParams: {
+    durationInHours: bigint;
+    percentage: bigint;
+  }[],
+
+  withNativeSellToken?: boolean,
+  withNativeBuyToken?: boolean,
+  noTaker?: boolean,
+  acceptBid?: boolean
+) => {
+  const {
+    atomicSwap,
+    usdc,
+    usdt,
+    sellTokenFeeRate,
+    buyTokenFeeRate,
+    treasury,
+    vestingManager,
+  } = await loadFixture(Utils.prepareInChainAtomicTest);
+  const accounts = await ethers.getSigners();
+  const [maker, taker] = accounts;
+  const expireAt = await BlockTime.AfterSeconds(10000);
+  const uuid = generateOrderID();
+  const payload = {
+    uuid,
+    sellToken: {
+      token: withNativeSellToken ? ethers.ZeroAddress : await usdc.getAddress(),
+      amount: ethers.parseEther("20"),
+    },
+    buyToken: {
+      token: withNativeBuyToken ? ethers.ZeroAddress : await usdt.getAddress(),
+      amount: ethers.parseEther("20"),
+    },
+    maker: maker.address,
+    minBidAmount: ethers.parseEther("15"),
+    desiredTaker: noTaker ? ethers.ZeroAddress : taker.address,
+    expireAt: expireAt,
+    acceptBid: acceptBid ?? true,
+  };
+
+  if (!withNativeSellToken) {
+    const amount = await usdc.allowance(
+      accounts[0].address,
+      await atomicSwap.getAddress()
+    );
+    await expect(
+      usdc.approve(
+        await atomicSwap.getAddress(),
+        amount + payload.sellToken.amount
+      )
+    ).not.to.reverted;
+  }
+
+  if (!withNativeBuyToken) {
+    const amount = (await usdt.allowance(
+      accounts[0].address,
+      await atomicSwap.getAddress()
+    )) as bigint;
+    await expect(
+      usdt.approve(
+        await atomicSwap.getAddress(),
+        amount + payload.buyToken.amount
+      )
+    ).not.to.reverted;
+  }
+
+  let nativeTokenAmount = BigInt(0);
+  if (withNativeSellToken) {
+    nativeTokenAmount = nativeTokenAmount + payload.sellToken.amount;
+    const tx = atomicSwap.makeSwapWithVesting(payload, vestingParams, {
+      value: nativeTokenAmount,
+    });
+    await expect(tx).to.changeEtherBalance(
+      await atomicSwap.getAddress(),
+      nativeTokenAmount
+    );
+    await expect(tx).to.emit(atomicSwap, "AtomicSwapOrderCreated");
+  } else {
+    const tx = atomicSwap.makeSwapWithVesting(payload, vestingParams);
+    await expect(tx).to.changeTokenBalance(
+      usdc,
+      await atomicSwap.getAddress(),
+      payload.sellToken.amount
+    );
+    await expect(tx).emit(atomicSwap, "AtomicSwapOrderCreated");
+  }
+
+  const id = newAtomicSwapOrderID(await atomicSwap.getAddress(), payload.uuid);
+  const orderIDAtContractA = await atomicSwap.swapOrder(id);
+  expect(orderIDAtContractA.id).to.equal(id);
+
+  return {
+    orderID: id,
+    maker,
+    taker,
+
+    atomicSwap,
+
+    payload: payload,
+    usdt,
+    usdc,
+    sellTokenFeeRate,
+    buyTokenFeeRate,
+    treasury,
+    vestingManager,
   };
 };
 

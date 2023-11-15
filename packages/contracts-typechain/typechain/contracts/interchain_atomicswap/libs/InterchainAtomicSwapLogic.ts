@@ -24,6 +24,7 @@ import type {
 export declare namespace IInterchainAtomicSwap {
   export type InitialParamsStruct = {
     admin: AddressLike;
+    vestingManager: AddressLike;
     chainID: BigNumberish;
     bridge: AddressLike;
     treasury: AddressLike;
@@ -33,6 +34,7 @@ export declare namespace IInterchainAtomicSwap {
 
   export type InitialParamsStructOutput = [
     admin: string,
+    vestingManager: string,
     chainID: bigint,
     bridge: string,
     treasury: string,
@@ -40,6 +42,7 @@ export declare namespace IInterchainAtomicSwap {
     buyerFee: bigint
   ] & {
     admin: string;
+    vestingManager: string;
     chainID: bigint;
     bridge: string;
     treasury: string;
@@ -106,7 +109,10 @@ export interface InterchainAtomicSwapLogic extends BaseContract {
   ): Promise<this>;
 
   _validateInitializeParams: TypedContractMethod<
-    [_params: IInterchainAtomicSwap.InitialParamsStruct, maxFee: BigNumberish],
+    [
+      _params: IInterchainAtomicSwap.InitialParamsStruct,
+      maxFeeRateScale: BigNumberish
+    ],
     [void],
     "view"
   >;
@@ -118,7 +124,10 @@ export interface InterchainAtomicSwapLogic extends BaseContract {
   getFunction(
     nameOrSignature: "_validateInitializeParams"
   ): TypedContractMethod<
-    [_params: IInterchainAtomicSwap.InitialParamsStruct, maxFee: BigNumberish],
+    [
+      _params: IInterchainAtomicSwap.InitialParamsStruct,
+      maxFeeRateScale: BigNumberish
+    ],
     [void],
     "view"
   >;

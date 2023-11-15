@@ -4,7 +4,7 @@ export declare class ISideLzAppUpgradable__factory {
     static readonly abi: readonly [{
         readonly inputs: readonly [{
             readonly internalType: "uint16";
-            readonly name: "_srcChainId";
+            readonly name: "_dstChainId";
             readonly type: "uint16";
         }, {
             readonly internalType: "address payable";

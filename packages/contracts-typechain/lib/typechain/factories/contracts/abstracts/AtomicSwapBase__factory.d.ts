@@ -62,6 +62,10 @@ export declare class AtomicSwapBase__factory {
         readonly name: "InvalidMinimumBidLimit";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidTotalPercentage";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "uint256";
             readonly name: "amount";
@@ -118,6 +122,10 @@ export declare class AtomicSwapBase__factory {
         readonly name: "OrderNotAllowTake";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "OverMaximumReleaseStep";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "owner";
@@ -164,6 +172,10 @@ export declare class AtomicSwapBase__factory {
     }, {
         readonly inputs: readonly [];
         readonly name: "UnsupportedTokenPair";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "ZeroReleaseSchedule";
         readonly type: "error";
     }, {
         readonly anonymous: false;
@@ -264,6 +276,26 @@ export declare class AtomicSwapBase__factory {
             readonly type: "address";
         }];
         readonly name: "OwnershipTransferred";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
+            readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "orderID";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "address";
+            readonly name: "bidder";
+            readonly type: "address";
+        }, {
+            readonly indexed: true;
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "PlacedBid";
         readonly type: "event";
     }, {
         readonly anonymous: false;
@@ -474,6 +506,28 @@ export declare class AtomicSwapBase__factory {
             readonly internalType: "bool";
             readonly name: "acceptBid";
             readonly type: "bool";
+        }];
+        readonly stateMutability: "view";
+        readonly type: "function";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "bytes32";
+            readonly name: "";
+            readonly type: "bytes32";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "";
+            readonly type: "uint256";
+        }];
+        readonly name: "swapOrderVestingParams";
+        readonly outputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "durationInHours";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "percentage";
+            readonly type: "uint256";
         }];
         readonly stateMutability: "view";
         readonly type: "function";

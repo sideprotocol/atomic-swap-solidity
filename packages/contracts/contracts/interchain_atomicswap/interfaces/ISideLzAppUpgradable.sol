@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 interface ISideLzAppUpgradable {
     function sendLzMsg(
-        uint16 _srcChainId,
+        uint16 _dstChainId,
         address payable sender,
         bytes calldata _payload
     ) external payable;

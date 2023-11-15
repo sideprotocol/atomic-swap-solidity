@@ -76,7 +76,7 @@ export interface ISideLzAppUpgradable extends BaseContract {
   ): Promise<this>;
 
   sendLzMsg: TypedContractMethod<
-    [_srcChainId: BigNumberish, sender: AddressLike, _payload: BytesLike],
+    [_dstChainId: BigNumberish, sender: AddressLike, _payload: BytesLike],
     [void],
     "payable"
   >;
@@ -88,7 +88,7 @@ export interface ISideLzAppUpgradable extends BaseContract {
   getFunction(
     nameOrSignature: "sendLzMsg"
   ): TypedContractMethod<
-    [_srcChainId: BigNumberish, sender: AddressLike, _payload: BytesLike],
+    [_dstChainId: BigNumberish, sender: AddressLike, _payload: BytesLike],
     [void],
     "payable"
   >;

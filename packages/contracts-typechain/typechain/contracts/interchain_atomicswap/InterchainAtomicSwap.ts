@@ -123,6 +123,7 @@ export declare namespace IAtomicSwapBase {
 export declare namespace IInterchainAtomicSwap {
   export type InitialParamsStruct = {
     admin: AddressLike;
+    vestingManager: AddressLike;
     chainID: BigNumberish;
     bridge: AddressLike;
     treasury: AddressLike;
@@ -132,6 +133,7 @@ export declare namespace IInterchainAtomicSwap {
 
   export type InitialParamsStructOutput = [
     admin: string,
+    vestingManager: string,
     chainID: bigint,
     bridge: string,
     treasury: string,
@@ -139,6 +141,7 @@ export declare namespace IInterchainAtomicSwap {
     buyerFee: bigint
   ] & {
     admin: string;
+    vestingManager: string;
     chainID: bigint;
     bridge: string;
     treasury: string;
@@ -186,6 +189,7 @@ export interface InterchainAtomicSwapInterface extends Interface {
       | "sellerFeeRate"
       | "swapOrder"
       | "swapOrderITCParams"
+      | "swapOrderVestingParams"
       | "takeSwap"
       | "transferOwnership"
       | "updateBid"
@@ -200,6 +204,7 @@ export interface InterchainAtomicSwapInterface extends Interface {
       | "CanceledBid"
       | "Initialized"
       | "OwnershipTransferred"
+      | "PlacedBid"
       | "ReceivedNewBid"
       | "UpdatedBid"
   ): EventFragment;
@@ -267,6 +272,10 @@ export interface InterchainAtomicSwapInterface extends Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "swapOrderVestingParams",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "takeSwap",
     values: [IAtomicSwapBase.TakeSwapMsgStruct]
   ): string;
@@ -315,6 +324,10 @@ export interface InterchainAtomicSwapInterface extends Interface {
   decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "swapOrderITCParams",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "swapOrderVestingParams",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "takeSwap", data: BytesLike): Result;
@@ -416,6 +429,24 @@ export namespace OwnershipTransferredEvent {
   export interface OutputObject {
     previousOwner: string;
     newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PlacedBidEvent {
+  export type InputTuple = [
+    orderID: BytesLike,
+    bidder: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
+  export interface OutputObject {
+    orderID: string;
+    bidder: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -627,6 +658,12 @@ export interface InterchainAtomicSwap extends BaseContract {
     "view"
   >;
 
+  swapOrderVestingParams: TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
+    "view"
+  >;
+
   takeSwap: TypedContractMethod<
     [takeswap: IAtomicSwapBase.TakeSwapMsgStruct],
     [void],
@@ -792,6 +829,13 @@ export interface InterchainAtomicSwap extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "swapOrderVestingParams"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "takeSwap"
   ): TypedContractMethod<
     [takeswap: IAtomicSwapBase.TakeSwapMsgStruct],
@@ -857,6 +901,13 @@ export interface InterchainAtomicSwap extends BaseContract {
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "PlacedBid"
+  ): TypedContractEvent<
+    PlacedBidEvent.InputTuple,
+    PlacedBidEvent.OutputTuple,
+    PlacedBidEvent.OutputObject
   >;
   getEvent(
     key: "ReceivedNewBid"
@@ -949,6 +1000,17 @@ export interface InterchainAtomicSwap extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "PlacedBid(bytes32,address,uint256)": TypedContractEvent<
+      PlacedBidEvent.InputTuple,
+      PlacedBidEvent.OutputTuple,
+      PlacedBidEvent.OutputObject
+    >;
+    PlacedBid: TypedContractEvent<
+      PlacedBidEvent.InputTuple,
+      PlacedBidEvent.OutputTuple,
+      PlacedBidEvent.OutputObject
     >;
 
     "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<
