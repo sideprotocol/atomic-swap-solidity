@@ -4,7 +4,6 @@ pragma solidity ^0.8.19;
 import "../abstracts/AtomicSwapBase.sol";
 import "./interfaces/IInterchainAtomicSwap.sol";
 import "./interfaces/ISideLzAppUpgradable.sol";
-import "hardhat/console.sol";
 import "./libs/InterchainAtomicSwapLogic.sol";
 import "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 
@@ -72,16 +71,16 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         return id;
     }
 
-    /// @notice Creates a new swap order with vesting parameters.
-    /// @param makeswap Struct containing details of the swap order.
-    /// @param releases Array of vesting release parameters.
-    function makeSwapWithVesting(ICMakeSwapMsg calldata makeswap, Release[] calldata releases) external payable {
-        releases.validateVestingParams();
-        bytes32 orderId = makeSwap(makeswap);
-        for (uint256 i = 0; i < releases.length; i++) {
-            swapOrderVestingParams[orderId].push(releases[i]);
-        }
-    }
+    // /// @notice Creates a new swap order with vesting parameters.
+    // /// @param makeswap Struct containing details of the swap order.
+    // /// @param releases Array of vesting release parameters.
+    // function makeSwapWithVesting(ICMakeSwapMsg calldata makeswap, Release[] calldata releases) external payable {
+    //     releases.validateVestingParams();
+    //     bytes32 orderId = makeSwap(makeswap);
+    //     for (uint256 i = 0; i < releases.length; i++) {
+    //         swapOrderVestingParams[orderId].push(releases[i]);
+    //     }
+    // }
 
     // /**
     //  * @notice Allows a taker to complete a swap order by exchanging tokens.
@@ -95,7 +94,7 @@ contract InterchainAtomicSwap is AtomicSwapBase, IInterchainAtomicSwap {
         onlyExist(takeswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
-        address makerReceiver = swapOrderITCParams[takeswap.orderID].makerReceiver;
+        // address makerReceiver = swapOrderITCParams[takeswap.orderID].makerReceiver;
 
         takeswap.validateTakeSwapParams(swapOrder);
         // Update order details

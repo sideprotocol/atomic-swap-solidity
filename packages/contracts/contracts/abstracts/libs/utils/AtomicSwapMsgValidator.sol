@@ -90,7 +90,7 @@ library AtomicSwapMsgValidator {
     /// @param addr The address to check.
     /// @return True if the address is a contract, false otherwise.
     /// @dev Uses assembly to check the size of the code at the address.
-    function isContract(address addr) internal view returns (bool) {
+    function isContract(address addr) public view returns (bool) {
         uint256 size;
         assembly {
             size := extcodesize(addr)

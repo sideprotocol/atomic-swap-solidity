@@ -394,7 +394,7 @@ export interface InterchainAtomicSwap extends BaseContract {
     makeSwap: TypedContractMethod<[
         icMakeSwap: IInterchainAtomicSwap.ICMakeSwapMsgStruct
     ], [
-        void
+        string
     ], "payable">;
     onReceivePacket: TypedContractMethod<[
         _srcChainID: BigNumberish,
@@ -535,7 +535,7 @@ export interface InterchainAtomicSwap extends BaseContract {
     getFunction(nameOrSignature: "makeSwap"): TypedContractMethod<[
         icMakeSwap: IInterchainAtomicSwap.ICMakeSwapMsgStruct
     ], [
-        void
+        string
     ], "payable">;
     getFunction(nameOrSignature: "onReceivePacket"): TypedContractMethod<[
         _srcChainID: BigNumberish,

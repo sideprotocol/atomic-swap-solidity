@@ -73,9 +73,16 @@ export declare namespace IAtomicSwapBase {
 
 export interface AtomicSwapMsgValidatorInterface extends Interface {
   getFunction(
-    nameOrSignature: "validateMakeSwapParams" | "validateVestingParams"
+    nameOrSignature:
+      | "isContract"
+      | "validateMakeSwapParams"
+      | "validateVestingParams"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "isContract",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "validateMakeSwapParams",
     values: [IAtomicSwapBase.MakeSwapMsgStruct]
@@ -85,6 +92,7 @@ export interface AtomicSwapMsgValidatorInterface extends Interface {
     values: [IAtomicSwapBase.ReleaseStruct[]]
   ): string;
 
+  decodeFunctionResult(functionFragment: "isContract", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "validateMakeSwapParams",
     data: BytesLike
@@ -138,6 +146,8 @@ export interface AtomicSwapMsgValidator extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  isContract: TypedContractMethod<[addr: AddressLike], [boolean], "view">;
+
   validateMakeSwapParams: TypedContractMethod<
     [makeswap: IAtomicSwapBase.MakeSwapMsgStruct],
     [void],
@@ -154,6 +164,9 @@ export interface AtomicSwapMsgValidator extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "isContract"
+  ): TypedContractMethod<[addr: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "validateMakeSwapParams"
   ): TypedContractMethod<
