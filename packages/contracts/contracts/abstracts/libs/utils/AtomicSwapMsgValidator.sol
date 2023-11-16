@@ -1,109 +1,97 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-// Import the atomic swap interface to access its data structures and enums.
 import "../../interfaces/IAtomicSwapBase.sol";
 
-// Define a library that provides message validation for atomic swaps.
+/// @title Atomic Swap Message Validator
+/// @notice Library providing validation functions for various atomic swap messages.
+/// @dev Used for ensuring the correctness and integrity of data in atomic swap operations.
 library AtomicSwapMsgValidator {
-    // Validates the parameters for making an atomic swap.
-    function validateMakeSwapParams(
-        IAtomicSwapBase.MakeSwapMsg memory makeswap
-    ) external view {
-        // Check if the token being sold is a valid contract address.
-        if (
-            makeswap.sellToken.token != address(0) && // Ensure it's not the zero address
-            !isContract(makeswap.sellToken.token) // Ensure it's a contract address
-        ) {
-            revert IAtomicSwapBase.InvalidContractAddress(
-                makeswap.sellToken.token
-            );
+    /// @notice Validates parameters for creating an atomic swap.
+    /// @param makeswap The structure containing swap details.
+    /// @dev Checks for valid contract address, positive minimum bid, authorized sender, and future expiration time.
+    function validateMakeSwapParams(IAtomicSwapBase.MakeSwapMsg memory makeswap) external view {
+        if (makeswap.sellToken.token != address(0) && !isContract(makeswap.sellToken.token)) {
+            revert IAtomicSwapBase.InvalidContractAddress(makeswap.sellToken.token);
         }
 
-        // Ensure the minimum bid amount is a positive value.
         if (makeswap.minBidAmount <= 0) {
             revert IAtomicSwapBase.InvalidMinimumBidLimit();
         }
 
-        // Ensure that the message sender is the one creating the swap.
         if (msg.sender == address(0) || msg.sender != makeswap.maker) {
             revert IAtomicSwapBase.UnauthorizedSender();
         }
 
-        // Ensure the expiration time of the swap is in the future.
         if (makeswap.expireAt < block.timestamp) {
-            revert IAtomicSwapBase.InvalidExpirationTime(
-                makeswap.expireAt,
-                block.timestamp
-            );
+            revert IAtomicSwapBase.InvalidExpirationTime(makeswap.expireAt, block.timestamp);
         }
     }
 
-    // Validates the parameters for taking an atomic swap.
+    /// @notice Validates parameters for taking an atomic swap.
+    /// @param takeswap The take swap message details.
+    /// @param swapOrder Mapping of current atomic swap orders.
+    /// @dev Checks if the order is not already accepted or completed, and if the taker is authorized.
     function validateTakeSwapParams(
         IAtomicSwapBase.TakeSwapMsg memory takeswap,
-        mapping(bytes32 => IAtomicSwapBase.AtomicSwapOrder) storage swapOrder // The existing swap orders
+        mapping(bytes32 => IAtomicSwapBase.AtomicSwapOrder) storage swapOrder
     ) external view {
-        // Retrieve the swap order details using the orderID from the input.
-        IAtomicSwapBase.AtomicSwapOrder storage order = swapOrder[
-            takeswap.orderID
-        ];
+        IAtomicSwapBase.AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
 
-        // Ensure the swap order hasn't been accepted yet.
         if (order.acceptBid) {
             revert IAtomicSwapBase.OrderNotAllowTake();
         }
 
-        // Ensure that the taker is authorized to take the order.
         if (order.taker != address(0) && order.taker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedTakeAction();
         }
 
-        // Ensure the swap order has not been completed.
         if (order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
             revert IAtomicSwapBase.OrderAlreadyCompleted();
         }
     }
 
-    // Validates the parameters to cancel a swap.
-    function validateCancelSwap(
-        IAtomicSwapBase.AtomicSwapOrder storage order // The order details to validate
-    ) external view {
-        // Ensure the person trying to cancel the swap is the maker of the order.
+    /// @notice Validates the cancellation of a swap.
+    /// @param order The atomic swap order to validate for cancellation.
+    /// @dev Ensures that the order is in the initial state and the sender is authorized to cancel.
+    function validateCancelSwap(IAtomicSwapBase.AtomicSwapOrder storage order) external view {
         if (order.maker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedCancelAction();
         }
 
-        // Ensure the swap order is still in the INITIAL state and hasn't been completed or accepted.
         if (order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
             revert IAtomicSwapBase.OrderAlreadyCompleted();
         }
     }
 
-    function validateVestingParams(
-        IAtomicSwapBase.Release[] memory releases // The order details to validate
-    ) external pure {
-        // Ensure the person trying to cancel the swap is the maker of the order.
+    /// @notice Validates vesting parameters for an atomic swap.
+    /// @param releases Array of release schedules for the vesting.
+    /// @dev Ensures the total percentage of releases equals 100% and the number of releases is within limits.
+    function validateVestingParams(IAtomicSwapBase.Release[] memory releases) external pure {
         if (releases.length == 0) {
             revert IAtomicSwapBase.ZeroReleaseSchedule();
         }
-        uint totalPercentage = 0;
-        for (uint i = 0; i < releases.length; i++) {
+
+        uint256 totalPercentage = 0;
+        for (uint256 i = 0; i < releases.length; i++) {
             totalPercentage += releases[i].percentage;
         }
+
         if (totalPercentage != 10000) {
             revert IAtomicSwapBase.InvalidTotalPercentage();
         }
-        // validate release
+
         if (releases.length > 150) {
             revert IAtomicSwapBase.OverMaximumReleaseStep();
         }
     }
 
-    // Utility function to check if an address is a contract.
+    /// @notice Checks if an address is a contract.
+    /// @param addr The address to check.
+    /// @return True if the address is a contract, false otherwise.
+    /// @dev Uses assembly to check the size of the code at the address.
     function isContract(address addr) internal view returns (bool) {
-        uint size;
-        // Use assembly to retrieve the size of the code on target address. Contracts will have code size > 0.
+        uint256 size;
         assembly {
             size := extcodesize(addr)
         }
