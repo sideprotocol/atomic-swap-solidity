@@ -31,18 +31,6 @@ export declare namespace IAtomicSwapBase {
     bidder: string;
   };
 
-  export type CounterOfferMsgStruct = {
-    orderID: BytesLike;
-    bidder: AddressLike;
-    amount: BigNumberish;
-  };
-
-  export type CounterOfferMsgStructOutput = [
-    orderID: string,
-    bidder: string,
-    amount: bigint
-  ] & { orderID: string; bidder: string; amount: bigint };
-
   export type CancelSwapMsgStruct = { orderID: BytesLike };
 
   export type CancelSwapMsgStructOutput = [orderID: string] & {
@@ -146,12 +134,10 @@ export interface InchainAtomicSwapInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "acceptBid"
-      | "acceptCountOfffer"
       | "bids"
       | "buyerFeeRate"
       | "cancelBid"
       | "cancelSwap"
-      | "counteroffer"
       | "counteroffers"
       | "initialize"
       | "makeSwap"
@@ -186,10 +172,6 @@ export interface InchainAtomicSwapInterface extends Interface {
     values: [IAtomicSwapBase.AcceptBidMsgStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "acceptCountOfffer",
-    values: [IAtomicSwapBase.CounterOfferMsgStruct]
-  ): string;
-  encodeFunctionData(
     functionFragment: "bids",
     values: [BytesLike, AddressLike]
   ): string;
@@ -204,10 +186,6 @@ export interface InchainAtomicSwapInterface extends Interface {
   encodeFunctionData(
     functionFragment: "cancelSwap",
     values: [IAtomicSwapBase.CancelSwapMsgStruct]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "counteroffer",
-    values: [IAtomicSwapBase.CounterOfferMsgStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "counteroffers",
@@ -260,10 +238,6 @@ export interface InchainAtomicSwapInterface extends Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "acceptBid", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "acceptCountOfffer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "buyerFeeRate",
@@ -271,10 +245,6 @@ export interface InchainAtomicSwapInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "cancelBid", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "counteroffer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "counteroffers",
     data: BytesLike
@@ -509,12 +479,6 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  acceptCountOfffer: TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
-  >;
-
   bids: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
@@ -539,12 +503,6 @@ export interface InchainAtomicSwap extends BaseContract {
     [cancelswap: IAtomicSwapBase.CancelSwapMsgStruct],
     [void],
     "payable"
-  >;
-
-  counteroffer: TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
   >;
 
   counteroffers: TypedContractMethod<
@@ -662,13 +620,6 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "acceptCountOfffer"
-  ): TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
     nameOrSignature: "bids"
   ): TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
@@ -697,13 +648,6 @@ export interface InchainAtomicSwap extends BaseContract {
     [cancelswap: IAtomicSwapBase.CancelSwapMsgStruct],
     [void],
     "payable"
-  >;
-  getFunction(
-    nameOrSignature: "counteroffer"
-  ): TypedContractMethod<
-    [counterOfferMsg: IAtomicSwapBase.CounterOfferMsgStruct],
-    [void],
-    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "counteroffers"
