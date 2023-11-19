@@ -13,7 +13,7 @@ describe("AtomicSwap: UpdateBid", () => {
         orderID,
         takerReceiver: maker.address,
       })
-    ).to.revertedWithCustomError(atomicSwap, "OrderNotAllowTake");
+    ).to.revertedWithCustomError(atomicSwap, "UnauthorizedTakeAction");
 
     const bidPayload = {
       bidder: taker.address,
@@ -102,7 +102,7 @@ describe("AtomicSwap: UpdateBid", () => {
         orderID,
         takerReceiver: maker.address,
       })
-    ).to.revertedWithCustomError(atomicSwap, "OrderNotAllowTake");
+    ).to.revertedWithCustomError(atomicSwap, "UnauthorizedTakeAction");
 
     const bidPayload = {
       bidder: taker.address,

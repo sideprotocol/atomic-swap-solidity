@@ -46,8 +46,8 @@ export const Utils = {
     );
     const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
 
-    const sellTokenFeeRate = 10;
-    const buyTokenFeeRate = 12;
+    const sellTokenFeeRate = 100;
+    const buyTokenFeeRate = 120;
     const treasury = accounts[10].address;
 
     // Deploy vesting contract.
@@ -203,8 +203,8 @@ export const Utils = {
       }
     );
 
-    const sellTokenFeeRate = 10;
-    const buyTokenFeeRate = 12;
+    const sellTokenFeeRate = 100;
+    const buyTokenFeeRate = 120;
     const treasury = accounts[10].address;
 
     const initialAParams = {
@@ -890,7 +890,7 @@ export function calcSwapAmount(amount: bigint, feeRate: number) {
   // Convert the feeRate to a bigint with a scaling factor (in this case, 1000 for precision)
   const feeRateBigInt = BigInt(Math.round(feeRate));
   // Calculate the feeAmount in bigint
-  const feeAmount = (amount * feeRateBigInt) / BigInt(1000);
+  const feeAmount = (amount * feeRateBigInt) / BigInt(10000);
 
   // Subtract the feeAmount from the initial amount to get the amount after fee
   const amountAfterFee = amount - feeAmount;

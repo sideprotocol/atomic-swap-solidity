@@ -28,11 +28,11 @@ describe("AtomicSwap: MakeVestingSwap", () => {
     createDefaultVestingAtomicOrder([
       {
         durationInHours: BigInt(1),
-        percentage: BigInt(10),
+        percentage: BigInt(1000),
       },
       {
         durationInHours: BigInt(1),
-        percentage: BigInt(90),
+        percentage: BigInt(9000),
       },
     ]));
 

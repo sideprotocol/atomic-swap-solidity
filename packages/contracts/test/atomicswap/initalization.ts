@@ -18,7 +18,13 @@ describe("AtomicSwap: Initialization", () => {
   it("should not allow re-initialization", async () => {
     const { atomicSwap } = await loadFixture(Utils.prepareInChainAtomicTest);
     await expect(
-      atomicSwap.initialize(accounts[0].address, accounts[10].address, 100, 100)
+      atomicSwap.initialize(
+        accounts[0].address,
+        accounts[0].address,
+        accounts[10].address,
+        100,
+        100
+      )
     ).to.be.reverted;
   });
 });

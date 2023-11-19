@@ -82,62 +82,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IInchainAtomicSwap__factory>;
     getContractFactory(
-      name: "InterchainAtomicSwap",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.InterchainAtomicSwap__factory>;
-    getContractFactory(
-      name: "IInterchainAtomicSwap",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IInterchainAtomicSwap__factory>;
-    getContractFactory(
-      name: "ISideLzAppUpgradable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISideLzAppUpgradable__factory>;
-    getContractFactory(
-      name: "ILayerZeroEndpointUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILayerZeroEndpointUpgradeable__factory>;
-    getContractFactory(
-      name: "ILayerZeroReceiverUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILayerZeroReceiverUpgradeable__factory>;
-    getContractFactory(
-      name: "ILayerZeroUserApplicationConfigUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable__factory>;
-    getContractFactory(
-      name: "InterchainAtomicSwapLogic",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.InterchainAtomicSwapLogic__factory>;
-    getContractFactory(
-      name: "LzAppUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.LzAppUpgradeable__factory>;
-    getContractFactory(
-      name: "NonblockingLzAppUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.NonblockingLzAppUpgradeable__factory>;
-    getContractFactory(
-      name: "SideLzAppUpgradable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SideLzAppUpgradable__factory>;
-    getContractFactory(
-      name: "ILayerZeroEndpoint",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILayerZeroEndpoint__factory>;
-    getContractFactory(
-      name: "ILayerZeroReceiver",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILayerZeroReceiver__factory>;
-    getContractFactory(
-      name: "ILayerZeroUserApplicationConfig",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILayerZeroUserApplicationConfig__factory>;
-    getContractFactory(
-      name: "LZEndpointMock",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.LZEndpointMock__factory>;
-    getContractFactory(
       name: "MockToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
@@ -236,76 +180,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IInchainAtomicSwap>;
     getContractAt(
-      name: "InterchainAtomicSwap",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.InterchainAtomicSwap>;
-    getContractAt(
-      name: "IInterchainAtomicSwap",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IInterchainAtomicSwap>;
-    getContractAt(
-      name: "ISideLzAppUpgradable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISideLzAppUpgradable>;
-    getContractAt(
-      name: "ILayerZeroEndpointUpgradeable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILayerZeroEndpointUpgradeable>;
-    getContractAt(
-      name: "ILayerZeroReceiverUpgradeable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILayerZeroReceiverUpgradeable>;
-    getContractAt(
-      name: "ILayerZeroUserApplicationConfigUpgradeable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable>;
-    getContractAt(
-      name: "InterchainAtomicSwapLogic",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.InterchainAtomicSwapLogic>;
-    getContractAt(
-      name: "LzAppUpgradeable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.LzAppUpgradeable>;
-    getContractAt(
-      name: "NonblockingLzAppUpgradeable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.NonblockingLzAppUpgradeable>;
-    getContractAt(
-      name: "SideLzAppUpgradable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SideLzAppUpgradable>;
-    getContractAt(
-      name: "ILayerZeroEndpoint",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILayerZeroEndpoint>;
-    getContractAt(
-      name: "ILayerZeroReceiver",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILayerZeroReceiver>;
-    getContractAt(
-      name: "ILayerZeroUserApplicationConfig",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILayerZeroUserApplicationConfig>;
-    getContractAt(
-      name: "LZEndpointMock",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.LZEndpointMock>;
-    getContractAt(
       name: "MockToken",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -389,62 +263,6 @@ declare module "hardhat/types/runtime" {
       name: "IInchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IInchainAtomicSwap>;
-    deployContract(
-      name: "InterchainAtomicSwap",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.InterchainAtomicSwap>;
-    deployContract(
-      name: "IInterchainAtomicSwap",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IInterchainAtomicSwap>;
-    deployContract(
-      name: "ISideLzAppUpgradable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ISideLzAppUpgradable>;
-    deployContract(
-      name: "ILayerZeroEndpointUpgradeable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroEndpointUpgradeable>;
-    deployContract(
-      name: "ILayerZeroReceiverUpgradeable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroReceiverUpgradeable>;
-    deployContract(
-      name: "ILayerZeroUserApplicationConfigUpgradeable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable>;
-    deployContract(
-      name: "InterchainAtomicSwapLogic",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.InterchainAtomicSwapLogic>;
-    deployContract(
-      name: "LzAppUpgradeable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.LzAppUpgradeable>;
-    deployContract(
-      name: "NonblockingLzAppUpgradeable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.NonblockingLzAppUpgradeable>;
-    deployContract(
-      name: "SideLzAppUpgradable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.SideLzAppUpgradable>;
-    deployContract(
-      name: "ILayerZeroEndpoint",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroEndpoint>;
-    deployContract(
-      name: "ILayerZeroReceiver",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroReceiver>;
-    deployContract(
-      name: "ILayerZeroUserApplicationConfig",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroUserApplicationConfig>;
-    deployContract(
-      name: "LZEndpointMock",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.LZEndpointMock>;
     deployContract(
       name: "MockToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -543,76 +361,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IInchainAtomicSwap>;
-    deployContract(
-      name: "InterchainAtomicSwap",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.InterchainAtomicSwap>;
-    deployContract(
-      name: "IInterchainAtomicSwap",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IInterchainAtomicSwap>;
-    deployContract(
-      name: "ISideLzAppUpgradable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ISideLzAppUpgradable>;
-    deployContract(
-      name: "ILayerZeroEndpointUpgradeable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroEndpointUpgradeable>;
-    deployContract(
-      name: "ILayerZeroReceiverUpgradeable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroReceiverUpgradeable>;
-    deployContract(
-      name: "ILayerZeroUserApplicationConfigUpgradeable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroUserApplicationConfigUpgradeable>;
-    deployContract(
-      name: "InterchainAtomicSwapLogic",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.InterchainAtomicSwapLogic>;
-    deployContract(
-      name: "LzAppUpgradeable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.LzAppUpgradeable>;
-    deployContract(
-      name: "NonblockingLzAppUpgradeable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.NonblockingLzAppUpgradeable>;
-    deployContract(
-      name: "SideLzAppUpgradable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.SideLzAppUpgradable>;
-    deployContract(
-      name: "ILayerZeroEndpoint",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroEndpoint>;
-    deployContract(
-      name: "ILayerZeroReceiver",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroReceiver>;
-    deployContract(
-      name: "ILayerZeroUserApplicationConfig",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ILayerZeroUserApplicationConfig>;
-    deployContract(
-      name: "LZEndpointMock",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.LZEndpointMock>;
     deployContract(
       name: "MockToken",
       args: any[],
