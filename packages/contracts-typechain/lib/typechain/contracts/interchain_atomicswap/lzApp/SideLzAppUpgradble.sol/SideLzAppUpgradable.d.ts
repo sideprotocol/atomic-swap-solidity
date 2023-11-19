@@ -24,7 +24,7 @@ export interface SideLzAppUpgradableInterface extends Interface {
     encodeFunctionData(functionFragment: "setConfig", values: [BigNumberish, BigNumberish, BigNumberish, BytesLike]): string;
     encodeFunctionData(functionFragment: "setMinDstGas", values: [BigNumberish, BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "setOracle", values: [BigNumberish, AddressLike]): string;
-    encodeFunctionData(functionFragment: "setPacketReceivers", values: [AddressLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "setPacketReceivers", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "setPayloadSizeLimit", values: [BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "setPrecrime", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "setReceiveVersion", values: [BigNumberish]): string;
@@ -328,8 +328,7 @@ export interface SideLzAppUpgradable extends BaseContract {
         void
     ], "nonpayable">;
     setPacketReceivers: TypedContractMethod<[
-        _atomicswap: AddressLike,
-        _interchainswap: AddressLike
+        _atomicswap: AddressLike
     ], [
         void
     ], "nonpayable">;
@@ -486,12 +485,7 @@ export interface SideLzAppUpgradable extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    getFunction(nameOrSignature: "setPacketReceivers"): TypedContractMethod<[
-        _atomicswap: AddressLike,
-        _interchainswap: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
+    getFunction(nameOrSignature: "setPacketReceivers"): TypedContractMethod<[_atomicswap: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "setPayloadSizeLimit"): TypedContractMethod<[
         _dstChainId: BigNumberish,
         _size: BigNumberish

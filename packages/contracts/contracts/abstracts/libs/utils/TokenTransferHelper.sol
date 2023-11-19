@@ -3,7 +3,6 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../../interfaces/IAtomicSwapBase.sol";
-import "hardhat/console.sol";
 
 /// @title Token Transfer Helper
 /// @notice Library providing functions to safely transfer tokens with support for fee deductions.

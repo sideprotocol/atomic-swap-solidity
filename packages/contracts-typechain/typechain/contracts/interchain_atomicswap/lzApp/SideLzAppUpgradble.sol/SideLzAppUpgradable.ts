@@ -150,7 +150,7 @@ export interface SideLzAppUpgradableInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setPacketReceivers",
-    values: [AddressLike, AddressLike]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setPayloadSizeLimit",
@@ -605,7 +605,7 @@ export interface SideLzAppUpgradable extends BaseContract {
   >;
 
   setPacketReceivers: TypedContractMethod<
-    [_atomicswap: AddressLike, _interchainswap: AddressLike],
+    [_atomicswap: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -817,11 +817,7 @@ export interface SideLzAppUpgradable extends BaseContract {
   >;
   getFunction(
     nameOrSignature: "setPacketReceivers"
-  ): TypedContractMethod<
-    [_atomicswap: AddressLike, _interchainswap: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  ): TypedContractMethod<[_atomicswap: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setPayloadSizeLimit"
   ): TypedContractMethod<

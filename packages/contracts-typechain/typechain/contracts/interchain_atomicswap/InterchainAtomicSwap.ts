@@ -583,7 +583,7 @@ export interface InterchainAtomicSwap extends BaseContract {
 
   makeSwap: TypedContractMethod<
     [icMakeSwap: IInterchainAtomicSwap.ICMakeSwapMsgStruct],
-    [void],
+    [string],
     "payable"
   >;
 
@@ -747,7 +747,7 @@ export interface InterchainAtomicSwap extends BaseContract {
     nameOrSignature: "makeSwap"
   ): TypedContractMethod<
     [icMakeSwap: IInterchainAtomicSwap.ICMakeSwapMsgStruct],
-    [void],
+    [string],
     "payable"
   >;
   getFunction(

@@ -51,6 +51,85 @@ const _abi = [
         anonymous: false,
         inputs: [
             {
+                components: [
+                    {
+                        components: [
+                            {
+                                internalType: "address",
+                                name: "from",
+                                type: "address",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "start",
+                                type: "uint256",
+                            },
+                            {
+                                internalType: "address",
+                                name: "token",
+                                type: "address",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "totalAmount",
+                                type: "uint256",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "amountReleased",
+                                type: "uint256",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "lastReleasedStep",
+                                type: "uint256",
+                            },
+                        ],
+                        internalType: "struct ICliffVesting.VestingSchedule",
+                        name: "schedule",
+                        type: "tuple",
+                    },
+                    {
+                        components: [
+                            {
+                                internalType: "uint256",
+                                name: "durationInHours",
+                                type: "uint256",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "percentage",
+                                type: "uint256",
+                            },
+                        ],
+                        internalType: "struct IAtomicSwapBase.Release[]",
+                        name: "release",
+                        type: "tuple[]",
+                    },
+                    {
+                        internalType: "address",
+                        name: "beneficiary",
+                        type: "address",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "scheduleId",
+                        type: "uint256",
+                    },
+                ],
+                indexed: true,
+                internalType: "struct ICliffVesting.VestingInfo",
+                name: "vesting",
+                type: "tuple",
+            },
+        ],
+        name: "NewVesting",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            {
                 indexed: true,
                 internalType: "address",
                 name: "sender",

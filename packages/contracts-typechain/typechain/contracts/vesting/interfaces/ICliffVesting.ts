@@ -23,6 +23,52 @@ import type {
   TypedContractMethod,
 } from "../../../common";
 
+export declare namespace ICliffVesting {
+  export type VestingScheduleStruct = {
+    from: AddressLike;
+    start: BigNumberish;
+    token: AddressLike;
+    totalAmount: BigNumberish;
+    amountReleased: BigNumberish;
+    lastReleasedStep: BigNumberish;
+  };
+
+  export type VestingScheduleStructOutput = [
+    from: string,
+    start: bigint,
+    token: string,
+    totalAmount: bigint,
+    amountReleased: bigint,
+    lastReleasedStep: bigint
+  ] & {
+    from: string;
+    start: bigint;
+    token: string;
+    totalAmount: bigint;
+    amountReleased: bigint;
+    lastReleasedStep: bigint;
+  };
+
+  export type VestingInfoStruct = {
+    schedule: ICliffVesting.VestingScheduleStruct;
+    release: IAtomicSwapBase.ReleaseStruct[];
+    beneficiary: AddressLike;
+    scheduleId: BigNumberish;
+  };
+
+  export type VestingInfoStructOutput = [
+    schedule: ICliffVesting.VestingScheduleStructOutput,
+    release: IAtomicSwapBase.ReleaseStructOutput[],
+    beneficiary: string,
+    scheduleId: bigint
+  ] & {
+    schedule: ICliffVesting.VestingScheduleStructOutput;
+    release: IAtomicSwapBase.ReleaseStructOutput[];
+    beneficiary: string;
+    scheduleId: bigint;
+  };
+}
+
 export declare namespace IAtomicSwapBase {
   export type ReleaseStruct = {
     durationInHours: BigNumberish;
@@ -38,7 +84,9 @@ export declare namespace IAtomicSwapBase {
 export interface ICliffVestingInterface extends Interface {
   getFunction(nameOrSignature: "startVesting"): FunctionFragment;
 
-  getEvent(nameOrSignatureOrTopic: "Received" | "Released"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "NewVesting" | "Received" | "Released"
+  ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "startVesting",
@@ -54,6 +102,18 @@ export interface ICliffVestingInterface extends Interface {
     functionFragment: "startVesting",
     data: BytesLike
   ): Result;
+}
+
+export namespace NewVestingEvent {
+  export type InputTuple = [vesting: ICliffVesting.VestingInfoStruct];
+  export type OutputTuple = [vesting: ICliffVesting.VestingInfoStructOutput];
+  export interface OutputObject {
+    vesting: ICliffVesting.VestingInfoStructOutput;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace ReceivedEvent {
@@ -154,6 +214,13 @@ export interface ICliffVesting extends BaseContract {
   >;
 
   getEvent(
+    key: "NewVesting"
+  ): TypedContractEvent<
+    NewVestingEvent.InputTuple,
+    NewVestingEvent.OutputTuple,
+    NewVestingEvent.OutputObject
+  >;
+  getEvent(
     key: "Received"
   ): TypedContractEvent<
     ReceivedEvent.InputTuple,
@@ -169,6 +236,17 @@ export interface ICliffVesting extends BaseContract {
   >;
 
   filters: {
+    "NewVesting(tuple)": TypedContractEvent<
+      NewVestingEvent.InputTuple,
+      NewVestingEvent.OutputTuple,
+      NewVestingEvent.OutputObject
+    >;
+    NewVesting: TypedContractEvent<
+      NewVestingEvent.InputTuple,
+      NewVestingEvent.OutputTuple,
+      NewVestingEvent.OutputObject
+    >;
+
     "Received(address,uint256)": TypedContractEvent<
       ReceivedEvent.InputTuple,
       ReceivedEvent.OutputTuple,

@@ -23,6 +23,13 @@ interface ICliffVesting {
         uint256 lastReleasedStep;
     }
 
+    struct VestingInfo {
+        VestingSchedule schedule;
+        IAtomicSwapBase.Release[] release;
+        address beneficiary; 
+        uint256 scheduleId;
+    }
+
     /// @notice Starts the vesting schedule for a beneficiary.
     /// @param beneficiary The address of the beneficiary.
     /// @param token The token to be vested.
@@ -35,6 +42,7 @@ interface ICliffVesting {
         IAtomicSwapBase.Release[] memory releases
     ) external;
 
+    event NewVesting(VestingInfo indexed vesting);
     /// @notice Event emitted when tokens are released to a beneficiary.
     /// @param beneficiary The address of the beneficiary.
     /// @param amount The amount of tokens released.
