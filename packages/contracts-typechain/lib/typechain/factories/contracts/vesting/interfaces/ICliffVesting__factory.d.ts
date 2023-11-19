@@ -36,6 +36,67 @@ export declare class ICliffVesting__factory {
     }, {
         readonly anonymous: false;
         readonly inputs: readonly [{
+            readonly components: readonly [{
+                readonly components: readonly [{
+                    readonly internalType: "address";
+                    readonly name: "from";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "start";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "totalAmount";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amountReleased";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "lastReleasedStep";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct ICliffVesting.VestingSchedule";
+                readonly name: "schedule";
+                readonly type: "tuple";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "uint256";
+                    readonly name: "durationInHours";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "percentage";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct IAtomicSwapBase.Release[]";
+                readonly name: "release";
+                readonly type: "tuple[]";
+            }, {
+                readonly internalType: "address";
+                readonly name: "beneficiary";
+                readonly type: "address";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "scheduleId";
+                readonly type: "uint256";
+            }];
+            readonly indexed: true;
+            readonly internalType: "struct ICliffVesting.VestingInfo";
+            readonly name: "vesting";
+            readonly type: "tuple";
+        }];
+        readonly name: "NewVesting";
+        readonly type: "event";
+    }, {
+        readonly anonymous: false;
+        readonly inputs: readonly [{
             readonly indexed: true;
             readonly internalType: "address";
             readonly name: "sender";

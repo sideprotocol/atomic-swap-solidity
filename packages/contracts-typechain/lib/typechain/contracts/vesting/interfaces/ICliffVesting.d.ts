@@ -1,5 +1,47 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
+export declare namespace ICliffVesting {
+    type VestingScheduleStruct = {
+        from: AddressLike;
+        start: BigNumberish;
+        token: AddressLike;
+        totalAmount: BigNumberish;
+        amountReleased: BigNumberish;
+        lastReleasedStep: BigNumberish;
+    };
+    type VestingScheduleStructOutput = [
+        from: string,
+        start: bigint,
+        token: string,
+        totalAmount: bigint,
+        amountReleased: bigint,
+        lastReleasedStep: bigint
+    ] & {
+        from: string;
+        start: bigint;
+        token: string;
+        totalAmount: bigint;
+        amountReleased: bigint;
+        lastReleasedStep: bigint;
+    };
+    type VestingInfoStruct = {
+        schedule: ICliffVesting.VestingScheduleStruct;
+        release: IAtomicSwapBase.ReleaseStruct[];
+        beneficiary: AddressLike;
+        scheduleId: BigNumberish;
+    };
+    type VestingInfoStructOutput = [
+        schedule: ICliffVesting.VestingScheduleStructOutput,
+        release: IAtomicSwapBase.ReleaseStructOutput[],
+        beneficiary: string,
+        scheduleId: bigint
+    ] & {
+        schedule: ICliffVesting.VestingScheduleStructOutput;
+        release: IAtomicSwapBase.ReleaseStructOutput[];
+        beneficiary: string;
+        scheduleId: bigint;
+    };
+}
 export declare namespace IAtomicSwapBase {
     type ReleaseStruct = {
         durationInHours: BigNumberish;
@@ -15,7 +57,7 @@ export declare namespace IAtomicSwapBase {
 }
 export interface ICliffVestingInterface extends Interface {
     getFunction(nameOrSignature: "startVesting"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "Received" | "Released"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "NewVesting" | "Received" | "Released"): EventFragment;
     encodeFunctionData(functionFragment: "startVesting", values: [
         AddressLike,
         AddressLike,
@@ -23,6 +65,17 @@ export interface ICliffVestingInterface extends Interface {
         IAtomicSwapBase.ReleaseStruct[]
     ]): string;
     decodeFunctionResult(functionFragment: "startVesting", data: BytesLike): Result;
+}
+export declare namespace NewVestingEvent {
+    type InputTuple = [vesting: ICliffVesting.VestingInfoStruct];
+    type OutputTuple = [vesting: ICliffVesting.VestingInfoStructOutput];
+    interface OutputObject {
+        vesting: ICliffVesting.VestingInfoStructOutput;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
 export declare namespace ReceivedEvent {
     type InputTuple = [sender: AddressLike, amount: BigNumberish];
@@ -78,9 +131,12 @@ export interface ICliffVesting extends BaseContract {
     ], [
         void
     ], "nonpayable">;
+    getEvent(key: "NewVesting"): TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
     getEvent(key: "Received"): TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
     getEvent(key: "Released"): TypedContractEvent<ReleasedEvent.InputTuple, ReleasedEvent.OutputTuple, ReleasedEvent.OutputObject>;
     filters: {
+        "NewVesting(tuple)": TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
+        NewVesting: TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
         "Received(address,uint256)": TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
         Received: TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
         "Released(address,uint256)": TypedContractEvent<ReleasedEvent.InputTuple, ReleasedEvent.OutputTuple, ReleasedEvent.OutputObject>;

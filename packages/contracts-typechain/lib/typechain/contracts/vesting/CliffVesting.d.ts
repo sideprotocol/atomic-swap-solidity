@@ -1,5 +1,47 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
+export declare namespace ICliffVesting {
+    type VestingScheduleStruct = {
+        from: AddressLike;
+        start: BigNumberish;
+        token: AddressLike;
+        totalAmount: BigNumberish;
+        amountReleased: BigNumberish;
+        lastReleasedStep: BigNumberish;
+    };
+    type VestingScheduleStructOutput = [
+        from: string,
+        start: bigint,
+        token: string,
+        totalAmount: bigint,
+        amountReleased: bigint,
+        lastReleasedStep: bigint
+    ] & {
+        from: string;
+        start: bigint;
+        token: string;
+        totalAmount: bigint;
+        amountReleased: bigint;
+        lastReleasedStep: bigint;
+    };
+    type VestingInfoStruct = {
+        schedule: ICliffVesting.VestingScheduleStruct;
+        release: IAtomicSwapBase.ReleaseStruct[];
+        beneficiary: AddressLike;
+        scheduleId: BigNumberish;
+    };
+    type VestingInfoStructOutput = [
+        schedule: ICliffVesting.VestingScheduleStructOutput,
+        release: IAtomicSwapBase.ReleaseStructOutput[],
+        beneficiary: string,
+        scheduleId: bigint
+    ] & {
+        schedule: ICliffVesting.VestingScheduleStructOutput;
+        release: IAtomicSwapBase.ReleaseStructOutput[];
+        beneficiary: string;
+        scheduleId: bigint;
+    };
+}
 export declare namespace IAtomicSwapBase {
     type ReleaseStruct = {
         durationInHours: BigNumberish;
@@ -14,12 +56,13 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface CliffVestingInterface extends Interface {
-    getFunction(nameOrSignature: "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "Initialized" | "OwnershipTransferred" | "Received" | "Released"): EventFragment;
+    getFunction(nameOrSignature: "getVestingScheduleCount" | "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Initialized" | "NewVesting" | "OwnershipTransferred" | "Received" | "Released"): EventFragment;
+    encodeFunctionData(functionFragment: "getVestingScheduleCount", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-    encodeFunctionData(functionFragment: "release", values: [AddressLike]): string;
-    encodeFunctionData(functionFragment: "releaseInfos", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "release", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "releaseInfos", values: [AddressLike, BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
     encodeFunctionData(functionFragment: "startVesting", values: [
         AddressLike,
@@ -28,7 +71,8 @@ export interface CliffVestingInterface extends Interface {
         IAtomicSwapBase.ReleaseStruct[]
     ]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
-    encodeFunctionData(functionFragment: "vestingSchedules", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "vestingSchedules", values: [AddressLike, BigNumberish]): string;
+    decodeFunctionResult(functionFragment: "getVestingScheduleCount", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
@@ -43,6 +87,17 @@ export declare namespace InitializedEvent {
     type OutputTuple = [version: bigint];
     interface OutputObject {
         version: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export declare namespace NewVestingEvent {
+    type InputTuple = [vesting: ICliffVesting.VestingInfoStruct];
+    type OutputTuple = [vesting: ICliffVesting.VestingInfoStructOutput];
+    interface OutputObject {
+        vesting: ICliffVesting.VestingInfoStructOutput;
     }
     type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
     type Filter = TypedDeferredTopicFilter<Event>;
@@ -98,6 +153,11 @@ export interface CliffVesting extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    getVestingScheduleCount: TypedContractMethod<[
+        beneficiary: AddressLike
+    ], [
+        bigint
+    ], "view">;
     initialize: TypedContractMethod<[
         _admin: AddressLike,
         _treasury: AddressLike,
@@ -107,13 +167,15 @@ export interface CliffVesting extends BaseContract {
     ], "nonpayable">;
     owner: TypedContractMethod<[], [string], "view">;
     release: TypedContractMethod<[
-        beneficiary: AddressLike
+        beneficiary: AddressLike,
+        scheduleId: BigNumberish
     ], [
         void
     ], "nonpayable">;
     releaseInfos: TypedContractMethod<[
         arg0: AddressLike,
-        arg1: BigNumberish
+        arg1: BigNumberish,
+        arg2: BigNumberish
     ], [
         [bigint, bigint] & {
             durationInHours: bigint;
@@ -135,7 +197,8 @@ export interface CliffVesting extends BaseContract {
         void
     ], "nonpayable">;
     vestingSchedules: TypedContractMethod<[
-        arg0: AddressLike
+        arg0: AddressLike,
+        arg1: BigNumberish
     ], [
         [
             string,
@@ -154,6 +217,7 @@ export interface CliffVesting extends BaseContract {
         }
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "getVestingScheduleCount"): TypedContractMethod<[beneficiary: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
         _admin: AddressLike,
         _treasury: AddressLike,
@@ -162,10 +226,16 @@ export interface CliffVesting extends BaseContract {
         void
     ], "nonpayable">;
     getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "release"): TypedContractMethod<[beneficiary: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "release"): TypedContractMethod<[
+        beneficiary: AddressLike,
+        scheduleId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "releaseInfos"): TypedContractMethod<[
         arg0: AddressLike,
-        arg1: BigNumberish
+        arg1: BigNumberish,
+        arg2: BigNumberish
     ], [
         [bigint, bigint] & {
             durationInHours: bigint;
@@ -183,7 +253,8 @@ export interface CliffVesting extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "vestingSchedules"): TypedContractMethod<[
-        arg0: AddressLike
+        arg0: AddressLike,
+        arg1: BigNumberish
     ], [
         [
             string,
@@ -202,12 +273,15 @@ export interface CliffVesting extends BaseContract {
         }
     ], "view">;
     getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+    getEvent(key: "NewVesting"): TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
     getEvent(key: "OwnershipTransferred"): TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
     getEvent(key: "Received"): TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
     getEvent(key: "Released"): TypedContractEvent<ReleasedEvent.InputTuple, ReleasedEvent.OutputTuple, ReleasedEvent.OutputObject>;
     filters: {
         "Initialized(uint64)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
         Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        "NewVesting(tuple)": TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
+        NewVesting: TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
         "OwnershipTransferred(address,address)": TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
         OwnershipTransferred: TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
         "Received(address,uint256)": TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;

@@ -6,7 +6,7 @@ import {
 import { expect } from "chai";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 
-describe.only("TakeSwap With Vesting", () => {
+describe("TakeSwap With Vesting", () => {
   beforeEach(async () => {});
   const testTakeSwap = async (withNativeToken?: boolean) => {
     const [, , takerReceiver] = await ethers.getSigners();
@@ -70,14 +70,14 @@ describe.only("TakeSwap With Vesting", () => {
     console.log("release of amount:", releaseAmount);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.release(takerReceiver)
+        await vestingManager.release(takerReceiver, 0)
       ).to.changeEtherBalances(
         [takerReceiver, treasury],
         [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
       );
     } else {
       expect(
-        await vestingManager.release(takerReceiver)
+        await vestingManager.release(takerReceiver, 0)
       ).to.changeTokenBalances(
         usdc,
         [takerReceiver, treasury],
@@ -89,14 +89,14 @@ describe.only("TakeSwap With Vesting", () => {
     await time.increase(3600);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.release(takerReceiver)
+        await vestingManager.release(takerReceiver, 0)
       ).to.changeEtherBalances(
         [takerReceiver, treasury],
         [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
       );
     } else {
       expect(
-        await vestingManager.release(takerReceiver)
+        await vestingManager.release(takerReceiver, 0)
       ).to.changeTokenBalances(
         usdc,
         [takerReceiver, treasury],

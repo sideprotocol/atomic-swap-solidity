@@ -23,6 +23,52 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
+export declare namespace ICliffVesting {
+  export type VestingScheduleStruct = {
+    from: AddressLike;
+    start: BigNumberish;
+    token: AddressLike;
+    totalAmount: BigNumberish;
+    amountReleased: BigNumberish;
+    lastReleasedStep: BigNumberish;
+  };
+
+  export type VestingScheduleStructOutput = [
+    from: string,
+    start: bigint,
+    token: string,
+    totalAmount: bigint,
+    amountReleased: bigint,
+    lastReleasedStep: bigint
+  ] & {
+    from: string;
+    start: bigint;
+    token: string;
+    totalAmount: bigint;
+    amountReleased: bigint;
+    lastReleasedStep: bigint;
+  };
+
+  export type VestingInfoStruct = {
+    schedule: ICliffVesting.VestingScheduleStruct;
+    release: IAtomicSwapBase.ReleaseStruct[];
+    beneficiary: AddressLike;
+    scheduleId: BigNumberish;
+  };
+
+  export type VestingInfoStructOutput = [
+    schedule: ICliffVesting.VestingScheduleStructOutput,
+    release: IAtomicSwapBase.ReleaseStructOutput[],
+    beneficiary: string,
+    scheduleId: bigint
+  ] & {
+    schedule: ICliffVesting.VestingScheduleStructOutput;
+    release: IAtomicSwapBase.ReleaseStructOutput[];
+    beneficiary: string;
+    scheduleId: bigint;
+  };
+}
+
 export declare namespace IAtomicSwapBase {
   export type ReleaseStruct = {
     durationInHours: BigNumberish;
@@ -38,6 +84,7 @@ export declare namespace IAtomicSwapBase {
 export interface CliffVestingInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "getVestingScheduleCount"
       | "initialize"
       | "owner"
       | "release"
@@ -51,11 +98,16 @@ export interface CliffVestingInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "Initialized"
+      | "NewVesting"
       | "OwnershipTransferred"
       | "Received"
       | "Released"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "getVestingScheduleCount",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [AddressLike, AddressLike, BigNumberish]
@@ -63,11 +115,11 @@ export interface CliffVestingInterface extends Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "release",
-    values: [AddressLike]
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "releaseInfos",
-    values: [AddressLike, BigNumberish]
+    values: [AddressLike, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -88,9 +140,13 @@ export interface CliffVestingInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "vestingSchedules",
-    values: [AddressLike]
+    values: [AddressLike, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "getVestingScheduleCount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
@@ -121,6 +177,18 @@ export namespace InitializedEvent {
   export type OutputTuple = [version: bigint];
   export interface OutputObject {
     version: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace NewVestingEvent {
+  export type InputTuple = [vesting: ICliffVesting.VestingInfoStruct];
+  export type OutputTuple = [vesting: ICliffVesting.VestingInfoStructOutput];
+  export interface OutputObject {
+    vesting: ICliffVesting.VestingInfoStructOutput;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -210,6 +278,12 @@ export interface CliffVesting extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  getVestingScheduleCount: TypedContractMethod<
+    [beneficiary: AddressLike],
+    [bigint],
+    "view"
+  >;
+
   initialize: TypedContractMethod<
     [_admin: AddressLike, _treasury: AddressLike, _sellerFee: BigNumberish],
     [void],
@@ -219,13 +293,13 @@ export interface CliffVesting extends BaseContract {
   owner: TypedContractMethod<[], [string], "view">;
 
   release: TypedContractMethod<
-    [beneficiary: AddressLike],
+    [beneficiary: AddressLike, scheduleId: BigNumberish],
     [void],
     "nonpayable"
   >;
 
   releaseInfos: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
+    [arg0: AddressLike, arg1: BigNumberish, arg2: BigNumberish],
     [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
     "view"
   >;
@@ -250,7 +324,7 @@ export interface CliffVesting extends BaseContract {
   >;
 
   vestingSchedules: TypedContractMethod<
-    [arg0: AddressLike],
+    [arg0: AddressLike, arg1: BigNumberish],
     [
       [string, bigint, string, bigint, bigint, bigint] & {
         from: string;
@@ -269,6 +343,9 @@ export interface CliffVesting extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "getVestingScheduleCount"
+  ): TypedContractMethod<[beneficiary: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
     [_admin: AddressLike, _treasury: AddressLike, _sellerFee: BigNumberish],
@@ -280,11 +357,15 @@ export interface CliffVesting extends BaseContract {
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "release"
-  ): TypedContractMethod<[beneficiary: AddressLike], [void], "nonpayable">;
+  ): TypedContractMethod<
+    [beneficiary: AddressLike, scheduleId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "releaseInfos"
   ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
+    [arg0: AddressLike, arg1: BigNumberish, arg2: BigNumberish],
     [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
     "view"
   >;
@@ -309,7 +390,7 @@ export interface CliffVesting extends BaseContract {
   getFunction(
     nameOrSignature: "vestingSchedules"
   ): TypedContractMethod<
-    [arg0: AddressLike],
+    [arg0: AddressLike, arg1: BigNumberish],
     [
       [string, bigint, string, bigint, bigint, bigint] & {
         from: string;
@@ -329,6 +410,13 @@ export interface CliffVesting extends BaseContract {
     InitializedEvent.InputTuple,
     InitializedEvent.OutputTuple,
     InitializedEvent.OutputObject
+  >;
+  getEvent(
+    key: "NewVesting"
+  ): TypedContractEvent<
+    NewVestingEvent.InputTuple,
+    NewVestingEvent.OutputTuple,
+    NewVestingEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -362,6 +450,17 @@ export interface CliffVesting extends BaseContract {
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
       InitializedEvent.OutputObject
+    >;
+
+    "NewVesting(tuple)": TypedContractEvent<
+      NewVestingEvent.InputTuple,
+      NewVestingEvent.OutputTuple,
+      NewVestingEvent.OutputObject
+    >;
+    NewVesting: TypedContractEvent<
+      NewVestingEvent.InputTuple,
+      NewVestingEvent.OutputTuple,
+      NewVestingEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
