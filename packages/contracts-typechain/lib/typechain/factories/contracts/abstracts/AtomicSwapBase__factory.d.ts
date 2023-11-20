@@ -34,6 +34,10 @@ export declare class AtomicSwapBase__factory {
         readonly name: "BidNotInPlacedStatus";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidBuyerFee";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "contractAddress";
@@ -63,7 +67,15 @@ export declare class AtomicSwapBase__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "InvalidSellerFee";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InvalidTotalPercentage";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "InvalidTreasuryAddress";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
@@ -144,6 +156,58 @@ export declare class AtomicSwapBase__factory {
     }, {
         readonly inputs: readonly [];
         readonly name: "ReentrancyGuardReentrantCall";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "to";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "TransferFailed";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "from";
+            readonly type: "address";
+        }, {
+            readonly internalType: "address";
+            readonly name: "to";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "TransferFromFailed";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "recipient";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "TransferToRecipientFailed";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "address";
+            readonly name: "recipient";
+            readonly type: "address";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "TransferToTreasuryFailed";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{

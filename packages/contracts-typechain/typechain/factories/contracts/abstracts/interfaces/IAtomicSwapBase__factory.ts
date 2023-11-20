@@ -52,6 +52,11 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "InvalidBuyerFee",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -85,7 +90,17 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "InvalidSellerFee",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InvalidTotalPercentage",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidTreasuryAddress",
     type: "error",
   },
   {
@@ -159,6 +174,75 @@ const _abi = [
   {
     inputs: [],
     name: "OverMaximumReleaseStep",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "TransferFailed",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "TransferFromFailed",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "TransferToRecipientFailed",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "TransferToTreasuryFailed",
     type: "error",
   },
   {

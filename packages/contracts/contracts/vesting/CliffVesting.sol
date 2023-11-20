@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import "./interfaces/ICliffVesting.sol";
-import "../abstracts/libs/utils/TokenTransferHelper.sol";
-import "hardhat/console.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+
+import {ICliffVesting, IAtomicSwapBase} from  "./interfaces/ICliffVesting.sol";
+import {TokenTransferHelper} from  "../abstracts/libs/utils/TokenTransferHelper.sol";
 
 /// @title Cliff Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
@@ -27,7 +27,7 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
     address private treasury;
 
     /// @notice Fee charged for the seller.
-    uint256 sellerFee;
+    uint256 public sellerFee;
 
     /// @notice Initializes the vesting contract with necessary parameters.
     /// @param _admin The address of the admin.

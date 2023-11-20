@@ -90,6 +90,7 @@ export interface CliffVestingInterface extends Interface {
       | "release"
       | "releaseInfos"
       | "renounceOwnership"
+      | "sellerFee"
       | "startVesting"
       | "transferOwnership"
       | "vestingSchedules"
@@ -125,6 +126,7 @@ export interface CliffVestingInterface extends Interface {
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "sellerFee", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "startVesting",
     values: [
@@ -159,6 +161,7 @@ export interface CliffVestingInterface extends Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "sellerFee", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "startVesting",
     data: BytesLike
@@ -307,6 +310,8 @@ export interface CliffVesting extends BaseContract {
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
+  sellerFee: TypedContractMethod<[], [bigint], "view">;
+
   startVesting: TypedContractMethod<
     [
       orderId: BytesLike,
@@ -374,6 +379,9 @@ export interface CliffVesting extends BaseContract {
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "sellerFee"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "startVesting"
   ): TypedContractMethod<

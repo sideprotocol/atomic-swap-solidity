@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "../abstracts/AtomicSwapBase.sol";
-import "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
-import "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
-import "../abstracts/libs/utils/TokenTransferHelper.sol";
-import "./interfaces/IInchainAtomicSwap.sol";
-import "../vesting/interfaces/ICliffVesting.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import {AtomicSwapBase} from  "../abstracts/AtomicSwapBase.sol";
+import { AtomicSwapMsgValidator } from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
+import { AtomicSwapStateLogic } from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
+import { TokenTransferHelper } from "../abstracts/libs/utils/TokenTransferHelper.sol";
+import {IInchainAtomicSwap } from "./interfaces/IInchainAtomicSwap.sol";
+import { ICliffVesting } from "../vesting/interfaces/ICliffVesting.sol";
 
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
@@ -30,9 +32,15 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         uint256 _buyerFee
     ) external initializer {
         __Ownable_init_unchained(_admin);
-        require(_sellerFee < maxFeeRateScale, "sellerFee has to be smaller than maxFee");
-        require(_buyerFee < maxFeeRateScale, "sellerFee has to be smaller than maxFee");
-        require(_treasury != address(0), "invalid treasury address");
+        if (_sellerFee > MAX_FEE_RATE_SCALE) {
+            revert InvalidSellerFee();
+        }
+        if (_buyerFee > MAX_FEE_RATE_SCALE) {
+            revert InvalidBuyerFee();
+        }
+        if(_treasury == address(0)) {
+            revert InvalidTreasuryAddress();
+        }
         sellerFeeRate = _sellerFee;
         buyerFeeRate = _buyerFee;
         treasury = _treasury;
@@ -54,7 +62,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
         if (makeswap.sellToken.token == address(0)) {
             // If selling Ether, ensure sufficient Ether was sent with the transaction.
-            require(msg.value >= makeswap.sellToken.amount, "Not enough ether");
+            if(msg.value < makeswap.sellToken.amount) {
+                revert NotEnoughFund(msg.value, makeswap.sellToken.amount);
+            }
         } else {
             // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
             makeswap.sellToken.token.safeTransferFrom(msg.sender, address(this), makeswap.sellToken.amount);
@@ -105,16 +115,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             // Exchange the tokens
             // If buying with ERC20 tokens
             order.sellToken.token.transferWithFee(
-                takeswap.takerReceiver, order.sellToken.amount, buyerFeeRate, maxFeeRateScale, treasury
+                takeswap.takerReceiver, order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
             order.buyToken.token.transferFromWithFee(
-                msg.sender, order.maker, order.buyToken.amount, sellerFeeRate, maxFeeRateScale, treasury
+                msg.sender, order.maker, order.buyToken.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
         } else {
             // Transfer sell token to vesting contract
             if (order.sellToken.token == address(0)) {
                 (bool successToRecipient,) = payable(address(vestingManager)).call{value: order.sellToken.amount}("");
-                require(successToRecipient, "Transfer failed.");
+                if(!successToRecipient) {
+                    revert TransferFailed(address(vestingManager), order.sellToken.amount);
+                }
             } else {
                 order.sellToken.token.safeTransfer(address(vestingManager), order.sellToken.amount);
             }
@@ -153,10 +165,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (order.sellToken.token == address(0)) {
             // Refund Ether if the sell token was Ether
             (bool success,) = payable(msg.sender).call{value: order.sellToken.amount}("");
-            require(success, "Transfer failed.");
+            if(!success) {
+                revert TransferFailed(msg.sender, order.sellToken.amount);
+            }
         } else {
             // Refund ERC20 tokens if the sell token was an ERC20 token
-            require(IERC20(order.sellToken.token).transfer(msg.sender, order.sellToken.amount), "Transfer failed.");
+            if(!IERC20(order.sellToken.token).transfer(msg.sender, order.sellToken.amount)) {
+                revert TransferFailed(msg.sender, order.sellToken.amount);
+            }
         }
         // Clean up storage (optimize gas by nullifying order details)
         delete swapOrder[cancelswap.orderID];
@@ -296,11 +312,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Process sell token transfers
         Coin storage _sellToken = _order.sellToken;
-        _sellToken.token.transferWithFee(selectedBid.bidder, _sellToken.amount, buyerFeeRate, maxFeeRateScale, treasury);
+        _sellToken.token.transferWithFee(selectedBid.bidder, _sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury);
 
         // Process buy token transfers
         Coin storage _buyToken = _order.buyToken;
-        _buyToken.token.transferWithFee(_order.maker, selectedBid.amount, sellerFeeRate, maxFeeRateScale, treasury);
+        _buyToken.token.transferWithFee(_order.maker, selectedBid.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury);
 
         emit AcceptedBid(_orderID, _bidder, selectedBid.amount);
     }
@@ -308,9 +324,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @notice Allows a bidder to cancel their bid on a swap order.
     /// @param _orderID The unique identifier of the swap order.
     function cancelBid(bytes32 _orderID) external payable nonReentrant onlyExist(_orderID) {
-        // Ensure no unnecessary Ether is sent with the transaction
-        require(msg.value == 0, "Unexpected Ether sent");
-
         // Retrieve the selected bid from storage
         Bid storage selectedBid = bids[_orderID][msg.sender];
 
@@ -335,7 +348,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         } else {
             // If buy token is Ether, transfer it back to the bidder
             (bool success,) = payable(msg.sender).call{value: selectedBid.amount}("");
-            require(success, "Transfer failed.");
+            if(!success) {
+                revert TransferFailed(msg.sender,selectedBid.amount);
+            }
         }
 
         emit CanceledBid(_orderID, selectedBid.bidder);

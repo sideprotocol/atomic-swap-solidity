@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/IAtomicSwapBase.sol";
-import "../vesting/interfaces/ICliffVesting.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+import {ReentrancyGuardUpgradeable} from  "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+
+import { IAtomicSwapBase } from "./interfaces/IAtomicSwapBase.sol";
+import {ICliffVesting} from  "../vesting/interfaces/ICliffVesting.sol";
 
 /// @title AtomicSwapBase
 /// @notice Abstract contract for creating atomic swap orders with support for vesting parameters.
@@ -21,10 +22,10 @@ abstract contract AtomicSwapBase is OwnableUpgradeable, ReentrancyGuardUpgradeab
     mapping(bytes32 => mapping(address => Bid)) public bids;
 
     /// @notice Contract managing the vesting of tokens.
-    ICliffVesting vestingManager;
+    ICliffVesting internal vestingManager;
 
     /// @notice Address of the treasury where fees are sent.
-    address treasury;
+    address internal treasury;
 
     /// @notice Fee rate charged to the seller in a swap transaction.
     uint256 public sellerFeeRate;
@@ -33,7 +34,7 @@ abstract contract AtomicSwapBase is OwnableUpgradeable, ReentrancyGuardUpgradeab
     uint256 public buyerFeeRate;
 
     /// @dev Maximum scale for fee rate calculations.
-    uint256 constant maxFeeRateScale = 1e4;
+    uint256 constant internal MAX_FEE_RATE_SCALE = 1e4;
 
     /// @notice Mapping of counteroffers for each bid.
     /// @dev Primary mapping using BidKey (order + bidder).

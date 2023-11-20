@@ -146,7 +146,7 @@ export interface AtomicSwapMsgValidator extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  isContract: TypedContractMethod<[addr: AddressLike], [boolean], "view">;
+  isContract: TypedContractMethod<[account: AddressLike], [boolean], "view">;
 
   validateMakeSwapParams: TypedContractMethod<
     [makeswap: IAtomicSwapBase.MakeSwapMsgStruct],
@@ -166,7 +166,7 @@ export interface AtomicSwapMsgValidator extends BaseContract {
 
   getFunction(
     nameOrSignature: "isContract"
-  ): TypedContractMethod<[addr: AddressLike], [boolean], "view">;
+  ): TypedContractMethod<[account: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "validateMakeSwapParams"
   ): TypedContractMethod<

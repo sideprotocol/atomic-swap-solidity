@@ -7,7 +7,7 @@ import "solidity-coverage";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomicfoundation/hardhat-chai-matchers";
 import "hardhat-contract-sizer";
-
+import "@nomiclabs/hardhat-solhint";
 dotenv.config();
 
 import "./task/deployment/inchain_atomicswap";

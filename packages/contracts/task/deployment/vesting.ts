@@ -26,7 +26,6 @@ task("deploy:vesting", "deploy in chain ").setAction(
         TokenTransferHelper: tokenTransferHelperAddress,
       },
     });
-
     // deploy contract
     const vesting = await upgrades.deployProxy(
       vestingFactory,

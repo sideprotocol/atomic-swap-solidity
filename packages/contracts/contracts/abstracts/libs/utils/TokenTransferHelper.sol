@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../interfaces/IAtomicSwapBase.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IAtomicSwapBase} from  "../../interfaces/IAtomicSwapBase.sol";
 
 /// @title Token Transfer Helper
 /// @notice Library providing functions to safely transfer tokens with support for fee deductions.
@@ -72,9 +72,13 @@ library TokenTransferHelper {
     /// @dev Transfers Ether to the recipient and treasury, ensuring both transfers succeed.
     function _transferEtherWithFee(address recipient, address treasury, uint256 amountAfterFee, uint256 fee) internal {
         (bool successToRecipient,) = payable(recipient).call{value: amountAfterFee}("");
-        require(successToRecipient, "Transfer to recipient failed.");
+        if(!successToRecipient) {
+            revert IAtomicSwapBase.TransferToRecipientFailed(recipient, amountAfterFee);
+        }
         (bool successToTreasury,) = payable(treasury).call{value: fee}("");
-        require(successToTreasury, "Transfer to treasury failed.");
+        if(!successToTreasury) {
+            revert IAtomicSwapBase.TransferToTreasuryFailed(treasury, fee);
+        }
     }
 
     /// @notice Safely transfers tokens from one address to another.
@@ -89,7 +93,9 @@ library TokenTransferHelper {
         if (allowance < amount) {
             revert IAtomicSwapBase.NotAllowedTransferAmount(allowance, amount);
         }
-        require(_token.transferFrom(from, to, amount), "TransferFrom failed.");
+        if(!_token.transferFrom(from, to, amount)) {
+            revert IAtomicSwapBase.TransferFromFailed(from, to, amount);
+        }
     }
 
     /// @notice Safely transfers tokens to a specified address.
@@ -99,6 +105,8 @@ library TokenTransferHelper {
     /// @dev Ensures that the transfer operation succeeds.
     function safeTransfer(address token, address to, uint256 amount) internal {
         IERC20 _token = IERC20(token);
-        require(_token.transfer(to, amount), "Transfer failed.");
+        if(!_token.transfer(to, amount)) {
+            revert IAtomicSwapBase.TransferFailed(to, amount);
+        }
     }
 }

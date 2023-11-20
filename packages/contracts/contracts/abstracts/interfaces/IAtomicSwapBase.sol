@@ -147,6 +147,14 @@ interface IAtomicSwapBase {
     error InvalidTotalPercentage();
     error OverMaximumReleaseStep();
 
+    error InvalidSellerFee();
+    error InvalidBuyerFee();
+    error InvalidTreasuryAddress();
+    error TransferToRecipientFailed(address recipient, uint256 amount);
+    error TransferToTreasuryFailed(address recipient, uint256 amount);
+    error TransferFromFailed(address from, address  to, uint256 amount);
+    error TransferFailed(address  to, uint256 amount);
+
     // Events
     event AtomicSwapOrderCreated(bytes32 indexed id);
     event AtomicSwapOrderTook(address indexed maker, address indexed taker, bytes32 indexed id);
@@ -156,4 +164,5 @@ interface IAtomicSwapBase {
     event AcceptedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
     event CanceledBid(bytes32 indexed orderID, address indexed bidder);
     event PlacedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
+
 }

@@ -56,7 +56,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface CliffVestingInterface extends Interface {
-    getFunction(nameOrSignature: "getVestingScheduleCount" | "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
+    getFunction(nameOrSignature: "getVestingScheduleCount" | "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "sellerFee" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "NewVesting" | "OwnershipTransferred" | "Received" | "Released"): EventFragment;
     encodeFunctionData(functionFragment: "getVestingScheduleCount", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, BigNumberish]): string;
@@ -64,6 +64,7 @@ export interface CliffVestingInterface extends Interface {
     encodeFunctionData(functionFragment: "release", values: [AddressLike, BytesLike]): string;
     encodeFunctionData(functionFragment: "releaseInfos", values: [AddressLike, BytesLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
+    encodeFunctionData(functionFragment: "sellerFee", values?: undefined): string;
     encodeFunctionData(functionFragment: "startVesting", values: [
         BytesLike,
         AddressLike,
@@ -79,6 +80,7 @@ export interface CliffVestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "releaseInfos", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "sellerFee", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "startVesting", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "vestingSchedules", data: BytesLike): Result;
@@ -184,6 +186,7 @@ export interface CliffVesting extends BaseContract {
         }
     ], "view">;
     renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    sellerFee: TypedContractMethod<[], [bigint], "view">;
     startVesting: TypedContractMethod<[
         orderId: BytesLike,
         beneficiary: AddressLike,
@@ -245,6 +248,7 @@ export interface CliffVesting extends BaseContract {
         }
     ], "view">;
     getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "sellerFee"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "startVesting"): TypedContractMethod<[
         orderId: BytesLike,
         beneficiary: AddressLike,

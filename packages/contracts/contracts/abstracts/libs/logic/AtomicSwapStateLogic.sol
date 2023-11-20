@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "../../interfaces/IAtomicSwapBase.sol";
+import {IAtomicSwapBase} from "../../interfaces/IAtomicSwapBase.sol";
 
 /// @title Atomic Swap State Logic
 /// @notice Library providing state management functions for atomic swap orders and bids.

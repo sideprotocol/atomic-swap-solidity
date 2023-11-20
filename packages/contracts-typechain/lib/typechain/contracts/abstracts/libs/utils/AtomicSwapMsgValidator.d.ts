@@ -72,7 +72,7 @@ export interface AtomicSwapMsgValidator extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
-    isContract: TypedContractMethod<[addr: AddressLike], [boolean], "view">;
+    isContract: TypedContractMethod<[account: AddressLike], [boolean], "view">;
     validateMakeSwapParams: TypedContractMethod<[
         makeswap: IAtomicSwapBase.MakeSwapMsgStruct
     ], [
@@ -84,7 +84,7 @@ export interface AtomicSwapMsgValidator extends BaseContract {
         void
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
-    getFunction(nameOrSignature: "isContract"): TypedContractMethod<[addr: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "isContract"): TypedContractMethod<[account: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "validateMakeSwapParams"): TypedContractMethod<[
         makeswap: IAtomicSwapBase.MakeSwapMsgStruct
     ], [

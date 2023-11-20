@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "../../abstracts/interfaces/IAtomicSwapBase.sol";
+import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
 
 /// @title ICliffVesting
 /// @notice Interface for the CliffVesting contract.

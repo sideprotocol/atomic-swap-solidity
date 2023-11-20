@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "../../interfaces/IAtomicSwapBase.sol";
+import { IAtomicSwapBase } from "../../interfaces/IAtomicSwapBase.sol";
 
 /// @title Atomic Swap Message Validator
 /// @notice Library providing validation functions for various atomic swap messages.
@@ -86,15 +86,18 @@ library AtomicSwapMsgValidator {
         }
     }
 
-    /// @notice Checks if an address is a contract.
-    /// @param addr The address to check.
-    /// @return True if the address is a contract, false otherwise.
-    /// @dev Uses assembly to check the size of the code at the address.
-    function isContract(address addr) public view returns (bool) {
-        uint256 size;
-        assembly {
-            size := extcodesize(addr)
-        }
-        return size > 0;
+    /// @notice Determines if an address is a contract
+    /// @dev Checks if the code at the address is non-zero using EIP-1052 extcodehash
+    /// @param account The address to be checked
+    /// @return bool True if `account` is a contract, false otherwise
+    function isContract(address account) public view returns (bool) {
+        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
+        // and 0xc5d2460186f7233c927e7db2dcc703c0e500c6ad is returned for accounts without code.
+        bytes32 codehash;
+        bytes32 accountHash 
+            = 0xc5d2460186f7233c927e7db2dcc703c0e500c6ad951cad7ef3aa0f8344b61239;
+        // solhint-disable-next-line no-inline-assembly
+        assembly { codehash := extcodehash(account) }
+        return (codehash != 0x0 && codehash != accountHash);
     }
 }

@@ -11,7 +11,7 @@ describe("AtomicSwap: MakeSwap", () => {
   it("create in-chain swap with ERC20 token", async () =>
     createDefaultAtomicOrder());
 
-  it("should revert to create in-chain pool with same token address", async () => {
+  it("should revert to create in-chain order with same token address", async () => {
     const { atomicSwap, usdc } = await loadFixture(
       Utils.prepareInChainAtomicTest
     );
@@ -45,7 +45,7 @@ describe("AtomicSwap: MakeSwap", () => {
     );
   });
 
-  it("should revert to create in-chain pool with not allowed amount", async () => {
+  it("should revert to create in-chain order with not allowed amount", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
       Utils.prepareInChainAtomicTest
     );
@@ -102,8 +102,9 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await usdc.setFailTransferFrom(true);
 
-    await expect(atomicSwap.makeSwap(payload)).to.revertedWith(
-      "TransferFrom failed."
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "TransferFromFailed"
     );
   });
 
@@ -132,8 +133,9 @@ describe("AtomicSwap: MakeSwap", () => {
       acceptBid: true,
     };
 
-    await expect(atomicSwap.makeSwap(payload)).to.revertedWith(
-      "Not enough ether"
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "NotEnoughFund"
     );
   });
 });
