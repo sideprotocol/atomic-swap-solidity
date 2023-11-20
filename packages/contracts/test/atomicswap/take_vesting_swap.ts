@@ -70,14 +70,14 @@ describe("TakeSwap With Vesting", () => {
     console.log("release of amount:", releaseAmount);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.release(takerReceiver, 0)
+        await vestingManager.release(takerReceiver, orderID)
       ).to.changeEtherBalances(
         [takerReceiver, treasury],
         [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
       );
     } else {
       expect(
-        await vestingManager.release(takerReceiver, 0)
+        await vestingManager.release(takerReceiver, orderID)
       ).to.changeTokenBalances(
         usdc,
         [takerReceiver, treasury],
@@ -89,14 +89,14 @@ describe("TakeSwap With Vesting", () => {
     await time.increase(3600);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.release(takerReceiver, 0)
+        await vestingManager.release(takerReceiver, orderID)
       ).to.changeEtherBalances(
         [takerReceiver, treasury],
         [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
       );
     } else {
       expect(
-        await vestingManager.release(takerReceiver, 0)
+        await vestingManager.release(takerReceiver, orderID)
       ).to.changeTokenBalances(
         usdc,
         [takerReceiver, treasury],

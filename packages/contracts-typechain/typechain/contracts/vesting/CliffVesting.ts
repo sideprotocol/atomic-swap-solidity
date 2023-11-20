@@ -53,19 +53,19 @@ export declare namespace ICliffVesting {
     schedule: ICliffVesting.VestingScheduleStruct;
     release: IAtomicSwapBase.ReleaseStruct[];
     beneficiary: AddressLike;
-    scheduleId: BigNumberish;
+    orderId: BytesLike;
   };
 
   export type VestingInfoStructOutput = [
     schedule: ICliffVesting.VestingScheduleStructOutput,
     release: IAtomicSwapBase.ReleaseStructOutput[],
     beneficiary: string,
-    scheduleId: bigint
+    orderId: string
   ] & {
     schedule: ICliffVesting.VestingScheduleStructOutput;
     release: IAtomicSwapBase.ReleaseStructOutput[];
     beneficiary: string;
-    scheduleId: bigint;
+    orderId: string;
   };
 }
 
@@ -115,11 +115,11 @@ export interface CliffVestingInterface extends Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "release",
-    values: [AddressLike, BigNumberish]
+    values: [AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "releaseInfos",
-    values: [AddressLike, BigNumberish, BigNumberish]
+    values: [AddressLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -128,6 +128,7 @@ export interface CliffVestingInterface extends Interface {
   encodeFunctionData(
     functionFragment: "startVesting",
     values: [
+      BytesLike,
       AddressLike,
       AddressLike,
       BigNumberish,
@@ -140,7 +141,7 @@ export interface CliffVestingInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "vestingSchedules",
-    values: [AddressLike, BigNumberish]
+    values: [AddressLike, BytesLike]
   ): string;
 
   decodeFunctionResult(
@@ -293,13 +294,13 @@ export interface CliffVesting extends BaseContract {
   owner: TypedContractMethod<[], [string], "view">;
 
   release: TypedContractMethod<
-    [beneficiary: AddressLike, scheduleId: BigNumberish],
+    [beneficiary: AddressLike, orderId: BytesLike],
     [void],
     "nonpayable"
   >;
 
   releaseInfos: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish, arg2: BigNumberish],
+    [arg0: AddressLike, arg1: BytesLike, arg2: BigNumberish],
     [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
     "view"
   >;
@@ -308,6 +309,7 @@ export interface CliffVesting extends BaseContract {
 
   startVesting: TypedContractMethod<
     [
+      orderId: BytesLike,
       beneficiary: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
@@ -324,7 +326,7 @@ export interface CliffVesting extends BaseContract {
   >;
 
   vestingSchedules: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
+    [arg0: AddressLike, arg1: BytesLike],
     [
       [string, bigint, string, bigint, bigint, bigint] & {
         from: string;
@@ -358,14 +360,14 @@ export interface CliffVesting extends BaseContract {
   getFunction(
     nameOrSignature: "release"
   ): TypedContractMethod<
-    [beneficiary: AddressLike, scheduleId: BigNumberish],
+    [beneficiary: AddressLike, orderId: BytesLike],
     [void],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "releaseInfos"
   ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish, arg2: BigNumberish],
+    [arg0: AddressLike, arg1: BytesLike, arg2: BigNumberish],
     [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
     "view"
   >;
@@ -376,6 +378,7 @@ export interface CliffVesting extends BaseContract {
     nameOrSignature: "startVesting"
   ): TypedContractMethod<
     [
+      orderId: BytesLike,
       beneficiary: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
@@ -390,7 +393,7 @@ export interface CliffVesting extends BaseContract {
   getFunction(
     nameOrSignature: "vestingSchedules"
   ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
+    [arg0: AddressLike, arg1: BytesLike],
     [
       [string, bigint, string, bigint, bigint, bigint] & {
         from: string;

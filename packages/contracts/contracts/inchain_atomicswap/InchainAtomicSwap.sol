@@ -119,7 +119,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 order.sellToken.token.safeTransfer(address(vestingManager), order.sellToken.amount);
             }
 
-            vestingManager.startVesting(takeswap.takerReceiver, order.sellToken.token, order.sellToken.amount, releases);
+            vestingManager.startVesting(order.id,takeswap.takerReceiver, order.sellToken.token, order.sellToken.amount, releases);
         }
         // Emit an event signaling the swap was completed
         emit AtomicSwapOrderTook(order.maker, order.taker, takeswap.orderID);

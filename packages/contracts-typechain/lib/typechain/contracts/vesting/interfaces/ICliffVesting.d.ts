@@ -28,18 +28,18 @@ export declare namespace ICliffVesting {
         schedule: ICliffVesting.VestingScheduleStruct;
         release: IAtomicSwapBase.ReleaseStruct[];
         beneficiary: AddressLike;
-        scheduleId: BigNumberish;
+        orderId: BytesLike;
     };
     type VestingInfoStructOutput = [
         schedule: ICliffVesting.VestingScheduleStructOutput,
         release: IAtomicSwapBase.ReleaseStructOutput[],
         beneficiary: string,
-        scheduleId: bigint
+        orderId: string
     ] & {
         schedule: ICliffVesting.VestingScheduleStructOutput;
         release: IAtomicSwapBase.ReleaseStructOutput[];
         beneficiary: string;
-        scheduleId: bigint;
+        orderId: string;
     };
 }
 export declare namespace IAtomicSwapBase {
@@ -59,6 +59,7 @@ export interface ICliffVestingInterface extends Interface {
     getFunction(nameOrSignature: "startVesting"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "NewVesting" | "Received" | "Released"): EventFragment;
     encodeFunctionData(functionFragment: "startVesting", values: [
+        BytesLike,
         AddressLike,
         AddressLike,
         BigNumberish,
@@ -115,6 +116,7 @@ export interface ICliffVesting extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     startVesting: TypedContractMethod<[
+        orderId: BytesLike,
         beneficiary: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
@@ -124,6 +126,7 @@ export interface ICliffVesting extends BaseContract {
     ], "nonpayable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "startVesting"): TypedContractMethod<[
+        orderId: BytesLike,
         beneficiary: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,

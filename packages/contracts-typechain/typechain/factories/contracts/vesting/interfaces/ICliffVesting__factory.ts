@@ -115,9 +115,9 @@ const _abi = [
             type: "address",
           },
           {
-            internalType: "uint256",
-            name: "scheduleId",
-            type: "uint256",
+            internalType: "bytes32",
+            name: "orderId",
+            type: "bytes32",
           },
         ],
         indexed: true,
@@ -169,6 +169,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "bytes32",
+        name: "orderId",
+        type: "bytes32",
+      },
       {
         internalType: "address",
         name: "beneficiary",

@@ -83,9 +83,9 @@ export declare class ICliffVesting__factory {
                 readonly name: "beneficiary";
                 readonly type: "address";
             }, {
-                readonly internalType: "uint256";
-                readonly name: "scheduleId";
-                readonly type: "uint256";
+                readonly internalType: "bytes32";
+                readonly name: "orderId";
+                readonly type: "bytes32";
             }];
             readonly indexed: true;
             readonly internalType: "struct ICliffVesting.VestingInfo";
@@ -126,6 +126,10 @@ export declare class ICliffVesting__factory {
         readonly type: "event";
     }, {
         readonly inputs: readonly [{
+            readonly internalType: "bytes32";
+            readonly name: "orderId";
+            readonly type: "bytes32";
+        }, {
             readonly internalType: "address";
             readonly name: "beneficiary";
             readonly type: "address";

@@ -27,7 +27,7 @@ interface ICliffVesting {
         VestingSchedule schedule;
         IAtomicSwapBase.Release[] release;
         address beneficiary; 
-        uint256 scheduleId;
+        bytes32 orderId;
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
@@ -36,6 +36,7 @@ interface ICliffVesting {
     /// @param totalAmount The total amount of tokens to be vested.
     /// @param releases The release schedule parameters.
     function startVesting(
+        bytes32 orderId, 
         address beneficiary,
         address token,
         uint256 totalAmount,

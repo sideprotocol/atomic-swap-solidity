@@ -53,19 +53,19 @@ export declare namespace ICliffVesting {
     schedule: ICliffVesting.VestingScheduleStruct;
     release: IAtomicSwapBase.ReleaseStruct[];
     beneficiary: AddressLike;
-    scheduleId: BigNumberish;
+    orderId: BytesLike;
   };
 
   export type VestingInfoStructOutput = [
     schedule: ICliffVesting.VestingScheduleStructOutput,
     release: IAtomicSwapBase.ReleaseStructOutput[],
     beneficiary: string,
-    scheduleId: bigint
+    orderId: string
   ] & {
     schedule: ICliffVesting.VestingScheduleStructOutput;
     release: IAtomicSwapBase.ReleaseStructOutput[];
     beneficiary: string;
-    scheduleId: bigint;
+    orderId: string;
   };
 }
 
@@ -91,6 +91,7 @@ export interface ICliffVestingInterface extends Interface {
   encodeFunctionData(
     functionFragment: "startVesting",
     values: [
+      BytesLike,
       AddressLike,
       AddressLike,
       BigNumberish,
@@ -187,6 +188,7 @@ export interface ICliffVesting extends BaseContract {
 
   startVesting: TypedContractMethod<
     [
+      orderId: BytesLike,
       beneficiary: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
@@ -204,6 +206,7 @@ export interface ICliffVesting extends BaseContract {
     nameOrSignature: "startVesting"
   ): TypedContractMethod<
     [
+      orderId: BytesLike,
       beneficiary: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,

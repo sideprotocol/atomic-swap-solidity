@@ -14,10 +14,10 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
     using TokenTransferHelper for *;
 
     /// @notice Stores vesting schedules for each beneficiary.
-    mapping(address =>  mapping(uint256 => VestingSchedule)) public vestingSchedules;
+    mapping(address =>  mapping(bytes32 => VestingSchedule)) public vestingSchedules;
 
     /// @notice Stores release information for each beneficiary.
-    mapping(address => mapping(uint256 => IAtomicSwapBase.Release[])) public releaseInfos;
+    mapping(address => mapping(bytes32 => IAtomicSwapBase.Release[])) public releaseInfos;
     
     // Counter for each beneficiary's vesting schedules
     mapping(address => uint256) private vestingScheduleCount;
@@ -46,13 +46,13 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
     /// @param releases Array of release schedules.
     /// @dev Sets up the vesting schedule and release information for the beneficiary.
     function startVesting(
+        bytes32 orderId, 
         address beneficiary,
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external {
         uint256 vestinStartTime = block.timestamp;
-        uint256 scheduleId = vestingScheduleCount[beneficiary]++;
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
             start: vestinStartTime,
@@ -61,9 +61,9 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
             amountReleased: 0,
             lastReleasedStep: 0
         });
-        vestingSchedules[beneficiary][scheduleId] = newVesting;
+        vestingSchedules[beneficiary][orderId] = newVesting;
 
-        IAtomicSwapBase.Release[] storage _releases = releaseInfos[beneficiary][scheduleId];
+        IAtomicSwapBase.Release[] storage _releases = releaseInfos[beneficiary][orderId];
         for (uint256 i = 0; i < releases.length; i++) {
             _releases.push(releases[i]);
         }
@@ -72,16 +72,16 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
             newVesting, 
             releases, 
             beneficiary,
-            scheduleId
+            orderId
         ));
     }
 
     /// @notice Releases vested tokens to the beneficiary.
     /// @param beneficiary The address of the beneficiary to release tokens to.
     /// @dev Calculates the amount of tokens to be released and transfers them to the beneficiary.
-    function release(address beneficiary,uint256 scheduleId) external nonReentrant {
-        VestingSchedule storage schedule = vestingSchedules[beneficiary][scheduleId];
-        IAtomicSwapBase.Release[] storage releases = releaseInfos[beneficiary][scheduleId];
+    function release(address beneficiary,bytes32 orderId) external nonReentrant {
+        VestingSchedule storage schedule = vestingSchedules[beneficiary][orderId];
+        IAtomicSwapBase.Release[] storage releases = releaseInfos[beneficiary][orderId];
 
         if (block.timestamp < schedule.start) {
             revert VestingNotStarted();
