@@ -146,7 +146,7 @@ interface IAtomicSwapBase {
     error ZeroReleaseSchedule();
     error InvalidTotalPercentage();
     error OverMaximumReleaseStep();
-
+    error InvalidAddress();
     error InvalidSellerFee();
     error InvalidBuyerFee();
     error InvalidTreasuryAddress();

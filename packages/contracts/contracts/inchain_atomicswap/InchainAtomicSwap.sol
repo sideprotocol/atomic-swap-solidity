@@ -117,9 +117,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             order.sellToken.token.transferWithFee(
                 takeswap.takerReceiver, order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
-            order.buyToken.token.transferFromWithFee(
-                msg.sender, order.maker, order.buyToken.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury
-            );
         } else {
             // Transfer sell token to vesting contract
             if (order.sellToken.token == address(0)) {
@@ -133,6 +130,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
             vestingManager.startVesting(order.id,takeswap.takerReceiver, order.sellToken.token, order.sellToken.amount, releases);
         }
+        
+        order.buyToken.token.transferFromWithFee(
+                msg.sender, order.maker, order.buyToken.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury
+        );
         // Emit an event signaling the swap was completed
         emit AtomicSwapOrderTook(order.maker, order.taker, takeswap.orderID);
     }

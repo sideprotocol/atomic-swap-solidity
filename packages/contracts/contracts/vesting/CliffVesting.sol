@@ -19,10 +19,6 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
     /// @notice Stores release information for each beneficiary.
     mapping(address => mapping(bytes32 => IAtomicSwapBase.Release[])) public releaseInfos;
     
-    // Counter for each beneficiary's vesting schedules
-    mapping(address => uint256) private vestingScheduleCount;
-
-
     /// @notice Address of the treasury where fees are sent.
     address private treasury;
 
@@ -108,10 +104,6 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
         schedule.amountReleased += amountForRelease;
         schedule.token.transferWithFee(beneficiary, amountForRelease, sellerFee, 1000, treasury);
         emit Released(beneficiary, amountForRelease);
-    }
-
-    function getVestingScheduleCount(address beneficiary) external view returns(uint256) {
-        return vestingScheduleCount[beneficiary];
     }
 
     /// @notice Fallback function to receive Ether.

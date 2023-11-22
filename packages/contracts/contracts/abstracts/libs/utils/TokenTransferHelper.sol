@@ -71,6 +71,10 @@ library TokenTransferHelper {
     /// @param fee The fee amount to transfer to the treasury.
     /// @dev Transfers Ether to the recipient and treasury, ensuring both transfers succeed.
     function _transferEtherWithFee(address recipient, address treasury, uint256 amountAfterFee, uint256 fee) internal {
+        if(recipient == address(0) || treasury == address(0) ){
+            revert IAtomicSwapBase.InvalidAddress();
+        }
+
         (bool successToRecipient,) = payable(recipient).call{value: amountAfterFee}("");
         if(!successToRecipient) {
             revert IAtomicSwapBase.TransferToRecipientFailed(recipient, amountAfterFee);
@@ -93,6 +97,11 @@ library TokenTransferHelper {
         if (allowance < amount) {
             revert IAtomicSwapBase.NotAllowedTransferAmount(allowance, amount);
         }
+        uint256 bal = _token.balanceOf(from);
+        if( bal < amount) {
+            revert IAtomicSwapBase.NotEnoughFund(bal, amount);
+        }
+
         if(!_token.transferFrom(from, to, amount)) {
             revert IAtomicSwapBase.TransferFromFailed(from, to, amount);
         }
