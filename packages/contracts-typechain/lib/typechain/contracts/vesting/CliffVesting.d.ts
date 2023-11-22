@@ -56,9 +56,8 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface CliffVestingInterface extends Interface {
-    getFunction(nameOrSignature: "getVestingScheduleCount" | "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "sellerFee" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
+    getFunction(nameOrSignature: "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "sellerFee" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "NewVesting" | "OwnershipTransferred" | "Received" | "Released"): EventFragment;
-    encodeFunctionData(functionFragment: "getVestingScheduleCount", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "release", values: [AddressLike, BytesLike]): string;
@@ -74,7 +73,6 @@ export interface CliffVestingInterface extends Interface {
     ]): string;
     encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "vestingSchedules", values: [AddressLike, BytesLike]): string;
-    decodeFunctionResult(functionFragment: "getVestingScheduleCount", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
@@ -156,11 +154,6 @@ export interface CliffVesting extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
-    getVestingScheduleCount: TypedContractMethod<[
-        beneficiary: AddressLike
-    ], [
-        bigint
-    ], "view">;
     initialize: TypedContractMethod<[
         _admin: AddressLike,
         _treasury: AddressLike,
@@ -222,7 +215,6 @@ export interface CliffVesting extends BaseContract {
         }
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
-    getFunction(nameOrSignature: "getVestingScheduleCount"): TypedContractMethod<[beneficiary: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
         _admin: AddressLike,
         _treasury: AddressLike,

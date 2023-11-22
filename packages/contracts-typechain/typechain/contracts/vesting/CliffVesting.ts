@@ -84,7 +84,6 @@ export declare namespace IAtomicSwapBase {
 export interface CliffVestingInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "getVestingScheduleCount"
       | "initialize"
       | "owner"
       | "release"
@@ -105,10 +104,6 @@ export interface CliffVestingInterface extends Interface {
       | "Released"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "getVestingScheduleCount",
-    values: [AddressLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [AddressLike, AddressLike, BigNumberish]
@@ -146,10 +141,6 @@ export interface CliffVestingInterface extends Interface {
     values: [AddressLike, BytesLike]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "getVestingScheduleCount",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
@@ -282,12 +273,6 @@ export interface CliffVesting extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  getVestingScheduleCount: TypedContractMethod<
-    [beneficiary: AddressLike],
-    [bigint],
-    "view"
-  >;
-
   initialize: TypedContractMethod<
     [_admin: AddressLike, _treasury: AddressLike, _sellerFee: BigNumberish],
     [void],
@@ -349,9 +334,6 @@ export interface CliffVesting extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
-  getFunction(
-    nameOrSignature: "getVestingScheduleCount"
-  ): TypedContractMethod<[beneficiary: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
