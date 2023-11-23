@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import { IAtomicSwapBase } from "../../interfaces/IAtomicSwapBase.sol";
-
+import "hardhat/console.sol";
 /// @title Atomic Swap Message Validator
 /// @notice Library providing validation functions for various atomic swap messages.
 /// @dev Used for ensuring the correctness and integrity of data in atomic swap operations.
@@ -14,7 +14,9 @@ library AtomicSwapMsgValidator {
         if (makeswap.sellToken.token != address(0) && !isContract(makeswap.sellToken.token)) {
             revert IAtomicSwapBase.InvalidContractAddress(makeswap.sellToken.token);
         }
-
+        if (makeswap.buyToken.token != address(0) && !isContract(makeswap.buyToken.token)) {
+            revert IAtomicSwapBase.InvalidContractAddress(makeswap.buyToken.token);
+        }
         if (makeswap.minBidAmount <= 0) {
             revert IAtomicSwapBase.InvalidMinimumBidLimit();
         }
@@ -30,36 +32,34 @@ library AtomicSwapMsgValidator {
 
     /// @notice Validates parameters for taking an atomic swap.
     /// @param takeswap The take swap message details.
-    /// @param swapOrder Mapping of current atomic swap orders.
     /// @dev Checks if the order is not already accepted or completed, and if the taker is authorized.
     function validateTakeSwapParams(
-        IAtomicSwapBase.TakeSwapMsg memory takeswap,
-        mapping(bytes32 => IAtomicSwapBase.AtomicSwapOrder) storage swapOrder
-    ) external view {
-        IAtomicSwapBase.AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
-
-        if (order.acceptBid) {
-            revert IAtomicSwapBase.OrderNotAllowTake();
+        IAtomicSwapBase.TakeSwapMsg memory takeswap
+    ) external pure {
+        if (takeswap.takerReceiver == address(0)) {
+            revert IAtomicSwapBase.UnauthorizedSender();
         }
+    }
 
-        if (order.taker != address(0) && order.taker != msg.sender) {
+    function validateTakeSwap(IAtomicSwapBase.AtomicSwapOrder storage _order) external view {
+        if (_order.taker != address(0) && _order.taker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedTakeAction();
         }
-
-        if (order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
+        // Ensure the swap order has not already been completed
+        if (_order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
             revert IAtomicSwapBase.InactiveOrder();
         }
     }
 
     /// @notice Validates the cancellation of a swap.
-    /// @param order The atomic swap order to validate for cancellation.
-    /// @dev Ensures that the order is in the initial state and the sender is authorized to cancel.
-    function validateCancelSwap(IAtomicSwapBase.AtomicSwapOrder storage order) external view {
-        if (order.maker != msg.sender) {
+    /// @param _order The atomic swap order to validate for cancellation.
+    /// @dev Ensures that the _order is in the initial state and the sender is authorized to cancel.
+    function validateCancelSwap(IAtomicSwapBase.AtomicSwapOrder storage _order) external view {
+        if (_order.maker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedCancelAction();
         }
 
-        if (order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
+        if (_order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
             revert IAtomicSwapBase.InactiveOrder();
         }
     }
@@ -88,16 +88,13 @@ library AtomicSwapMsgValidator {
 
     /// @notice Determines if an address is a contract
     /// @dev Checks if the code at the address is non-zero using EIP-1052 extcodehash
-    /// @param account The address to be checked
+    /// @param _addr The address to be checked
     /// @return bool True if `account` is a contract, false otherwise
-    function isContract(address account) public view returns (bool) {
-        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
-        // and 0xc5d2460186f7233c927e7db2dcc703c0e500c6ad is returned for accounts without code.
-        bytes32 codehash;
-        bytes32 accountHash 
-            = 0xc5d2460186f7233c927e7db2dcc703c0e500c6ad951cad7ef3aa0f8344b61239;
-        // solhint-disable-next-line no-inline-assembly
-        assembly { codehash := extcodehash(account) }
-        return (codehash != 0x0 && codehash != accountHash);
+    function isContract(address _addr) public view returns (bool) {
+        uint32 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        return (size > 0);
     }
 }

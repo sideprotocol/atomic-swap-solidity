@@ -4,6 +4,7 @@ import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { randomBytes } from "crypto";
 
 describe("AtomicSwap: MakeSwap", () => {
   it("create in-chain swap with native token", async () =>
@@ -137,5 +138,193 @@ describe("AtomicSwap: MakeSwap", () => {
       atomicSwap,
       "NotEnoughFund"
     );
+  });
+  it("should revert to create in-chain pool with invalid sell token address", async () => {
+    const { atomicSwap, usdc } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = await BlockTime.AfterSeconds(10);
+    const uuid = generateOrderID();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: taker.address,
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "InvalidContractAddress"
+    );
+  });
+  it("should revert to create in-chain pool with invalid buy token address", async () => {
+    const { atomicSwap, usdc } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = await BlockTime.AfterSeconds(10);
+    const uuid = generateOrderID();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: taker.address,
+        amount: ethers.parseEther("20"),
+      },
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "InvalidContractAddress"
+    );
+  });
+  it("should revert to create in-chain pool with invalid min amount", async () => {
+    const { atomicSwap, usdc, usdt } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = await BlockTime.AfterSeconds(10);
+    const uuid = generateOrderID();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: await usdt.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("0"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "InvalidMinimumBidLimit"
+    );
+  });
+  it("should revert to create in-chain pool with different maker", async () => {
+    const { atomicSwap, usdc, usdt } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = await BlockTime.AfterSeconds(10);
+    const uuid = generateOrderID();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: await usdt.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      maker: taker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "UnauthorizedSender"
+    );
+  });
+  it("should revert to create in-chain pool with invalid expire time", async () => {
+    const { atomicSwap, usdc, usdt } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = 10;
+    const uuid = generateOrderID();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: await usdt.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
+      atomicSwap,
+      "InvalidExpirationTime"
+    );
+  });
+
+  it("should revert to create in-chain pool with zero address", async () => {
+    const { atomicSwap, usdc, usdt } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = 10;
+    const uuid = generateOrderID();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: await usdt.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    // Impersonating address(0) - Note: This is non-standard and might not work as expected
+    await ethers.provider.send("hardhat_impersonateAccount", [
+      "0x0000000000000000000000000000000000000000",
+    ]);
+    const signer = await ethers.provider.getSigner(
+      "0x0000000000000000000000000000000000000000"
+    );
+
+    await expect(
+      atomicSwap.connect(signer).makeSwap(payload)
+    ).to.revertedWithCustomError(atomicSwap, "UnauthorizedSender");
   });
 });

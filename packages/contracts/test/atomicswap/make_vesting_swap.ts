@@ -78,7 +78,7 @@ describe("AtomicSwap: MakeVestingSwap", () => {
     ).to.revertedWithCustomError(atomicSwap, "InvalidTotalPercentage");
   });
 
-  it("should revert to create in-chain vesting swap with same token address", async () => {
+  it("should revert to create in-chain vesting swap with zero release schedule", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
       Utils.prepareInChainAtomicTest
     );
@@ -109,5 +109,52 @@ describe("AtomicSwap: MakeVestingSwap", () => {
     await expect(
       atomicSwap.makeSwapWithVesting(payload, [])
     ).to.revertedWithCustomError(atomicSwap, "ZeroReleaseSchedule");
+  });
+
+  it("should revert to create in-chain vesting swap with invalid release plans", async () => {
+    const { atomicSwap, usdc, usdt } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = await BlockTime.AfterSeconds(100);
+    const usdcAddress = await usdc.getAddress();
+    const usdtAddress = await usdt.getAddress();
+    const uuid = generateOrderID();
+    const payload = {
+      uuid: uuid,
+      sellToken: {
+        token: usdcAddress,
+        amount: "20",
+      },
+      buyToken: {
+        token: usdtAddress,
+        amount: "20",
+      },
+
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    const releases: {
+      durationInHours: bigint;
+      percentage: bigint;
+    }[] = [];
+
+    let sum: bigint = BigInt(0);
+    for (let index = 0; index < 160; index++) {
+      sum = sum + BigInt(1);
+      releases.push({
+        durationInHours: BigInt(1),
+        percentage: sum <= 100 ? BigInt(100) : BigInt(0),
+      });
+    }
+
+    await expect(
+      atomicSwap.makeSwapWithVesting(payload, releases)
+    ).to.revertedWithCustomError(atomicSwap, "OverMaximumReleaseStep");
   });
 });

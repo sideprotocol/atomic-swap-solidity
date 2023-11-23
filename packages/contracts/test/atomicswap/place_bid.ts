@@ -206,4 +206,24 @@ describe("AtomicSwap: PlaceBid", () => {
       atomicSwap.connect(taker).placeBid(bidPayload)
     ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
   });
+  it("should revert to place bid with bigger amount of expectation", async () => {
+    const { atomicSwap, taker, orderID, usdt } = await createDefaultAtomicOrder(
+      false,
+      true
+    );
+
+    const bidPayload = {
+      bidder: taker.address,
+      bidAmount: ethers.parseEther("30"),
+      orderID: orderID,
+      bidderReceiver: taker.address,
+      expireTimestamp: await BlockTime.AfterSeconds(30),
+    };
+    // make bid
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload, {
+        value: bidPayload.bidAmount,
+      })
+    ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
+  });
 });
