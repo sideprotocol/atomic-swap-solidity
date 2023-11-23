@@ -64,46 +64,32 @@ describe("TakeSwap With Vesting", () => {
     // Release from vesting contract
     // After cliff time, it's possible to get started releasing
     await time.increase(3600 * 1);
-    const totalReleaseAmount = order.sellToken.amount / BigInt(2);
-    const releaseAmount = calcSwapAmount(totalReleaseAmount, sellTokenFeeRate);
+    const totalReleaseAmount = calcSwapAmount(
+      order.sellToken.amount,
+      buyTokenFeeRate
+    );
 
-    console.log("release of amount:", releaseAmount);
+    const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
         await vestingManager.release(takerReceiver, orderID)
-      ).to.changeEtherBalances(
-        [takerReceiver, treasury],
-        [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
-      );
+      ).to.changeEtherBalance(takerReceiver, releaseAmount);
     } else {
       expect(
         await vestingManager.release(takerReceiver, orderID)
-      ).to.changeTokenBalances(
-        usdc,
-        [takerReceiver, treasury],
-        [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
-      );
+      ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
     }
-
     // after 1 hours, release again
     await time.increase(3600);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
         await vestingManager.release(takerReceiver, orderID)
-      ).to.changeEtherBalances(
-        [takerReceiver, treasury],
-        [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
-      );
+      ).to.changeEtherBalance(takerReceiver, releaseAmount);
     } else {
       expect(
         await vestingManager.release(takerReceiver, orderID)
-      ).to.changeTokenBalances(
-        usdc,
-        [takerReceiver, treasury],
-        [releaseAmount.amountAfterFee, releaseAmount.feeAmount]
-      );
+      ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
     }
-
     expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
     return {
       orderID,

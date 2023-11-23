@@ -8,7 +8,8 @@ import { AtomicSwapMsgValidator } from "../abstracts/libs/utils/AtomicSwapMsgVal
 import { AtomicSwapStateLogic } from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
 import { TokenTransferHelper } from "../abstracts/libs/utils/TokenTransferHelper.sol";
 import {IInchainAtomicSwap } from "./interfaces/IInchainAtomicSwap.sol";
-import { ICliffVesting } from "../vesting/interfaces/ICliffVesting.sol";
+import { IVesting } from "../vesting/interfaces/IVesting.sol";
+
 
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
@@ -44,7 +45,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         sellerFeeRate = _sellerFee;
         buyerFeeRate = _buyerFee;
         treasury = _treasury;
-        vestingManager = ICliffVesting(_vestingManager);
+        vestingManager = IVesting(_vestingManager);
     }
 
     /// @notice Creates a new swap order.
@@ -117,18 +118,24 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 takeswap.takerReceiver, _order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
         } else {
-            // TODO: calculate and deduct total Fee before start vesting
             // Transfer sell token to vesting contract
+            uint256 _sellTokenFee = (_order.sellToken.amount * buyerFeeRate) / MAX_FEE_RATE_SCALE;
+            uint256 _sellTokenAmountAfterFee = _order.sellToken.amount - _sellTokenFee;
             if (_order.sellToken.token == address(0)) {
-                (bool successToRecipient,) = payable(address(vestingManager)).call{value: _order.sellToken.amount}("");
+                (bool successToRecipient,) = payable(address(vestingManager)).call{value: _sellTokenAmountAfterFee}("");
                 if(!successToRecipient) {
                     revert TransferFailed(address(vestingManager), _order.sellToken.amount);
                 }
+                // Take Fee. 
+                (bool successToTreasury,) = payable(address(treasury)).call{value: _sellTokenFee}("");
+                if(!successToTreasury) {
+                    revert TransferFailed(address(treasury), _sellTokenFee);
+                }
             } else {
-                _order.sellToken.token.safeTransfer(address(vestingManager), _order.sellToken.amount);
+                _order.sellToken.token.safeTransfer(address(vestingManager), _sellTokenAmountAfterFee);
+                _order.sellToken.token.safeTransfer(address(treasury),_sellTokenFee);
             }
-
-            vestingManager.startVesting(_order.id,takeswap.takerReceiver, _order.sellToken.token, _order.sellToken.amount, _releases);
+            vestingManager.startVesting(_order.id,takeswap.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
         }
         
         _order.buyToken.token.transferFromWithFee(

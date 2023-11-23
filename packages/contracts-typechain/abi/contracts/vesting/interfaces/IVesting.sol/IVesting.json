@@ -1,0 +1,214 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IVesting",
+  "sourceName": "contracts/vesting/interfaces/IVesting.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidTotalPercentage",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidVesting",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoVestedTokensAvailable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NoVestedTokensForRelease",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OverMaximumReleaseStep",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        }
+      ],
+      "name": "VestingAlreadyStarted",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "VestingNotStarted",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "from",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "start",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "totalAmount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amountReleased",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "lastReleasedStep",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct IVesting.VestingSchedule",
+              "name": "schedule",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "durationInHours",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "percentage",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct IAtomicSwapBase.Release[]",
+              "name": "release",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "address",
+              "name": "beneficiary",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "orderId",
+              "type": "bytes32"
+            }
+          ],
+          "indexed": true,
+          "internalType": "struct IVesting.VestingInfo",
+          "name": "vesting",
+          "type": "tuple"
+        }
+      ],
+      "name": "NewVesting",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Received",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Released",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "orderId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalAmount",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "durationInHours",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "percentage",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IAtomicSwapBase.Release[]",
+          "name": "releases",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "startVesting",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

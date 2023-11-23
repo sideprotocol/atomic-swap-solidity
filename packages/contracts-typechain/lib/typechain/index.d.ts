@@ -39,7 +39,7 @@ export type { IInchainAtomicSwap } from "./contracts/inchain_atomicswap/interfac
 export { IInchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap__factory";
 export type { MockToken } from "./contracts/mocks/MockToken";
 export { MockToken__factory } from "./factories/contracts/mocks/MockToken__factory";
-export type { CliffVesting } from "./contracts/vesting/CliffVesting";
-export { CliffVesting__factory } from "./factories/contracts/vesting/CliffVesting__factory";
-export type { ICliffVesting } from "./contracts/vesting/interfaces/ICliffVesting";
-export { ICliffVesting__factory } from "./factories/contracts/vesting/interfaces/ICliffVesting__factory";
+export type { IVesting } from "./contracts/vesting/interfaces/IVesting";
+export { IVesting__factory } from "./factories/contracts/vesting/interfaces/IVesting__factory";
+export type { Vesting } from "./contracts/vesting/Vesting";
+export { Vesting__factory } from "./factories/contracts/vesting/Vesting__factory";

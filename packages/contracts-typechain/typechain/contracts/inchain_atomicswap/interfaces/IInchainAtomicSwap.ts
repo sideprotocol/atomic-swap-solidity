@@ -88,7 +88,6 @@ export declare namespace IAtomicSwapBase {
   export type PlaceBidMsgStruct = {
     bidAmount: BigNumberish;
     bidder: AddressLike;
-    bidderReceiver: AddressLike;
     orderID: BytesLike;
     expireTimestamp: BigNumberish;
   };
@@ -96,13 +95,11 @@ export declare namespace IAtomicSwapBase {
   export type PlaceBidMsgStructOutput = [
     bidAmount: bigint,
     bidder: string,
-    bidderReceiver: string,
     orderID: string,
     expireTimestamp: bigint
   ] & {
     bidAmount: bigint;
     bidder: string;
-    bidderReceiver: string;
     orderID: string;
     expireTimestamp: bigint;
   };

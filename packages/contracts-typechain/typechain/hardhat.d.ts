@@ -86,13 +86,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
-      name: "CliffVesting",
+      name: "IVesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CliffVesting__factory>;
+    ): Promise<Contracts.IVesting__factory>;
     getContractFactory(
-      name: "ICliffVesting",
+      name: "Vesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ICliffVesting__factory>;
+    ): Promise<Contracts.Vesting__factory>;
 
     getContractAt(
       name: "OwnableUpgradeable",
@@ -185,15 +185,15 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
     getContractAt(
-      name: "CliffVesting",
+      name: "IVesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.CliffVesting>;
+    ): Promise<Contracts.IVesting>;
     getContractAt(
-      name: "ICliffVesting",
+      name: "Vesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.ICliffVesting>;
+    ): Promise<Contracts.Vesting>;
 
     deployContract(
       name: "OwnableUpgradeable",
@@ -268,13 +268,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
     deployContract(
-      name: "CliffVesting",
+      name: "IVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CliffVesting>;
+    ): Promise<Contracts.IVesting>;
     deployContract(
-      name: "ICliffVesting",
+      name: "Vesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ICliffVesting>;
+    ): Promise<Contracts.Vesting>;
 
     deployContract(
       name: "OwnableUpgradeable",
@@ -367,15 +367,15 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
     deployContract(
-      name: "CliffVesting",
+      name: "IVesting",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CliffVesting>;
+    ): Promise<Contracts.IVesting>;
     deployContract(
-      name: "ICliffVesting",
+      name: "Vesting",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ICliffVesting>;
+    ): Promise<Contracts.Vesting>;
 
     // default types
     getContractFactory(

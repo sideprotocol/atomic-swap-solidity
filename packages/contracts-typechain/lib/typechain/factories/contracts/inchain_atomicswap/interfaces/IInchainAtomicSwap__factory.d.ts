@@ -35,6 +35,14 @@ export declare class IInchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "InactiveOrder";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
+        readonly name: "InvaldAddition";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InvalidAddress";
         readonly type: "error";
     }, {
@@ -115,11 +123,11 @@ export declare class IInchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "OrderAlreadyCompleted";
+        readonly name: "OrderAlreadyExists";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "OrderAlreadyExists";
+        readonly name: "OrderCanceled";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
@@ -534,10 +542,6 @@ export declare class IInchainAtomicSwap__factory {
             }, {
                 readonly internalType: "address";
                 readonly name: "bidder";
-                readonly type: "address";
-            }, {
-                readonly internalType: "address";
-                readonly name: "bidderReceiver";
                 readonly type: "address";
             }, {
                 readonly internalType: "bytes32";
