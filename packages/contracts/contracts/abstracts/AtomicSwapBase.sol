@@ -48,11 +48,4 @@ abstract contract AtomicSwapBase is OwnableUpgradeable, ReentrancyGuardUpgradeab
         }
         _;
     }
-
-    modifier onlyActive(bytes32 id) {
-        if (swapOrder[id].status == OrderStatus.INITIAL) {
-            revert InactiveOrder();
-        }
-        _;
-    }
 }

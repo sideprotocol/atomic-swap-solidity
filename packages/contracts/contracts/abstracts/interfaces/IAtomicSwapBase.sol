@@ -59,6 +59,7 @@ interface IAtomicSwapBase {
         bytes32 order; // Associated order ID.
         BidStatus status; // Current status.
         address bidder; // Bidder's address.
+        address bidderReceiver; // Address to receive the swapped asset.
         uint256 receiveTimestamp; // Receipt timestamp.
         uint256 expireTimestamp; // Expiration timestamp.
     }
@@ -91,6 +92,7 @@ interface IAtomicSwapBase {
     struct PlaceBidMsg {
         uint256 bidAmount; // Bid amount.
         address bidder; // Bidder's address.
+        address bidderReceiver; // Receiver of the swapped asset.
         bytes32 orderID; // Order ID.
         uint256 expireTimestamp; // Expiration timestamp.
     }
@@ -125,8 +127,7 @@ interface IAtomicSwapBase {
     error OrderDoesNotExist();
     error BidDoesNotExist();
     error UnauthorizedTakeAction();
-    error InactiveOrder();
-    error OrderCanceled();
+    error OrderAlreadyCompleted();
     error OrderNotAllowTake();
     error UnauthorizedCancelAction();
     error UnsupportedTokenPair();
@@ -153,7 +154,6 @@ interface IAtomicSwapBase {
     error TransferToTreasuryFailed(address recipient, uint256 amount);
     error TransferFromFailed(address from, address  to, uint256 amount);
     error TransferFailed(address  to, uint256 amount);
-    error InvaldAddition();
 
     // Events
     event AtomicSwapOrderCreated(bytes32 indexed id);
