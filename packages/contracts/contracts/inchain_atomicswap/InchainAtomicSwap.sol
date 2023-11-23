@@ -3,11 +3,11 @@ pragma solidity ^0.8.19;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import {AtomicSwapBase} from  "../abstracts/AtomicSwapBase.sol";
+import { AtomicSwapBase } from  "../abstracts/AtomicSwapBase.sol";
 import { AtomicSwapMsgValidator } from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import { AtomicSwapStateLogic } from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
 import { TokenTransferHelper } from "../abstracts/libs/utils/TokenTransferHelper.sol";
-import {IInchainAtomicSwap } from "./interfaces/IInchainAtomicSwap.sol";
+import { IInchainAtomicSwap } from "./interfaces/IInchainAtomicSwap.sol";
 import { ICliffVesting } from "../vesting/interfaces/ICliffVesting.sol";
 
 /// @title Inchain Atomic Swap
@@ -101,6 +101,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Ensure the swap order has not already been completed
+        // TODO: status check is not accurate. cannceled order should not be taken as well.
         if (order.status == OrderStatus.COMPLETE) {
             revert OrderAlreadyCompleted();
         }
@@ -156,6 +157,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Ensure the caller is the maker of the swap order
+        // the above comment is not accurate
         if (order.status != OrderStatus.INITIAL) {
             revert OrderAlreadyCompleted();
         }
@@ -164,7 +166,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         order.status = OrderStatus.CANCEL;
         // Return the funds/tokens to the maker
         if (order.sellToken.token == address(0)) {
-            // Refund Ether if the sell token was Ether
+            // Refund Ether if the sell token was native token. (such as ETH, BNB)
             (bool success,) = payable(msg.sender).call{value: order.sellToken.amount}("");
             if(!success) {
                 revert TransferFailed(msg.sender, order.sellToken.amount);
@@ -192,6 +194,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_currentBid.bidder != address(0)) {
             revert BidAlreadyPlaced();
         }
+
+        // TODO: need check order status here
+
+
         // Update last bidder expire time in order
         AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
 
@@ -287,6 +293,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert UnauthorizedSender();
         }
         AtomicSwapOrder storage _order = swapOrder[_orderID];
+
+        // TODO: need check order status. here. 
 
         if (!_order.acceptBid) {
             revert BidNotAllowed();
