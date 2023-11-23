@@ -6,7 +6,6 @@ import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/
 
 import {IVesting, IAtomicSwapBase} from  "./interfaces/IVesting.sol";
 import {TokenTransferHelper} from  "../abstracts/libs/utils/TokenTransferHelper.sol";
-
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.

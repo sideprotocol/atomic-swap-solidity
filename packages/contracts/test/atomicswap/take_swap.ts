@@ -142,7 +142,7 @@ describe("TakeSwap", () => {
         orderID,
         takerReceiver: taker.address,
       })
-    ).to.be.revertedWithCustomError(atomicSwap, "OrderAlreadyCompleted");
+    ).to.be.revertedWithCustomError(atomicSwap, "InactiveOrder");
   });
 
   it("should fail when a non-taker tries to take the swap", async () => {

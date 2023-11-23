@@ -10,6 +10,7 @@ import { TokenTransferHelper } from "../abstracts/libs/utils/TokenTransferHelper
 import {IInchainAtomicSwap } from "./interfaces/IInchainAtomicSwap.sol";
 import { IVesting } from "../vesting/interfaces/IVesting.sol";
 
+
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
 /// @dev Extends the AtomicSwapBase and implements the IInchainAtomicSwap interface.
@@ -117,13 +118,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 takeswap.takerReceiver, _order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
         } else {
-            // TODO: calculate and deduct total Fee before start vesting
-            
             // Transfer sell token to vesting contract
             uint256 _sellTokenFee = (_order.sellToken.amount * buyerFeeRate) / MAX_FEE_RATE_SCALE;
             uint256 _sellTokenAmountAfterFee = _order.sellToken.amount - _sellTokenFee;
             if (_order.sellToken.token == address(0)) {
-            
                 (bool successToRecipient,) = payable(address(vestingManager)).call{value: _sellTokenAmountAfterFee}("");
                 if(!successToRecipient) {
                     revert TransferFailed(address(vestingManager), _order.sellToken.amount);
@@ -137,7 +135,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 _order.sellToken.token.safeTransfer(address(vestingManager), _sellTokenAmountAfterFee);
                 _order.sellToken.token.safeTransfer(address(treasury),_sellTokenFee);
             }
-            vestingManager.startVesting(_order.id,takeswap.takerReceiver, _order.sellToken.token, _order.sellToken.amount, _releases);
+            vestingManager.startVesting(_order.id,takeswap.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
         }
         
         _order.buyToken.token.transferFromWithFee(

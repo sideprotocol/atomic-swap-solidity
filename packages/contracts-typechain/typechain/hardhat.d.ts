@@ -86,14 +86,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
-      name: "CliffVesting",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CliffVesting__factory>;
-    getContractFactory(
-      name: "ICliffVesting",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ICliffVesting__factory>;
-    getContractFactory(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVesting__factory>;
@@ -193,16 +185,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
     getContractAt(
-      name: "CliffVesting",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CliffVesting>;
-    getContractAt(
-      name: "ICliffVesting",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ICliffVesting>;
-    getContractAt(
       name: "IVesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -285,14 +267,6 @@ declare module "hardhat/types/runtime" {
       name: "MockToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
-    deployContract(
-      name: "CliffVesting",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CliffVesting>;
-    deployContract(
-      name: "ICliffVesting",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ICliffVesting>;
     deployContract(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -392,16 +366,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
-    deployContract(
-      name: "CliffVesting",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CliffVesting>;
-    deployContract(
-      name: "ICliffVesting",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ICliffVesting>;
     deployContract(
       name: "IVesting",
       args: any[],
