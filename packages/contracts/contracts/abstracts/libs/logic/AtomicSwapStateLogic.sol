@@ -64,7 +64,7 @@ library AtomicSwapStateLogic {
             order: bidMsg.orderID,
             status: IAtomicSwapBase.BidStatus.Placed,
             bidder: bidMsg.bidder,
-            bidderReceiver: bidMsg.bidderReceiver,
+            bidderReceiver: bidMsg.bidderReceiver,  // TODO: Unused variable
             receiveTimestamp: block.timestamp,
             expireTimestamp: bidMsg.expireTimestamp
         });

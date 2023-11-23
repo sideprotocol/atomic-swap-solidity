@@ -100,7 +100,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert UnauthorizedTakeAction();
         }
 
-        // TODO: Check order status 'CANCEL'
+        // TODO: Add cancel status check
         // Ensure the swap order has not already been completed
         if (order.status == OrderStatus.COMPLETE) {
             revert OrderAlreadyCompleted();
@@ -109,6 +109,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Update order details
         order.status = OrderStatus.COMPLETE;
         order.completedAt = block.timestamp;
+        // TODO: Save taker to order
 
         // Check vesting parameter is exist or not.
         Release[] memory releases = swapOrderVestingParams[order.id];
@@ -119,6 +120,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 takeswap.takerReceiver, order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
         } else {
+            // TODO: calculate and deduct total Fee before start vesting
             // Transfer sell token to vesting contract
             if (order.sellToken.token == address(0)) {
                 (bool successToRecipient,) = payable(address(vestingManager)).call{value: order.sellToken.amount}("");
@@ -196,11 +198,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Update last bidder expire time in order
         AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
 
+        // TODO:Check order status: INITIAL
+        
         // Ensure bide amount meet bid requirements.
         if (_bidAmount < _order.minBidAmount || _bidAmount > _order.buyToken.amount) {
             revert MismatchedBidAmount(_bidAmount);
         }
 
+        // TODO: tokenAmount = _bidAmount
         // Calculate the additional token amount being bid
         uint256 tokenAmount = _bidAmount - _currentBid.amount;
         Coin storage _buyToken = swapOrder[_orderID].buyToken;
@@ -244,6 +249,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Retrieve the associated AtomicSwapOrder
         AtomicSwapOrder storage _order = swapOrder[_orderID];
 
+        // TODO:Check order status: INITIAL
+        // TODO:Check _currentBid status: Placed
+
+        // TODO:Check _additing >= 0
         // Ensure the additional bid amount is non-zero
         if (_addition == 0) {
             revert MismatchedBidAmount(_addition);
@@ -289,6 +298,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
         AtomicSwapOrder storage _order = swapOrder[_orderID];
 
+        // TODO: Check order is existing
+        // TODO: Check order status: INITIAL
         if (!_order.acceptBid) {
             revert BidNotAllowed();
         }
@@ -309,9 +320,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert BidAlreadyExpired(selectedBid.expireTimestamp, block.timestamp);
         }
 
+        // TODO: Update the order status to 'COMPLETE'
         // Update the bid status to 'Executed'
         selectedBid.status = BidStatus.Executed;
 
+        // TODO: Check and process vesting releases
         // Process sell token transfers
         Coin storage _sellToken = _order.sellToken;
         _sellToken.token.transferWithFee(selectedBid.bidder, _sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury);

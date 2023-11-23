@@ -7,6 +7,7 @@ import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/
 import {ICliffVesting, IAtomicSwapBase} from  "./interfaces/ICliffVesting.sol";
 import {TokenTransferHelper} from  "../abstracts/libs/utils/TokenTransferHelper.sol";
 
+// TODO: Rename CliffVesting to Vesting
 /// @title Cliff Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
@@ -102,6 +103,7 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
             revert NoVestedTokensForRelease();
         }
         schedule.amountReleased += amountForRelease;
+        // TODO: Remove sellerFee, calculate and deduct total fee before start vesting 
         schedule.token.transferWithFee(beneficiary, amountForRelease, sellerFee, 1000, treasury);
         emit Released(beneficiary, amountForRelease);
     }

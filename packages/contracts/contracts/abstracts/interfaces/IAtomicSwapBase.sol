@@ -59,7 +59,7 @@ interface IAtomicSwapBase {
         bytes32 order; // Associated order ID.
         BidStatus status; // Current status.
         address bidder; // Bidder's address.
-        address bidderReceiver; // Address to receive the swapped asset.
+        address bidderReceiver; // Address to receive the swapped asset. TODO: Unused variable
         uint256 receiveTimestamp; // Receipt timestamp.
         uint256 expireTimestamp; // Expiration timestamp.
     }
@@ -92,7 +92,7 @@ interface IAtomicSwapBase {
     struct PlaceBidMsg {
         uint256 bidAmount; // Bid amount.
         address bidder; // Bidder's address.
-        address bidderReceiver; // Receiver of the swapped asset.
+        address bidderReceiver; // Receiver of the swapped asset. TODO: Unused variable
         bytes32 orderID; // Order ID.
         uint256 expireTimestamp; // Expiration timestamp.
     }
