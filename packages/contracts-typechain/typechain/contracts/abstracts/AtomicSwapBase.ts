@@ -321,12 +321,11 @@ export interface AtomicSwapBase extends BaseContract {
   bids: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
-      [bigint, string, bigint, string, string, bigint, bigint] & {
+      [bigint, string, bigint, string, bigint, bigint] & {
         amount: bigint;
         order: string;
         status: bigint;
         bidder: string;
-        bidderReceiver: string;
         receiveTimestamp: bigint;
         expireTimestamp: bigint;
       }
@@ -403,12 +402,11 @@ export interface AtomicSwapBase extends BaseContract {
   ): TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
-      [bigint, string, bigint, string, string, bigint, bigint] & {
+      [bigint, string, bigint, string, bigint, bigint] & {
         amount: bigint;
         order: string;
         status: bigint;
         bidder: string;
-        bidderReceiver: string;
         receiveTimestamp: bigint;
         expireTimestamp: bigint;
       }

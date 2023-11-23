@@ -4,14 +4,13 @@ pragma solidity ^0.8.19;
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
-import {ICliffVesting, IAtomicSwapBase} from  "./interfaces/ICliffVesting.sol";
+import {IVesting, IAtomicSwapBase} from  "./interfaces/IVesting.sol";
 import {TokenTransferHelper} from  "../abstracts/libs/utils/TokenTransferHelper.sol";
 
-// TODO: Rename CliffVesting to Vesting
-/// @title Cliff Vesting Contract
+/// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
-contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffVesting {
+contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     using TokenTransferHelper for *;
 
     /// @notice Stores vesting schedules for each beneficiary.
@@ -20,20 +19,10 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
     /// @notice Stores release information for each beneficiary.
     mapping(address => mapping(bytes32 => IAtomicSwapBase.Release[])) public releaseInfos;
     
-    /// @notice Address of the treasury where fees are sent.
-    address private treasury;
-
-    /// @notice Fee charged for the seller.
-    uint256 public sellerFee;
-
     /// @notice Initializes the vesting contract with necessary parameters.
     /// @param _admin The address of the admin.
-    /// @param _treasury The address of the treasury for collecting fees.
-    /// @param _sellerFee The fee percentage for the seller.
-    function initialize(address _admin, address _treasury, uint256 _sellerFee) external initializer {
+    function initialize(address _admin) external initializer {
         __Ownable_init_unchained(_admin);
-        treasury = _treasury;
-        sellerFee = _sellerFee;
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
@@ -103,8 +92,14 @@ contract CliffVesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, ICliffV
             revert NoVestedTokensForRelease();
         }
         schedule.amountReleased += amountForRelease;
-        // TODO: Remove sellerFee, calculate and deduct total fee before start vesting 
-        schedule.token.transferWithFee(beneficiary, amountForRelease, sellerFee, 1000, treasury);
+        if (schedule.token != address(0)) {
+            schedule.token.safeTransfer(beneficiary, amountForRelease);
+        } else {
+            (bool successToRecipient,) = payable(beneficiary).call{value: amountForRelease}("");
+            if(!successToRecipient) {
+                revert IAtomicSwapBase.TransferToRecipientFailed(beneficiary, amountForRelease);
+            }
+        }
         emit Released(beneficiary, amountForRelease);
     }
 

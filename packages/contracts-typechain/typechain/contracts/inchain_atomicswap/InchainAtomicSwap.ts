@@ -88,7 +88,6 @@ export declare namespace IAtomicSwapBase {
   export type PlaceBidMsgStruct = {
     bidAmount: BigNumberish;
     bidder: AddressLike;
-    bidderReceiver: AddressLike;
     orderID: BytesLike;
     expireTimestamp: BigNumberish;
   };
@@ -96,13 +95,11 @@ export declare namespace IAtomicSwapBase {
   export type PlaceBidMsgStructOutput = [
     bidAmount: bigint,
     bidder: string,
-    bidderReceiver: string,
     orderID: string,
     expireTimestamp: bigint
   ] & {
     bidAmount: bigint;
     bidder: string;
-    bidderReceiver: string;
     orderID: string;
     expireTimestamp: bigint;
   };
@@ -482,12 +479,11 @@ export interface InchainAtomicSwap extends BaseContract {
   bids: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
-      [bigint, string, bigint, string, string, bigint, bigint] & {
+      [bigint, string, bigint, string, bigint, bigint] & {
         amount: bigint;
         order: string;
         status: bigint;
         bidder: string;
-        bidderReceiver: string;
         receiveTimestamp: bigint;
         expireTimestamp: bigint;
       }
@@ -624,12 +620,11 @@ export interface InchainAtomicSwap extends BaseContract {
   ): TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
     [
-      [bigint, string, bigint, string, string, bigint, bigint] & {
+      [bigint, string, bigint, string, bigint, bigint] & {
         amount: bigint;
         order: string;
         status: bigint;
         bidder: string;
-        bidderReceiver: string;
         receiveTimestamp: bigint;
         expireTimestamp: bigint;
       }

@@ -47,7 +47,7 @@ library AtomicSwapMsgValidator {
         }
 
         if (order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
-            revert IAtomicSwapBase.OrderAlreadyCompleted();
+            revert IAtomicSwapBase.InactiveOrder();
         }
     }
 
@@ -60,7 +60,7 @@ library AtomicSwapMsgValidator {
         }
 
         if (order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
-            revert IAtomicSwapBase.OrderAlreadyCompleted();
+            revert IAtomicSwapBase.InactiveOrder();
         }
     }
 

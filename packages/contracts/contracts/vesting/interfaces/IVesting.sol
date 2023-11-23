@@ -3,10 +3,10 @@ pragma solidity ^0.8.9;
 
 import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
 
-/// @title ICliffVesting
-/// @notice Interface for the CliffVesting contract.
-/// @dev Provides function signatures and structures for cliff vesting operations.
-interface ICliffVesting {
+/// @title IVesting
+/// @notice Interface for the Vesting contract.
+/// @dev Provides function signatures and structures for vesting operations.
+interface IVesting {
     /// @notice Represents a vesting schedule for a beneficiary.
     /// @param from The address that created the vesting schedule.
     /// @param start The start time of the vesting schedule.

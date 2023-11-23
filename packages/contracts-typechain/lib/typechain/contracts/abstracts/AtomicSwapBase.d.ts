@@ -196,7 +196,6 @@ export interface AtomicSwapBase extends BaseContract {
             string,
             bigint,
             string,
-            string,
             bigint,
             bigint
         ] & {
@@ -204,7 +203,6 @@ export interface AtomicSwapBase extends BaseContract {
             order: string;
             status: bigint;
             bidder: string;
-            bidderReceiver: string;
             receiveTimestamp: bigint;
             expireTimestamp: bigint;
         }
@@ -274,7 +272,6 @@ export interface AtomicSwapBase extends BaseContract {
             string,
             bigint,
             string,
-            string,
             bigint,
             bigint
         ] & {
@@ -282,7 +279,6 @@ export interface AtomicSwapBase extends BaseContract {
             order: string;
             status: bigint;
             bidder: string;
-            bidderReceiver: string;
             receiveTimestamp: bigint;
             expireTimestamp: bigint;
         }

@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "ICliffVesting",
-  "sourceName": "contracts/vesting/interfaces/ICliffVesting.sol",
+  "contractName": "IVesting",
+  "sourceName": "contracts/vesting/interfaces/IVesting.sol",
   "abi": [
     {
       "inputs": [],
@@ -82,7 +82,7 @@
                   "type": "uint256"
                 }
               ],
-              "internalType": "struct ICliffVesting.VestingSchedule",
+              "internalType": "struct IVesting.VestingSchedule",
               "name": "schedule",
               "type": "tuple"
             },
@@ -115,7 +115,7 @@
             }
           ],
           "indexed": true,
-          "internalType": "struct ICliffVesting.VestingInfo",
+          "internalType": "struct IVesting.VestingInfo",
           "name": "vesting",
           "type": "tuple"
         }

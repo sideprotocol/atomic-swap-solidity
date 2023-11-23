@@ -50,6 +50,16 @@ const _abi = [
     },
     {
         inputs: [],
+        name: "InactiveOrder",
+        type: "error",
+    },
+    {
+        inputs: [],
+        name: "InvaldAddition",
+        type: "error",
+    },
+    {
+        inputs: [],
         name: "InvalidAddress",
         type: "error",
     },
@@ -155,12 +165,12 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "OrderAlreadyCompleted",
+        name: "OrderAlreadyExists",
         type: "error",
     },
     {
         inputs: [],
-        name: "OrderAlreadyExists",
+        name: "OrderCanceled",
         type: "error",
     },
     {
@@ -696,11 +706,6 @@ const _abi = [
                     {
                         internalType: "address",
                         name: "bidder",
-                        type: "address",
-                    },
-                    {
-                        internalType: "address",
-                        name: "bidderReceiver",
                         type: "address",
                     },
                     {
