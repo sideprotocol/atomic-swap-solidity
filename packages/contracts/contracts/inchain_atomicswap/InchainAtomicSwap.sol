@@ -100,6 +100,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert UnauthorizedTakeAction();
         }
 
+        // TODO: Check order status 'CANCEL'
         // Ensure the swap order has not already been completed
         if (order.status == OrderStatus.COMPLETE) {
             revert OrderAlreadyCompleted();
