@@ -401,10 +401,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         emit CanceledBid(_orderID, _selectedBid.bidder);
     }
 
+    /// @notice Transfers the sell token to the buyer with optional vesting
+    /// @dev This function handles both immediate transfers and vesting-based transfers of the sell token.
+    /// @param _order The atomic swap order containing details of the transaction
+    /// @param buyer The address of the buyer receiving the sell token
     function _transferSellTokenToBuyer(
         AtomicSwapOrder storage _order,
         address buyer
-    ) private {
+    ) internal {
         Release[] memory _releases = swapOrderVestingParams[_order.id];
         if (_releases.length == 0) {
             // Exchange the tokens
