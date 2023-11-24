@@ -87,15 +87,22 @@ export declare namespace IAtomicSwapBase {
 
   export type PlaceBidMsgStruct = {
     bidAmount: BigNumberish;
+    bidder: AddressLike;
     orderID: BytesLike;
     expireTimestamp: BigNumberish;
   };
 
   export type PlaceBidMsgStructOutput = [
     bidAmount: bigint,
+    bidder: string,
     orderID: string,
     expireTimestamp: bigint
-  ] & { bidAmount: bigint; orderID: string; expireTimestamp: bigint };
+  ] & {
+    bidAmount: bigint;
+    bidder: string;
+    orderID: string;
+    expireTimestamp: bigint;
+  };
 
   export type TakeSwapMsgStruct = {
     orderID: BytesLike;
@@ -109,13 +116,15 @@ export declare namespace IAtomicSwapBase {
 
   export type UpdateBidMsgStruct = {
     orderID: BytesLike;
+    bidder: AddressLike;
     addition: BigNumberish;
   };
 
-  export type UpdateBidMsgStructOutput = [orderID: string, addition: bigint] & {
-    orderID: string;
-    addition: bigint;
-  };
+  export type UpdateBidMsgStructOutput = [
+    orderID: string,
+    bidder: string,
+    addition: bigint
+  ] & { orderID: string; bidder: string; addition: bigint };
 }
 
 export interface InchainAtomicSwapInterface extends Interface {

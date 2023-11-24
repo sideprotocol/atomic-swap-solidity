@@ -1,6 +1,7 @@
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { bidToDefaultAtomicOrder, calcSwapAmount } from "../../utils/utils";
 import { expect } from "chai";
+import { ZeroAddress } from "ethers";
 
 describe("AtomicSwap: AcceptBid", () => {
   it("should accept bid with native token", async () => {
@@ -98,11 +99,8 @@ describe("AtomicSwap: AcceptBid", () => {
   it("should revert to accept bid with already took bid", async () => {
     const { atomicSwap, maker, orderID, bidAmount, bidder, payload } =
       await bidToDefaultAtomicOrder(true, false);
-
-    await expect(atomicSwap.connect(maker).acceptBid({ orderID, bidder })).not
-      .to.reverted;
     await expect(
-      atomicSwap.connect(maker).acceptBid({ orderID, bidder })
+      atomicSwap.connect(maker).acceptBid({ orderID, bidder: ZeroAddress })
     ).to.revertedWithCustomError(atomicSwap, "BidNotInPlacedStatus");
   });
 

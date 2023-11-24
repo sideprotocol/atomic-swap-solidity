@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import { IAtomicSwapBase } from "../../interfaces/IAtomicSwapBase.sol";
-import "hardhat/console.sol";
 /// @title Atomic Swap Message Validator
 /// @notice Library providing validation functions for various atomic swap messages.
 /// @dev Used for ensuring the correctness and integrity of data in atomic swap operations.
