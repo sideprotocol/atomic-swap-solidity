@@ -143,16 +143,12 @@ describe("AtomicSwap: MakeVestingSwap", () => {
       durationInHours: bigint;
       percentage: bigint;
     }[] = [];
-
-    let sum: bigint = BigInt(0);
-    for (let index = 0; index < 160; index++) {
-      sum = sum + BigInt(1);
+    for (let index = 0; index < 200; index++) {
       releases.push({
         durationInHours: BigInt(1),
-        percentage: sum <= 100 ? BigInt(100) : BigInt(0),
+        percentage: BigInt(50),
       });
     }
-
     await expect(
       atomicSwap.makeSwapWithVesting(payload, releases)
     ).to.revertedWithCustomError(atomicSwap, "OverMaximumReleaseStep");

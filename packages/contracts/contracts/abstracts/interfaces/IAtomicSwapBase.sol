@@ -128,6 +128,7 @@ interface IAtomicSwapBase {
     error InactiveOrder();
     error OrderCanceled();
     error OrderNotAllowTake();
+    error InvalidBidderAddress();
     error UnauthorizedCancelAction();
     error UnsupportedTokenPair();
     error InvalidContractAddress(address contractAddress);
@@ -143,6 +144,7 @@ interface IAtomicSwapBase {
     error NotAllowedTransferAmount(uint256 amount, uint256 allowance);
     error NotEnoughFund(uint256 real, uint256 expected);
     error ZeroReleaseSchedule();
+    error InvalidReleasePercentage();
     error InvalidTotalPercentage();
     error OverMaximumReleaseStep();
     error InvalidAddress();

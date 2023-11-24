@@ -203,7 +203,7 @@
       ],
       "name": "startVesting",
       "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "payable",
       "type": "function"
     }
   ],

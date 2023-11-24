@@ -11,7 +11,6 @@ import {TokenTransferHelper} from  "../abstracts/libs/utils/TokenTransferHelper.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     using TokenTransferHelper for *;
-
     /// @notice Stores vesting schedules for each beneficiary.
     mapping(address =>  mapping(bytes32 => VestingSchedule)) public vestingSchedules;
 
@@ -23,7 +22,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     function initialize(address _admin) external initializer {
         __Ownable_init_unchained(_admin);
     }
-
+    // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
     /// @notice Starts the vesting schedule for a beneficiary.
     /// @param beneficiary The address of the beneficiary.
     /// @param token The token address for vesting.
@@ -36,7 +35,14 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
-    ) external {
+    ) external payable {
+        if(token == address(0) ) {
+            if(msg.value != totalAmount){
+                revert IAtomicSwapBase.NotEnoughFund(totalAmount, msg.value);
+            } 
+        }else{
+            token.safeTransferFrom(msg.sender, address(this), totalAmount);
+        }
         uint256 vestinStartTime = block.timestamp;
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
@@ -47,7 +53,6 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
             lastReleasedStep: 0
         });
         vestingSchedules[beneficiary][orderId] = newVesting;
-
         IAtomicSwapBase.Release[] storage _releases = releaseInfos[beneficiary][orderId];
         for (uint256 i = 0; i < releases.length; i++) {
             _releases.push(releases[i]);
@@ -91,6 +96,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
             revert NoVestedTokensForRelease();
         }
         schedule.amountReleased += amountForRelease;
+
         if (schedule.token != address(0)) {
             schedule.token.safeTransfer(beneficiary, amountForRelease);
         } else {

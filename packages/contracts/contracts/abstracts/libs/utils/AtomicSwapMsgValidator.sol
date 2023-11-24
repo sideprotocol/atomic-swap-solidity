@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import { IAtomicSwapBase } from "../../interfaces/IAtomicSwapBase.sol";
-import "hardhat/console.sol";
 /// @title Atomic Swap Message Validator
 /// @notice Library providing validation functions for various atomic swap messages.
 /// @dev Used for ensuring the correctness and integrity of data in atomic swap operations.
@@ -45,10 +44,12 @@ library AtomicSwapMsgValidator {
         if (_order.taker != address(0) && _order.taker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedTakeAction();
         }
+
+        // change to onlyActive
         // Ensure the swap order has not already been completed
-        if (_order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
-            revert IAtomicSwapBase.InactiveOrder();
-        }
+        // if (_order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
+        //     revert IAtomicSwapBase.InactiveOrder();
+        // }
     }
 
     /// @notice Validates the cancellation of a swap.
@@ -59,9 +60,10 @@ library AtomicSwapMsgValidator {
             revert IAtomicSwapBase.UnauthorizedCancelAction();
         }
 
-        if (_order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
-            revert IAtomicSwapBase.InactiveOrder();
-        }
+        // change to onlyActive
+        // if (_order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
+        //     revert IAtomicSwapBase.InactiveOrder();
+        // }
     }
 
     /// @notice Validates vesting parameters for an atomic swap.
@@ -74,7 +76,12 @@ library AtomicSwapMsgValidator {
 
         uint256 totalPercentage = 0;
         for (uint256 i = 0; i < releases.length; i++) {
-            totalPercentage += releases[i].percentage;
+            uint256 percentage = releases[i].percentage;
+            if (percentage < 0 || (i > 0 && percentage == 0)) {
+                revert IAtomicSwapBase.InvalidReleasePercentage();
+            }
+
+            totalPercentage += percentage;
         }
 
         if (totalPercentage != 10000) {

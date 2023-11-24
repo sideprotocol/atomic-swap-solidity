@@ -51,8 +51,7 @@ describe("TakeSwap With Vesting", () => {
         orderID,
         takerReceiver: takerReceiver.address,
       });
-
-      await expect(tx).not.to.reverted;
+      expect(await tx).not.to.reverted;
     } else {
       const tx = atomicSwap.connect(taker).takeSwap({
         orderID,

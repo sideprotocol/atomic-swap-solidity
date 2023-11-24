@@ -297,7 +297,7 @@ export interface Vesting extends BaseContract {
       releases: IAtomicSwapBase.ReleaseStruct[]
     ],
     [void],
-    "nonpayable"
+    "payable"
   >;
 
   transferOwnership: TypedContractMethod<
@@ -359,7 +359,7 @@ export interface Vesting extends BaseContract {
       releases: IAtomicSwapBase.ReleaseStruct[]
     ],
     [void],
-    "nonpayable"
+    "payable"
   >;
   getFunction(
     nameOrSignature: "transferOwnership"

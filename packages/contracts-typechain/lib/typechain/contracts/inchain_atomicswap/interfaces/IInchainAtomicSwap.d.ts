@@ -65,18 +65,15 @@ export declare namespace IAtomicSwapBase {
     };
     type PlaceBidMsgStruct = {
         bidAmount: BigNumberish;
-        bidder: AddressLike;
         orderID: BytesLike;
         expireTimestamp: BigNumberish;
     };
     type PlaceBidMsgStructOutput = [
         bidAmount: bigint,
-        bidder: string,
         orderID: string,
         expireTimestamp: bigint
     ] & {
         bidAmount: bigint;
-        bidder: string;
         orderID: string;
         expireTimestamp: bigint;
     };
@@ -93,16 +90,10 @@ export declare namespace IAtomicSwapBase {
     };
     type UpdateBidMsgStruct = {
         orderID: BytesLike;
-        bidder: AddressLike;
         addition: BigNumberish;
     };
-    type UpdateBidMsgStructOutput = [
-        orderID: string,
-        bidder: string,
-        addition: bigint
-    ] & {
+    type UpdateBidMsgStructOutput = [orderID: string, addition: bigint] & {
         orderID: string;
-        bidder: string;
         addition: bigint;
     };
 }

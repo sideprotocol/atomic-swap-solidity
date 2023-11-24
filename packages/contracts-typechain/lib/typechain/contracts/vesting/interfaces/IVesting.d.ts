@@ -123,7 +123,7 @@ export interface IVesting extends BaseContract {
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
         void
-    ], "nonpayable">;
+    ], "payable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "startVesting"): TypedContractMethod<[
         orderId: BytesLike,
@@ -133,7 +133,7 @@ export interface IVesting extends BaseContract {
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
         void
-    ], "nonpayable">;
+    ], "payable">;
     getEvent(key: "NewVesting"): TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
     getEvent(key: "Received"): TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
     getEvent(key: "Released"): TypedContractEvent<ReleasedEvent.InputTuple, ReleasedEvent.OutputTuple, ReleasedEvent.OutputObject>;

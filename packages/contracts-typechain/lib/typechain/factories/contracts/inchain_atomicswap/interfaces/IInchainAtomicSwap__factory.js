@@ -102,6 +102,11 @@ const _abi = [
     },
     {
         inputs: [],
+        name: "InvalidReleasePercentage",
+        type: "error",
+    },
+    {
+        inputs: [],
         name: "InvalidSellerFee",
         type: "error",
     },
@@ -704,11 +709,6 @@ const _abi = [
                         type: "uint256",
                     },
                     {
-                        internalType: "address",
-                        name: "bidder",
-                        type: "address",
-                    },
-                    {
                         internalType: "bytes32",
                         name: "orderID",
                         type: "bytes32",
@@ -762,11 +762,6 @@ const _abi = [
                         internalType: "bytes32",
                         name: "orderID",
                         type: "bytes32",
-                    },
-                    {
-                        internalType: "address",
-                        name: "bidder",
-                        type: "address",
                     },
                     {
                         internalType: "uint256",
