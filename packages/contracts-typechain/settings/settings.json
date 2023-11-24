@@ -3,10 +3,10 @@
   "inChainAtomicSwap_mumbai": "0x6ac6dF3907Cf1fC4158CFB2f76517B5A139531C9",
   "mockUSDC_mumbai": "0x6B74954243e25B354d4B24F409c37a4DfE91DAdB",
   "mockUSDT_mumbai": "0xC6c8E162b4Fe3288348D0D7cD2b19239386c1035",
-  "inChainAtomicSwap_sepolia": "0x63C26AE7cb1fE9F7D6Be3855d3c7e6AdadB7e4eb",
-  "mockUSDC_sepolia": "0x6032bc676ba28c5e381F17DBBcDFE86Be04F67A9",
-  "mockUSDT_sepolia": "0x579B7980368bBe5505aAe0FA884d55940a0E8FEd",
-  "atomicSwapMsgValidator_sepolia": "0xFd210dD1ff178da7C7177bf8Faf20f8Dd2015a35",
+  "inChainAtomicSwap_sepolia": "0xDb991Fa947a6C91B5828F444c2D7BCfd2dacCE8B",
+  "mockUSDC_sepolia": "0x5bF76b1C7591AF50a60Bb64a46eb4b52cff52F44",
+  "mockUSDT_sepolia": "0xb0ab84475bCeCF18EE09c21E6898470351A07098",
+  "atomicSwapMsgValidator_sepolia": "0xb1E1eEadE69806772aC1965C03991509C0e0e3D4",
   "interchainAtomicSwapLogic_sepolia": "0x13061187C08747428c260cEe4c417BFEbecF0F23",
   "sideBridgeAddress_sepolia": "0x1461D9332B5e096126E26528Db216b95aB371d8a",
   "interChainAtomicSwap_sepolia": "0x8Ad7628730188d7bfF7c3dA7C8ACA5b00c283094",
@@ -15,7 +15,7 @@
   "interchainAtomicSwapLogic_bnb": "0x194Bd45e1a2045d34FfAdfF323aA57A5473E73Fc",
   "sideBridgeAddress_bnb": "0x669BA9D3E56A48b42f3178720d733DBAf04a847d",
   "interChainAtomicSwap_bnb": "0xF4DEFbAd78558C44F7b4dAc09B1Dd51d5F7222E7",
-  "vesting_sepolia": "0xd5E6B6EBBC7ee002F3Fda1E7abC85917592721Da",
-  "atomicSwapStateLogic_sepolia": "0x6f49667882f4deF3e6B744cF51ac06f6c4613b8C",
-  "tokenTransferHelper_sepolia": "0x3B63680d2C6186d057936B626D4Be09675FDd65d"
+  "vesting_sepolia": "0x30C318553915F79b51Fad3A2EDe4386865861c84",
+  "atomicSwapStateLogic_sepolia": "0xCA2a09e3F0D894A4053e8D5A337Fe7a05b540859",
+  "tokenTransferHelper_sepolia": "0xeFD57C12f987b3676d7a1bB066502443754b184b"
 }

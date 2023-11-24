@@ -21,20 +21,12 @@ task("deploy:vesting", "deploy in chain ").setAction(
     }
 
     // AtomicSwap contract deploy
-    const vestingFactory = await ethers.getContractFactory(`CliffVesting`, {
-      libraries: {
-        TokenTransferHelper: tokenTransferHelperAddress,
-      },
-    });
+    const vestingFactory = await ethers.getContractFactory(`Vesting`);
     // deploy contract
-    const vesting = await upgrades.deployProxy(
-      vestingFactory,
-      [admin, treasury, sellTokenFeeRate],
-      {
-        initializer: "initialize",
-        unsafeAllowLinkedLibraries: true,
-      }
-    );
+    const vesting = await upgrades.deployProxy(vestingFactory, [admin], {
+      initializer: "initialize",
+      unsafeAllowLinkedLibraries: true,
+    });
     const vestingContractAddress = await vesting.getAddress();
 
     await saveItemsToSetting([
