@@ -36,10 +36,9 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external payable {
-
         if(token == address(0) ) {
             if(msg.value != totalAmount){
-                revert();
+                revert IAtomicSwapBase.NotEnoughFund(totalAmount, msg.value);
             } 
         }else{
             token.safeTransferFrom(msg.sender, address(this), totalAmount);
