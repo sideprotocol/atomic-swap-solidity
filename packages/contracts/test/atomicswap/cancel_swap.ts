@@ -1,4 +1,4 @@
-import { createDefaultAtomicOrder } from "../../utils/utils";
+import { createDefaultAtomicOrder, testTakeSwap } from "../../utils/utils";
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { randomBytes } from "crypto";
@@ -54,5 +54,15 @@ describe("AtomicSwap: CancelSwap", () => {
     await expect(
       atomicSwap.connect(taker).cancelSwap(cancelSwapMsg)
     ).to.be.revertedWithCustomError(atomicSwap, "OrderDoesNotExist");
+  });
+
+  it("should revert to cancel swap when order is not initial status", async () => {
+    const { atomicSwap, orderID, taker } = await testTakeSwap();
+    const cancelSwapMsg = {
+      orderID: orderID,
+    };
+    await expect(
+      atomicSwap.connect(taker).cancelSwap(cancelSwapMsg)
+    ).to.be.revertedWithCustomError(atomicSwap, "InactiveOrder");
   });
 });

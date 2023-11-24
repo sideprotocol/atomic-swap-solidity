@@ -375,6 +375,85 @@ export const bidToDefaultAtomicOrder = async (
   return { ...orderParams, ...bidPayload };
 };
 
+export const testTakeSwap = async (withNativeToken?: boolean) => {
+  const [, , takerReceiver] = await ethers.getSigners();
+  const {
+    orderID,
+    atomicSwap,
+    maker,
+    taker,
+    usdc,
+    usdt,
+    treasury,
+    sellTokenFeeRate,
+    buyTokenFeeRate,
+  } = await createDefaultAtomicOrder(withNativeToken, false, false, false);
+
+  const order = await atomicSwap.swapOrder(orderID);
+  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
+  const atomicSwapAddress = await atomicSwap.getAddress();
+  await expect(usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount))
+    .not.to.reverted;
+
+  if (order.sellToken.token == ethers.ZeroAddress) {
+    const tx = atomicSwap.connect(taker).takeSwap({
+      orderID,
+      takerReceiver: takerReceiver.address,
+    });
+
+    const { amountAfterFee, feeAmount } = calcSwapAmount(
+      order.buyToken.amount,
+      buyTokenFeeRate
+    );
+
+    await expect(tx).to.changeEtherBalances(
+      [takerReceiver, treasury],
+      [amountAfterFee, feeAmount]
+    );
+    const amountAfterSwap = calcSwapAmount(
+      order.sellToken.amount,
+      sellTokenFeeRate
+    );
+    await expect(tx).changeTokenBalances(
+      usdt,
+      [maker.address, treasury],
+      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
+    );
+  } else {
+    const tx = atomicSwap.connect(taker).takeSwap({
+      orderID,
+      takerReceiver: takerReceiver.address,
+    });
+
+    const { amountAfterFee, feeAmount } = calcSwapAmount(
+      order.buyToken.amount,
+      buyTokenFeeRate
+    );
+
+    await expect(tx).to.changeTokenBalances(
+      usdc,
+      [takerReceiver.address, treasury],
+      [amountAfterFee, feeAmount]
+    );
+    const amountAfterSwap = calcSwapAmount(
+      order.sellToken.amount,
+      sellTokenFeeRate
+    );
+    await expect(tx).changeTokenBalances(
+      usdt,
+      [maker.address, treasury],
+      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
+    );
+  }
+
+  expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
+  return {
+    orderID,
+    atomicSwap,
+    taker,
+  };
+};
+
 // Utility methods
 export const encodePayload = (types: string[], values: any[]): string => {
   return new ethers.AbiCoder().encode(types, values);

@@ -87,24 +87,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     }
 
     /// @notice Allows a user to complete a swap order.
-    /// @param takeswap Struct containing the ID of the swap order to be taken.
-    function takeSwap(TakeSwapMsg calldata takeswap)
+    /// @param takeswapMsg Struct containing the ID of the swap order to be taken.
+    function takeSwap(TakeSwapMsg calldata takeswapMsg)
         external
         payable
         virtual
         nonReentrant // Prevents reentrancy attacks
-        onlyExist(takeswap.orderID) // Ensures the swap order exists
-    {
-        AtomicSwapOrder storage _order = swapOrder[takeswap.orderID];
-
-        if (_order.taker != address(0) && _order.taker != msg.sender) {
-            revert UnauthorizedTakeAction();
-        }
-
-        // Ensure the swap order has not already been completed
-        if (_order.status == OrderStatus.COMPLETE || _order.status == OrderStatus.CANCEL) {
-            revert InactiveOrder();
-        }
+        onlyExist(takeswapMsg.orderID) // Ensures the swap order exists
+    {   
+        takeswapMsg.validateTakeSwapParams();
+        AtomicSwapOrder storage _order = swapOrder[takeswapMsg.orderID];
+        _order.validateTakeSwap();
+        
         // Update order details
         _order.status = OrderStatus.COMPLETE;
         _order.completedAt = block.timestamp;
@@ -115,7 +109,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             // Exchange the tokens
             // If buying with ERC20 tokens
             _order.sellToken.token.transferWithFee(
-                takeswap.takerReceiver, _order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
+                takeswapMsg.takerReceiver, _order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
             );
         } else {
             // Transfer sell token to vesting contract
@@ -135,14 +129,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 _order.sellToken.token.safeTransfer(address(vestingManager), _sellTokenAmountAfterFee);
                 _order.sellToken.token.safeTransfer(address(treasury),_sellTokenFee);
             }
-            vestingManager.startVesting(_order.id,takeswap.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
+            vestingManager.startVesting(_order.id,takeswapMsg.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
         }
         
         _order.buyToken.token.transferFromWithFee(
                 msg.sender, _order.maker, _order.buyToken.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury
         );
         // Emit an event signaling the swap was completed
-        emit AtomicSwapOrderTook(_order.maker, _order.taker, takeswap.orderID);
+        emit AtomicSwapOrderTook(_order.maker, _order.taker, takeswapMsg.orderID);
     }
 
     /// @notice Allows the maker of a swap order to cancel it.
@@ -155,13 +149,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         nonReentrant // Prevents reentrancy attacks
         onlyExist(cancelswap.orderID) onlyActive(cancelswap.orderID) // Ensures the swap order exists
     {
+       
         AtomicSwapOrder storage _order = swapOrder[cancelswap.orderID];
-
-        // Ensure the caller is the maker of the swap order
-        if (_order.maker != msg.sender) {
-            revert UnauthorizedCancelAction();
-        }
-
+        _order.validateCancelSwap();
         // Update the status of the swap order to 'CANCEL'
         _order.status = OrderStatus.CANCEL;
         // Return the funds/tokens to the maker
@@ -336,7 +326,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     function cancelBid(bytes32 _orderID) external payable nonReentrant onlyExist(_orderID) {
         // Retrieve the selected bid from storage
         Bid storage _selectedBid = bids[_orderID][msg.sender];
-
+        
         // Ensure that msg.sender is same with bidder.
         if (_selectedBid.bidder != msg.sender) {
             revert UnauthorizedCancelAction();
