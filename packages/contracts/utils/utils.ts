@@ -375,6 +375,62 @@ export const bidToDefaultAtomicOrder = async (
   return { ...orderParams, ...bidPayload };
 };
 
+export const bidToDefaultVestingAtomicOrder = async (
+  withSellNativeToken?: boolean,
+  withBuyNativeToken?: boolean,
+  noTaker?: boolean
+) => {
+  const vestingParams = [
+    {
+      durationInHours: BigInt(1),
+      percentage: BigInt(5000),
+    },
+    {
+      durationInHours: BigInt(1),
+      percentage: BigInt(5000),
+    },
+  ];
+  const orderParams = await createDefaultVestingAtomicOrder(
+    vestingParams,
+    withSellNativeToken,
+    withBuyNativeToken,
+    noTaker
+  );
+  const { atomicSwap, maker, taker, orderID, usdc, usdt } = orderParams;
+
+  // try to take swap
+  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
+
+  const bidPayload = {
+    bidder: taker.address,
+    bidderReceiver: taker.address,
+    bidAmount: buyToken.amount,
+    orderID: orderID,
+    expireTimestamp: await BlockTime.AfterSeconds(30),
+  };
+
+  if (withBuyNativeToken) {
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload, {
+        value: buyToken.amount,
+      })
+    ).to.changeEtherBalance(await atomicSwap.getAddress(), buyToken.amount);
+  } else {
+    await usdt
+      .connect(taker)
+      .approve(await atomicSwap.getAddress(), buyToken.amount);
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload)
+    ).to.changeTokenBalance(
+      usdt,
+      await atomicSwap.getAddress(),
+      buyToken.amount
+    );
+  }
+
+  return { ...orderParams, ...bidPayload };
+};
+
 export const testTakeSwap = async (withNativeToken?: boolean) => {
   const [, , takerReceiver] = await ethers.getSigners();
   const {

@@ -65,6 +65,11 @@ const _abi = [
     },
     {
         inputs: [],
+        name: "InvalidBidderAddress",
+        type: "error",
+    },
+    {
+        inputs: [],
         name: "InvalidBuyerFee",
         type: "error",
     },

@@ -3,13 +3,12 @@ pragma solidity ^0.8.19;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import {AtomicSwapBase} from  "../abstracts/AtomicSwapBase.sol";
-import { AtomicSwapMsgValidator } from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
-import { AtomicSwapStateLogic } from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
-import { TokenTransferHelper } from "../abstracts/libs/utils/TokenTransferHelper.sol";
-import {IInchainAtomicSwap } from "./interfaces/IInchainAtomicSwap.sol";
-import { IVesting } from "../vesting/interfaces/IVesting.sol";
-
+import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
+import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
+import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
+import {TokenTransferHelper} from "../abstracts/libs/utils/TokenTransferHelper.sol";
+import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
+import {IVesting} from "../vesting/interfaces/IVesting.sol";
 
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
@@ -39,7 +38,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_buyerFee > MAX_FEE_RATE_SCALE) {
             revert InvalidBuyerFee();
         }
-        if(_treasury == address(0)) {
+        if (_treasury == address(0)) {
             revert InvalidTreasuryAddress();
         }
         sellerFeeRate = _sellerFee;
@@ -51,7 +50,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @notice Creates a new swap order.
     /// @param makeswap Struct containing details of the swap order.
     /// @return Returns the unique identifier of the created swap order.
-    function makeSwap(MakeSwapMsg calldata makeswap) public payable nonReentrant returns (bytes32) {
+    function makeSwap(
+        MakeSwapMsg calldata makeswap
+    ) public payable nonReentrant returns (bytes32) {
         // Ensure the sell token and buy token are not the same non-zero address.
         if (makeswap.sellToken.token == makeswap.buyToken.token) {
             revert UnsupportedTokenPair();
@@ -63,12 +64,16 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
         if (makeswap.sellToken.token == address(0)) {
             // If selling Ether, ensure sufficient Ether was sent with the transaction.
-            if(msg.value < makeswap.sellToken.amount) {
+            if (msg.value < makeswap.sellToken.amount) {
                 revert NotEnoughFund(msg.value, makeswap.sellToken.amount);
             }
         } else {
             // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
-            makeswap.sellToken.token.safeTransferFrom(msg.sender, address(this), makeswap.sellToken.amount);
+            makeswap.sellToken.token.safeTransferFrom(
+                msg.sender,
+                address(this),
+                makeswap.sellToken.amount
+            );
         }
         // Emit an event signaling the creation of a new swap order.
         emit AtomicSwapOrderCreated(id);
@@ -78,7 +83,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @notice Creates a new swap order with vesting parameters.
     /// @param makeswap Struct containing details of the swap order.
     /// @param releases Array of vesting release parameters.
-    function makeSwapWithVesting(MakeSwapMsg calldata makeswap, Release[] calldata releases) external payable {
+    function makeSwapWithVesting(
+        MakeSwapMsg calldata makeswap,
+        Release[] calldata releases
+    ) external payable {
         releases.validateVestingParams();
         bytes32 orderId = makeSwap(makeswap);
         for (uint256 i = 0; i < releases.length; i++) {
@@ -88,7 +96,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     /// @notice Allows a user to complete a swap order.
     /// @param takeswapMsg Struct containing the ID of the swap order to be taken.
-    function takeSwap(TakeSwapMsg calldata takeswapMsg)
+    function takeSwap(
+        TakeSwapMsg calldata takeswapMsg
+    )
         external
         payable
         virtual
@@ -99,54 +109,41 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         takeswapMsg.validateTakeSwapParams();
         AtomicSwapOrder storage _order = swapOrder[takeswapMsg.orderID];
         _order.validateTakeSwap();
-        
+
         // Update order details
         _order.status = OrderStatus.COMPLETE;
         _order.completedAt = block.timestamp;
         _order.taker = msg.sender;
-        // Check vesting parameter is exist or not.
-        Release[] memory _releases = swapOrderVestingParams[_order.id];
-        if (_releases.length == 0) {
-            // Exchange the tokens
-            // If buying with ERC20 tokens
-            _order.sellToken.token.transferWithFee(
-                takeswapMsg.takerReceiver, _order.sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury
-            );
-        } else {
-            // Transfer sell token to vesting contract
-            uint256 _sellTokenFee = (_order.sellToken.amount * buyerFeeRate) / MAX_FEE_RATE_SCALE;
-            uint256 _sellTokenAmountAfterFee = _order.sellToken.amount - _sellTokenFee;
-            if (_order.sellToken.token == address(0)) {
-                // Take Fee. 
-                (bool successToTreasury,) = payable(address(treasury)).call{value: _sellTokenFee}("");
-                if(!successToTreasury) {
-                    revert TransferFailed(address(treasury), _sellTokenFee);
-                }
-                vestingManager.startVesting{value: _sellTokenAmountAfterFee}(_order.id,takeswapMsg.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
-            } else {
-                 // Take Fee. 
-                _order.sellToken.token.safeTransfer(address(treasury),_sellTokenFee);
-                IERC20( _order.sellToken.token).approve(address(vestingManager), _sellTokenAmountAfterFee);
-                vestingManager.startVesting(_order.id,takeswapMsg.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
-            }
-        }
-        
+
+        _transferSellTokenToBuyer(_order, takeswapMsg.takerReceiver);
         _order.buyToken.token.transferFromWithFee(
-                msg.sender, _order.maker, _order.buyToken.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury
+            msg.sender,
+            _order.maker,
+            _order.buyToken.amount,
+            sellerFeeRate,
+            MAX_FEE_RATE_SCALE,
+            treasury
         );
         // Emit an event signaling the swap was completed
-        emit AtomicSwapOrderTook(_order.maker, _order.taker, takeswapMsg.orderID);
+        emit AtomicSwapOrderTook(
+            _order.maker,
+            _order.taker,
+            takeswapMsg.orderID
+        );
     }
 
     /// @notice Allows the maker of a swap order to cancel it.
     /// @param cancelswap Struct containing the ID of the swap order to be canceled.
 
-    function cancelSwap(CancelSwapMsg calldata cancelswap)
+    function cancelSwap(
+        CancelSwapMsg calldata cancelswap
+    )
         external
         payable
         virtual
         nonReentrant // Prevents reentrancy attacks
-        onlyExist(cancelswap.orderID) onlyActive(cancelswap.orderID) // Ensures the swap order exists
+        onlyExist(cancelswap.orderID)
+        onlyActive(cancelswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage _order = swapOrder[cancelswap.orderID];
         _order.validateCancelSwap();
@@ -155,13 +152,20 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Return the funds/tokens to the maker
         if (_order.sellToken.token == address(0)) {
             // Refund Ether if the sell token was Ether
-            (bool success,) = payable(msg.sender).call{value: _order.sellToken.amount}("");
-            if(!success) {
+            (bool success, ) = payable(msg.sender).call{
+                value: _order.sellToken.amount
+            }("");
+            if (!success) {
                 revert TransferFailed(msg.sender, _order.sellToken.amount);
             }
         } else {
             // Refund ERC20 tokens if the sell token was an ERC20 token
-            if(!IERC20(_order.sellToken.token).transfer(msg.sender, _order.sellToken.amount)) {
+            if (
+                !IERC20(_order.sellToken.token).transfer(
+                    msg.sender,
+                    _order.sellToken.amount
+                )
+            ) {
                 revert TransferFailed(msg.sender, _order.sellToken.amount);
             }
         }
@@ -173,7 +177,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     /// @notice Allows a user to place a bid on a swap order.
     /// @param placeBidMsg Struct containing details of the bid.
-    function placeBid(PlaceBidMsg calldata placeBidMsg)
+    function placeBid(
+        PlaceBidMsg calldata placeBidMsg
+    )
         external
         payable
         nonReentrant
@@ -196,7 +202,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
 
         // Ensure bide amount meet bid requirements.
-        if (_bidAmount < _order.minBidAmount || _bidAmount > _order.buyToken.amount) {
+        if (
+            _bidAmount < _order.minBidAmount ||
+            _bidAmount > _order.buyToken.amount
+        ) {
             revert MismatchedBidAmount(_bidAmount);
         }
 
@@ -206,7 +215,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
             // Transfer the additional bid amount from the bidder to this contract
-            _buyToken.token.safeTransferFrom(msg.sender, address(this), _bidAmount);
+            _buyToken.token.safeTransferFrom(
+                msg.sender,
+                address(this),
+                _bidAmount
+            );
         } else {
             // Ensure the bidder has sent sufficient Ether for the bid
             if (msg.value != _bidAmount) {
@@ -221,11 +234,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     /// @notice Updates an existing bid on a swap order.
     /// @param updateBidMsg Struct containing the update details.
-    function updateBid(UpdateBidMsg calldata updateBidMsg)
+    function updateBid(
+        UpdateBidMsg calldata updateBidMsg
+    )
         external
         payable
         nonReentrant // Ensures the function cannot be re-entered during execution
-        onlyExist(updateBidMsg.orderID) onlyActive(updateBidMsg.orderID) // Ensures the order exists
+        onlyExist(updateBidMsg.orderID)
+        onlyActive(updateBidMsg.orderID) // Ensures the order exists
     {
         // Extracting details from the updateBidMsg for easy reference
         bytes32 _orderID = updateBidMsg.orderID;
@@ -242,7 +258,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Retrieve the associated AtomicSwapOrder
         AtomicSwapOrder storage _order = swapOrder[_orderID];
 
-        if(_currentBid.status != BidStatus.Placed) {
+        if (_currentBid.status != BidStatus.Placed) {
             revert NoBidPlaced();
         }
 
@@ -264,7 +280,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_buyToken.token != address(0)) {
             // Bidding with ERC20 token
             // Safely transfer the additional bid amount from the bidder to this contract
-            _buyToken.token.safeTransferFrom(msg.sender, address(this), _addition);
+            _buyToken.token.safeTransferFrom(
+                msg.sender,
+                address(this),
+                _addition
+            );
         } else {
             // Ensure the sent Ether matches the additional bid amount
             if (msg.value != _addition) {
@@ -276,11 +296,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     /// @notice Allows the maker to accept a bid on their swap order.
     /// @param acceptBidMsg Struct containing details of the bid to accept.
-    function acceptBid(AcceptBidMsg calldata acceptBidMsg)
+    function acceptBid(
+        AcceptBidMsg calldata acceptBidMsg
+    )
         external
         payable
         nonReentrant
-        onlyExist(acceptBidMsg.orderID) onlyActive(acceptBidMsg.orderID)
+        onlyExist(acceptBidMsg.orderID)
+        onlyActive(acceptBidMsg.orderID)
     {
         // Ensure no unnecessary Ether is sent with the transaction
         bytes32 _orderID = acceptBidMsg.orderID;
@@ -289,7 +312,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert UnauthorizedSender();
         }
         AtomicSwapOrder storage _order = swapOrder[_orderID];
-
         if (!_order.acceptBid) {
             revert BidNotAllowed();
         }
@@ -307,7 +329,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // Ensure the bid is expired or not
         if (_selectedBid.expireTimestamp < block.timestamp) {
-            revert BidAlreadyExpired(_selectedBid.expireTimestamp, block.timestamp);
+            revert BidAlreadyExpired(
+                _selectedBid.expireTimestamp,
+                block.timestamp
+            );
         }
 
         // update the order status to 'COMPLETE'
@@ -320,22 +345,28 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // TODO: Check and process vesting releases
         // Process sell token transfers
-        Coin storage _sellToken = _order.sellToken;
-        _sellToken.token.transferWithFee(_selectedBid.bidder, _sellToken.amount, buyerFeeRate, MAX_FEE_RATE_SCALE, treasury);
-
+        _transferSellTokenToBuyer(_order, _selectedBid.bidder);
         // Process buy token transfers
         Coin storage _buyToken = _order.buyToken;
-        _buyToken.token.transferWithFee(_order.maker, _selectedBid.amount, sellerFeeRate, MAX_FEE_RATE_SCALE, treasury);
+        _buyToken.token.transferWithFee(
+            _order.maker,
+            _selectedBid.amount,
+            sellerFeeRate,
+            MAX_FEE_RATE_SCALE,
+            treasury
+        );
 
         emit AcceptedBid(_orderID, _bidder, _selectedBid.amount);
     }
 
     /// @notice Allows a bidder to cancel their bid on a swap order.
     /// @param _orderID The unique identifier of the swap order.
-    function cancelBid(bytes32 _orderID) external payable nonReentrant onlyExist(_orderID) {
+    function cancelBid(
+        bytes32 _orderID
+    ) external payable nonReentrant onlyExist(_orderID) {
         // Retrieve the selected bid from storage
         Bid storage _selectedBid = bids[_orderID][msg.sender];
-        
+
         // Ensure that msg.sender is same with bidder.
         if (_selectedBid.bidder != msg.sender) {
             revert UnauthorizedCancelAction();
@@ -353,15 +384,81 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // If buy token is an ERC20 token, transfer it back to the bidder
         if (_buyToken.token != address(0)) {
-            _buyToken.token.safeTransfer(_selectedBid.bidder, _selectedBid.amount);
+            _buyToken.token.safeTransfer(
+                _selectedBid.bidder,
+                _selectedBid.amount
+            );
         } else {
             // If buy token is Ether, transfer it back to the bidder
-            (bool success,) = payable(msg.sender).call{value: _selectedBid.amount}("");
-            if(!success) {
-                revert TransferFailed(msg.sender,_selectedBid.amount);
+            (bool success, ) = payable(msg.sender).call{
+                value: _selectedBid.amount
+            }("");
+            if (!success) {
+                revert TransferFailed(msg.sender, _selectedBid.amount);
             }
         }
 
         emit CanceledBid(_orderID, _selectedBid.bidder);
+    }
+
+    /// @notice Transfers the sell token to the buyer with optional vesting
+    /// @dev This function handles both immediate transfers and vesting-based transfers of the sell token.
+    /// @param _order The atomic swap order containing details of the transaction
+    /// @param buyer The address of the buyer receiving the sell token
+    function _transferSellTokenToBuyer(
+        AtomicSwapOrder storage _order,
+        address buyer
+    ) internal {
+        Release[] memory _releases = swapOrderVestingParams[_order.id];
+        if (_releases.length == 0) {
+            // Exchange the tokens
+            // If buying with ERC20 tokens
+            _order.sellToken.token.transferWithFee(
+                buyer,
+                _order.sellToken.amount,
+                buyerFeeRate,
+                MAX_FEE_RATE_SCALE,
+                treasury
+            );
+        } else {
+            // Transfer sell token to vesting contract
+            uint256 _sellTokenFee = (_order.sellToken.amount * buyerFeeRate) /
+                MAX_FEE_RATE_SCALE;
+            uint256 _sellTokenAmountAfterFee = _order.sellToken.amount -
+                _sellTokenFee;
+            if (_order.sellToken.token == address(0)) {
+                // Take Fee.
+                (bool successToTreasury, ) = payable(address(treasury)).call{
+                    value: _sellTokenFee
+                }("");
+                if (!successToTreasury) {
+                    revert TransferFailed(address(treasury), _sellTokenFee);
+                }
+                vestingManager.startVesting{value: _sellTokenAmountAfterFee}(
+                    _order.id,
+                    buyer,
+                    _order.sellToken.token,
+                    _sellTokenAmountAfterFee,
+                    _releases
+                );
+            } else {
+                // Take Fee.
+                _order.sellToken.token.safeTransfer(
+                    address(treasury),
+                    _sellTokenFee
+                );
+                IERC20(_order.sellToken.token).approve(
+                    address(vestingManager),
+                    _sellTokenAmountAfterFee
+                );
+                vestingManager.startVesting(
+                    _order.id,
+                    buyer,
+                    _order.sellToken.token,
+                    _sellTokenAmountAfterFee,
+                    _releases
+                );
+            }
+        }
     }
 }

@@ -47,6 +47,10 @@ export declare class IAtomicSwapBase__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "InvalidBidderAddress";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InvalidBuyerFee";
         readonly type: "error";
     }, {
