@@ -186,6 +186,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         uint256 _bidAmount = placeBidMsg.bidAmount;
 
         // Ensure the caller is the bidder
+        if (placeBidMsg.bidder != msg.sender) {
+            revert InvalidBidderAddress();
+        }
+
         Bid storage _currentBid = bids[_orderID][msg.sender];
         if (_currentBid.bidder != address(0)) {
             revert BidAlreadyPlaced();
@@ -245,7 +249,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Ensure the additional bid amount is non-zero
-        if (_addition <= 0) {
+        if (_addition == 0) {
             revert MismatchedBidAmount(_addition);
         }
 

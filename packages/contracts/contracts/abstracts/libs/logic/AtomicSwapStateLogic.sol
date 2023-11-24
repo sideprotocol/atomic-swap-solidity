@@ -63,11 +63,11 @@ library AtomicSwapStateLogic {
             amount: bidMsg.bidAmount,
             order: bidMsg.orderID,
             status: IAtomicSwapBase.BidStatus.Placed,
-            bidder: msg.sender,
+            bidder: bidMsg.bidder,
             receiveTimestamp: block.timestamp,
             expireTimestamp: bidMsg.expireTimestamp
         });
-        bids[bidMsg.orderID][msg.sender] = newBid;
+        bids[bidMsg.orderID][bidMsg.bidder] = newBid;
     }
 
     /// @notice Generates a new unique identifier for an atomic swap.

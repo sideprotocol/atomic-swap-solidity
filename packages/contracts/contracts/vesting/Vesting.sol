@@ -92,9 +92,6 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
             revert NoVestedTokensForRelease();
         }
         schedule.amountReleased += amountForRelease;
-        if (schedule.amountReleased > schedule.totalAmount) {
-            revert NoVestedTokensForRelease();
-        }
 
         if (schedule.token != address(0)) {
             schedule.token.safeTransfer(beneficiary, amountForRelease);
