@@ -23,7 +23,7 @@
     "lint-fix": "eslint --fix .",
     "typechain:build": "cd packages/contracts-typechain && yarn build",
     "hh:node": "cd packages/blockchain && npx hardhat node",
-    "hh:build": "cd packages/contracts && npx hardhat compile --force && cd .. && yarn typechain:build",
+    "hh:build": "cd packages/contracts && npx hardhat clean && npx hardhat compile --force && cd .. && yarn typechain:build",
     "hh:test": "yarn hh:build && cd packages/contracts && npx hardhat test",
     "hh:coverage": "cd packages/contracts && npx hardhat coverage",
     "hh:deploy:local": "cd packages/contracts && npx hardhat run --network localhost scripts/deploy.ts && cd .. && yarn typechain:build",
