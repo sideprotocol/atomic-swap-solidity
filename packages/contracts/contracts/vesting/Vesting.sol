@@ -25,7 +25,6 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     function initialize(address _admin) external initializer {
         __Ownable_init_unchained(_admin);
     }
-
     // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
     /// @notice Starts the vesting schedule for a beneficiary.
     /// @param beneficiary The address of the beneficiary.
