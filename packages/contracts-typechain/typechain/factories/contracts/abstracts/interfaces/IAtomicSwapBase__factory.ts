@@ -105,6 +105,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "InvalidReleasePercentage",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InvalidSellerFee",
     type: "error",
   },

@@ -41,7 +41,7 @@ interface IVesting {
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
-    ) external;
+    ) external payable;
 
     event NewVesting(VestingInfo indexed vesting);
     /// @notice Event emitted when tokens are released to a beneficiary.

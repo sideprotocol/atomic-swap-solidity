@@ -157,7 +157,7 @@ export declare class IVesting__factory {
         }];
         readonly name: "startVesting";
         readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
+        readonly stateMutability: "payable";
         readonly type: "function";
     }];
     static createInterface(): IVestingInterface;

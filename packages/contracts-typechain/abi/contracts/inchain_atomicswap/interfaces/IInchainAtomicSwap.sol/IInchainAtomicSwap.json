@@ -99,6 +99,11 @@
     },
     {
       "inputs": [],
+      "name": "InvalidReleasePercentage",
+      "type": "error"
+    },
+    {
+      "inputs": [],
       "name": "InvalidSellerFee",
       "type": "error"
     },
@@ -701,11 +706,6 @@
               "type": "uint256"
             },
             {
-              "internalType": "address",
-              "name": "bidder",
-              "type": "address"
-            },
-            {
               "internalType": "bytes32",
               "name": "orderID",
               "type": "bytes32"
@@ -759,11 +759,6 @@
               "internalType": "bytes32",
               "name": "orderID",
               "type": "bytes32"
-            },
-            {
-              "internalType": "address",
-              "name": "bidder",
-              "type": "address"
             },
             {
               "internalType": "uint256",

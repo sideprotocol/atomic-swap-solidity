@@ -79,6 +79,10 @@ export declare class AtomicSwapBase__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "InvalidReleasePercentage";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InvalidSellerFee";
         readonly type: "error";
     }, {

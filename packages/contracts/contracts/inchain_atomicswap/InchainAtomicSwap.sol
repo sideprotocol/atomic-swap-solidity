@@ -117,20 +117,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             uint256 _sellTokenFee = (_order.sellToken.amount * buyerFeeRate) / MAX_FEE_RATE_SCALE;
             uint256 _sellTokenAmountAfterFee = _order.sellToken.amount - _sellTokenFee;
             if (_order.sellToken.token == address(0)) {
-                (bool successToRecipient,) = payable(address(vestingManager)).call{value: _sellTokenAmountAfterFee}("");
-                if(!successToRecipient) {
-                    revert TransferFailed(address(vestingManager), _order.sellToken.amount);
-                }
                 // Take Fee. 
                 (bool successToTreasury,) = payable(address(treasury)).call{value: _sellTokenFee}("");
                 if(!successToTreasury) {
                     revert TransferFailed(address(treasury), _sellTokenFee);
                 }
+                vestingManager.startVesting{value: _sellTokenAmountAfterFee}(_order.id,takeswapMsg.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
             } else {
-                _order.sellToken.token.safeTransfer(address(vestingManager), _sellTokenAmountAfterFee);
+                 // Take Fee. 
                 _order.sellToken.token.safeTransfer(address(treasury),_sellTokenFee);
+                IERC20( _order.sellToken.token).approve(address(vestingManager), _sellTokenAmountAfterFee);
+                vestingManager.startVesting(_order.id,takeswapMsg.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
             }
-            vestingManager.startVesting(_order.id,takeswapMsg.takerReceiver, _order.sellToken.token, _sellTokenAmountAfterFee, _releases);
         }
         
         _order.buyToken.token.transferFromWithFee(

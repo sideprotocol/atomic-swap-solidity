@@ -179,7 +179,7 @@ export interface Vesting extends BaseContract {
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
         void
-    ], "nonpayable">;
+    ], "payable">;
     transferOwnership: TypedContractMethod<[
         newOwner: AddressLike
     ], [
@@ -233,7 +233,7 @@ export interface Vesting extends BaseContract {
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
         void
-    ], "nonpayable">;
+    ], "payable">;
     getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "vestingSchedules"): TypedContractMethod<[
         arg0: AddressLike,

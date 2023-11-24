@@ -209,7 +209,7 @@ const _abi = [
     ],
     name: "startVesting",
     outputs: [],
-    stateMutability: "nonpayable",
+    stateMutability: "payable",
     type: "function",
   },
 ] as const;

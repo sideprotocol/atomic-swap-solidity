@@ -195,7 +195,7 @@ export interface IVesting extends BaseContract {
       releases: IAtomicSwapBase.ReleaseStruct[]
     ],
     [void],
-    "nonpayable"
+    "payable"
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
@@ -213,7 +213,7 @@ export interface IVesting extends BaseContract {
       releases: IAtomicSwapBase.ReleaseStruct[]
     ],
     [void],
-    "nonpayable"
+    "payable"
   >;
 
   getEvent(
