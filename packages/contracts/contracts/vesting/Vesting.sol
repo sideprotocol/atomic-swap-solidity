@@ -24,6 +24,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         __Ownable_init_unchained(_admin);
     }
 
+    // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
     /// @notice Starts the vesting schedule for a beneficiary.
     /// @param beneficiary The address of the beneficiary.
     /// @param token The token address for vesting.
@@ -91,6 +92,10 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
             revert NoVestedTokensForRelease();
         }
         schedule.amountReleased += amountForRelease;
+        if (schedule.amountReleased > schedule.totalAmount) {
+            revert NoVestedTokensForRelease();
+        }
+
         if (schedule.token != address(0)) {
             schedule.token.safeTransfer(beneficiary, amountForRelease);
         } else {

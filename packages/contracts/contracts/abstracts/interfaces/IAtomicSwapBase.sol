@@ -90,7 +90,6 @@ interface IAtomicSwapBase {
     /// @notice Details for placing a bid on an atomic swap order.
     struct PlaceBidMsg {
         uint256 bidAmount; // Bid amount.
-        address bidder; // Bidder's address.
         bytes32 orderID; // Order ID.
         uint256 expireTimestamp; // Expiration timestamp.
     }
@@ -98,7 +97,6 @@ interface IAtomicSwapBase {
     /// @notice Details for updating an existing bid.
     struct UpdateBidMsg {
         bytes32 orderID; // Order ID.
-        address bidder; // Bidder's address.
         uint256 addition; // Additional amount.
     }
 
@@ -143,6 +141,7 @@ interface IAtomicSwapBase {
     error NotAllowedTransferAmount(uint256 amount, uint256 allowance);
     error NotEnoughFund(uint256 real, uint256 expected);
     error ZeroReleaseSchedule();
+    error InvalidReleasePercentage();
     error InvalidTotalPercentage();
     error OverMaximumReleaseStep();
     error InvalidAddress();
