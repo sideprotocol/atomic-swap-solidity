@@ -255,6 +255,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         bytes32 _orderID = updateBidMsg.orderID;
         uint256 _addition = updateBidMsg.addition;
 
+        // TODO: Add a check for, If bid is completed, it can't be changed
+
         // Retrieving the current bid for this order and sender
         Bid storage _currentBid = bids[_orderID][msg.sender];
 
