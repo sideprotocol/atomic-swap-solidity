@@ -12,6 +12,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { keccak256 } from "ethers";
 import { BlockTime } from "./time";
+import { boolean } from "hardhat/internal/core/params/argumentTypes";
 export const ERC20_MINT_AMOUNT = 100000000;
 // stable coins
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
@@ -431,7 +432,10 @@ export const bidToDefaultVestingAtomicOrder = async (
   return { ...orderParams, ...bidPayload };
 };
 
-export const testTakeSwap = async (withNativeToken?: boolean) => {
+export const testTakeSwap = async (
+  isNativeSellToken?: boolean,
+  isNativeBuyToken?: boolean
+) => {
   const [, , takerReceiver] = await ethers.getSigners();
   const {
     orderID,
@@ -443,7 +447,12 @@ export const testTakeSwap = async (withNativeToken?: boolean) => {
     treasury,
     sellTokenFeeRate,
     buyTokenFeeRate,
-  } = await createDefaultAtomicOrder(withNativeToken, false, false, false);
+  } = await createDefaultAtomicOrder(
+    isNativeSellToken,
+    isNativeBuyToken,
+    false,
+    false
+  );
 
   const order = await atomicSwap.swapOrder(orderID);
   const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
@@ -476,10 +485,13 @@ export const testTakeSwap = async (withNativeToken?: boolean) => {
       [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
     );
   } else {
-    const tx = atomicSwap.connect(taker).takeSwap({
-      orderID,
-      takerReceiver: takerReceiver.address,
-    });
+    const tx = atomicSwap.connect(taker).takeSwap(
+      {
+        orderID,
+        takerReceiver: takerReceiver.address,
+      },
+      { value: order.buyToken.amount }
+    );
 
     const { amountAfterFee, feeAmount } = calcSwapAmount(
       order.buyToken.amount,
@@ -495,8 +507,7 @@ export const testTakeSwap = async (withNativeToken?: boolean) => {
       order.sellToken.amount,
       sellTokenFeeRate
     );
-    await expect(tx).changeTokenBalances(
-      usdt,
+    await expect(tx).changeEtherBalances(
       [maker.address, treasury],
       [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
     );

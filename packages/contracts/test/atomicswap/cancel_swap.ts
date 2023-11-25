@@ -57,7 +57,7 @@ describe("AtomicSwap: CancelSwap", () => {
   });
 
   it("should revert to cancel swap when order is not initial status", async () => {
-    const { atomicSwap, orderID, taker } = await testTakeSwap();
+    const { atomicSwap, orderID, taker } = await testTakeSwap(true);
     const cancelSwapMsg = {
       orderID: orderID,
     };

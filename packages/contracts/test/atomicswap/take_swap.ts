@@ -1,12 +1,16 @@
 import { ethers } from "hardhat";
-import { calcSwapAmount, createDefaultAtomicOrder, testTakeSwap } from "../../utils/utils";
+import {
+  calcSwapAmount,
+  createDefaultAtomicOrder,
+  testTakeSwap,
+} from "../../utils/utils";
 import { expect } from "chai";
 import { ZeroAddress } from "ethers";
 describe("TakeSwap", () => {
   beforeEach(async () => {});
-
   it("should take order with native token", async () => testTakeSwap(true));
-  it("should take order with erc20 token", async () => testTakeSwap());
+  it("should take order with erc20 token", async () =>
+    testTakeSwap(false, true));
 
   it("should revert when trying to take a non-existent swap", async () => {
     const { atomicSwap, taker } = await createDefaultAtomicOrder(true);
