@@ -20,5 +20,11 @@ export declare const Settings: {
     vesting_sepolia: string;
     atomicSwapStateLogic_sepolia: string;
     tokenTransferHelper_sepolia: string;
+    atomicSwapStateLogic_bnb: string;
+    tokenTransferHelper_bnb: string;
+    vesting_bnb: string;
+    inChainAtomicSwap_bnb: string;
+    mockUSDC_bnb: string;
+    mockUSDT_bnb: string;
 };
 export declare const CONSTANTS: typeof constants;
