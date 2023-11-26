@@ -143,6 +143,7 @@ interface IAtomicSwapBase {
     error NoBidPlaced();
     error NotAllowedTransferAmount(uint256 amount, uint256 allowance);
     error NotEnoughFund(uint256 real, uint256 expected);
+    error DuplicateReleaseSchedule();
     error ZeroReleaseSchedule();
     error InvalidReleasePercentage();
     error InvalidTotalPercentage();
