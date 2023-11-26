@@ -200,8 +200,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
         // Update last bidder expire time in order
         AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
+        if (_order.expiredAt < block.timestamp) {
+            revert InvalidExpirationTime(_order.expiredAt, block.timestamp);
+        }
 
-        // Ensure bide amount meet bid requirements.
+        // Ensure bid amount meet bid requirements.
         if (
             _bidAmount < _order.minBidAmount ||
             _bidAmount > _order.buyToken.amount
@@ -246,10 +249,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Extracting details from the updateBidMsg for easy reference
         bytes32 _orderID = updateBidMsg.orderID;
         uint256 _addition = updateBidMsg.addition;
-
         // Retrieving the current bid for this order and sender
         Bid storage _currentBid = bids[_orderID][msg.sender];
-
+        if(_currentBid.expireTimestamp < block.timestamp) {
+            revert BidAlreadyExpired(_currentBid.expireTimestamp,block.timestamp);
+        }
         // Ensure the function caller has previously placed a bid
         if (_currentBid.bidder == address(0)) {
             revert NoBidPlaced();
