@@ -5,12 +5,14 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
+import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {TokenTransferHelper} from "../abstracts/libs/utils/TokenTransferHelper.sol";
 
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
+    using AtomicSwapMsgValidator for *;
     using TokenTransferHelper for *;
     /// @notice Stores vesting schedules for each beneficiary.
     mapping(address => mapping(bytes32 => VestingSchedule))
@@ -39,6 +41,12 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external payable {
+        // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
+        if (vestingSchedules[beneficiary][orderId].from != address(0)) {
+            revert IAtomicSwapBase.DuplicateReleaseSchedule();
+        }
+        releases.validateVestingParams();
+
         if (token == address(0)) {
             if (msg.value != totalAmount) {
                 revert IAtomicSwapBase.NotEnoughFund(totalAmount, msg.value);
