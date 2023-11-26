@@ -60,6 +60,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Validate makeswap message
         makeswap.validateMakeSwapParams();
         // Generate a unique ID and add the new swap order to the contract's state.
+    
+        // UUID should be unique, In current logic anyone can spam orders with uuid and code
+        // will fail when we send some uuid from frontend
+        // Solution: Store uuid in contract and increment it with each order
         bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
         if (makeswap.sellToken.token == address(0)) {
@@ -109,6 +113,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         takeswapMsg.validateTakeSwapParams();
         AtomicSwapOrder storage _order = swapOrder[takeswapMsg.orderID];
         _order.validateTakeSwap();
+
+        // TODO: Add check for order expiration in validate function
 
         // Update order details
         _order.status = OrderStatus.COMPLETE;
@@ -188,6 +194,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     {
         bytes32 _orderID = placeBidMsg.orderID;
         uint256 _bidAmount = placeBidMsg.bidAmount;
+
+        // TODO: Add check for expiration of order
 
         // Ensure the caller is the bidder
         if (placeBidMsg.bidder != msg.sender) {
