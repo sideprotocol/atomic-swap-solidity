@@ -138,6 +138,18 @@ export declare class IAtomicSwapBase__factory {
         readonly name: "OrderAlreadyExists";
         readonly type: "error";
     }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "current";
+            readonly type: "uint256";
+        }, {
+            readonly internalType: "uint256";
+            readonly name: "expiredTime";
+            readonly type: "uint256";
+        }];
+        readonly name: "OrderAlreadyExpired";
+        readonly type: "error";
+    }, {
         readonly inputs: readonly [];
         readonly name: "OrderCanceled";
         readonly type: "error";

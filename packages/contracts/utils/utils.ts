@@ -8,7 +8,7 @@ import {
   IVesting,
   MockToken,
 } from "@sideprotocol/contracts-typechain";
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { keccak256 } from "ethers";
 import { BlockTime } from "./time";
@@ -131,6 +131,7 @@ export const createDefaultAtomicOrder = async (
 ) => {
   const {
     atomicSwap,
+    vestingManager,
     usdc,
     usdt,
     sellTokenFeeRate,
@@ -215,7 +216,7 @@ export const createDefaultAtomicOrder = async (
     taker,
 
     atomicSwap,
-
+    vestingManager,
     payload: payload,
     usdt,
     usdc,
@@ -520,7 +521,104 @@ export const testTakeSwap = async (
   return {
     orderID,
     atomicSwap,
+
     taker,
+  };
+};
+
+export const testVestingTakeSwap = async (
+  withSellNativeToken: boolean,
+  withBuyNativeToken: boolean
+) => {
+  const [, , takerReceiver] = await ethers.getSigners();
+  const vestingParams = [
+    {
+      durationInHours: BigInt(1),
+      percentage: BigInt(5000),
+    },
+    {
+      durationInHours: BigInt(1),
+      percentage: BigInt(5000),
+    },
+  ];
+  const {
+    orderID,
+    atomicSwap,
+    taker,
+    usdc,
+    usdt,
+    treasury,
+    sellTokenFeeRate,
+    buyTokenFeeRate,
+    vestingManager,
+  } = await createDefaultVestingAtomicOrder(
+    vestingParams,
+    withSellNativeToken,
+    withBuyNativeToken,
+    false,
+    false
+  );
+
+  const order = await atomicSwap.swapOrder(orderID);
+  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
+  const atomicSwapAddress = await atomicSwap.getAddress();
+  await expect(usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount))
+    .not.to.reverted;
+
+  // Run takeSwap message
+  if (order.buyToken.token == ethers.ZeroAddress) {
+    const tx = atomicSwap.connect(taker).takeSwap(
+      {
+        orderID,
+        takerReceiver: takerReceiver.address,
+      },
+      { value: order.buyToken.amount }
+    );
+    expect(await tx).not.to.reverted;
+  } else {
+    const tx = atomicSwap.connect(taker).takeSwap({
+      orderID,
+      takerReceiver: takerReceiver.address,
+    });
+    await expect(tx).not.to.reverted;
+  }
+
+  // Release from vesting contract
+  // After cliff time, it's possible to get started releasing
+  await time.increase(3600 * 1);
+  const totalReleaseAmount = calcSwapAmount(
+    order.sellToken.amount,
+    buyTokenFeeRate
+  );
+
+  const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
+  if (order.sellToken.token == ethers.ZeroAddress) {
+    expect(
+      await vestingManager.release(takerReceiver, orderID)
+    ).to.changeEtherBalance(takerReceiver, releaseAmount);
+  } else {
+    expect(
+      await vestingManager.release(takerReceiver, orderID)
+    ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
+  }
+  // after 1 hours, release again
+  await time.increase(3600);
+  if (order.sellToken.token == ethers.ZeroAddress) {
+    expect(
+      await vestingManager.release(takerReceiver, orderID)
+    ).to.changeEtherBalance(takerReceiver, releaseAmount);
+  } else {
+    expect(
+      await vestingManager.release(takerReceiver, orderID)
+    ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
+  }
+  expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
+  return {
+    orderID,
+    atomicSwap,
+    taker,
+    takerReceiver,
+    vestingManager,
   };
 };
 

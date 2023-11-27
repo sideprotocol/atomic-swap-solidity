@@ -62,7 +62,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     
         // UUID should be unique, In current logic anyone can spam orders with uuid and code
         // will fail when we send some uuid from frontend
-        // Solution: Store uuid in contract and increment it with each order
         bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
         swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
         if (makeswap.sellToken.token == address(0)) {
@@ -114,14 +113,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         AtomicSwapOrder storage _order = swapOrder[takeswapMsg.orderID];
         _order.validateTakeSwap();
 
-        // TODO: Add check for order expiration in validate function
-
         // Update order details
         _order.status = OrderStatus.COMPLETE;
         _order.completedAt = block.timestamp;
         _order.taker = msg.sender;
-
-        // slither-disable-next-line arbitrary-send
+        
         _transferSellTokenToBuyer(_order, takeswapMsg.takerReceiver);
         _order.buyToken.token.transferFromWithFee(
             _order.maker,

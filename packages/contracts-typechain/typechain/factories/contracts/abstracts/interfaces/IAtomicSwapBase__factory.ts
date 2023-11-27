@@ -187,6 +187,22 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "current",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "expiredTime",
+        type: "uint256",
+      },
+    ],
+    name: "OrderAlreadyExpired",
+    type: "error",
+  },
+  {
     inputs: [],
     name: "OrderCanceled",
     type: "error",

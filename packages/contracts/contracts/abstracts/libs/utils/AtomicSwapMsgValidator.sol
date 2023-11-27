@@ -46,7 +46,7 @@ library AtomicSwapMsgValidator {
         }
 
         if(_order.expiredAt < block.timestamp) {
-            revert IAtomicSwapBase.InvalidExpirationTime(_order.expiredAt, block.timestamp);
+            revert IAtomicSwapBase.OrderAlreadyExpired(block.timestamp,_order.expiredAt);
         }
     }
 

@@ -32,6 +32,8 @@ export type { IAtomicSwapBase } from "./contracts/abstracts/interfaces/IAtomicSw
 export { IAtomicSwapBase__factory } from "./factories/contracts/abstracts/interfaces/IAtomicSwapBase__factory";
 export type { AtomicSwapStateLogic } from "./contracts/abstracts/libs/logic/AtomicSwapStateLogic";
 export { AtomicSwapStateLogic__factory } from "./factories/contracts/abstracts/libs/logic/AtomicSwapStateLogic__factory";
+export type { AnteHandler } from "./contracts/abstracts/libs/utils/AnteHandler";
+export { AnteHandler__factory } from "./factories/contracts/abstracts/libs/utils/AnteHandler__factory";
 export type { AtomicSwapMsgValidator } from "./contracts/abstracts/libs/utils/AtomicSwapMsgValidator";
 export { AtomicSwapMsgValidator__factory } from "./factories/contracts/abstracts/libs/utils/AtomicSwapMsgValidator__factory";
 export type { InchainAtomicSwap } from "./contracts/inchain_atomicswap/InchainAtomicSwap";

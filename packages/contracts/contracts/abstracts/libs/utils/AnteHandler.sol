@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
+import { IAtomicSwapBase } from "../../interfaces/IAtomicSwapBase.sol";
 /// @title Token Transfer Helper
 /// @notice Library providing functions to safely transfer tokens with support for fee deductions.
 /// @dev Used for handling ERC20 token transfers with fee calculations in atomic swap operations.
@@ -13,6 +14,7 @@ library AnteHandler {
     /// @param maxFeeRateScale The scaling factor for the fee rate.
     /// @param treasury The address of the treasury to receive the fee.
     /// @dev Deducts a fee from the amount and transfers the net amount to the recipient and fee to the treasury.
+  
     function transferWithFee(
         address token,
         address recipient,
@@ -55,6 +57,9 @@ library AnteHandler {
             TransferHelper.safeTransferFrom(token, msg.sender, recipient, amountAfterFee);
             TransferHelper.safeTransferFrom(token, msg.sender, treasury, fee);
         } else {
+            if(msg.value != amount) {
+                revert IAtomicSwapBase.NotEnoughFund(msg.value, amount);
+            }
             TransferHelper.safeTransferETH(recipient,amountAfterFee);
             TransferHelper.safeTransferETH(treasury,fee);
         }

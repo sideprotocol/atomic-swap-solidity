@@ -128,6 +128,7 @@ interface IAtomicSwapBase {
     error InactiveOrder();
     error OrderCanceled();
     error OrderNotAllowTake();
+    error OrderAlreadyExpired(uint256 current, uint256 expiredTime);
     error InvalidBidderAddress();
     error UnauthorizedCancelAction();
     error UnsupportedTokenPair();
@@ -138,6 +139,7 @@ interface IAtomicSwapBase {
     error BidNotAllowed();
     error BidAlreadyExpired(uint256 provided, uint256 expectedExpiry);
     error InvalidExpirationTime(uint256 provided, uint256 maximum);
+    
     error InvalidMinimumBidLimit();
     error BidAlreadyPlaced();
     error NoBidPlaced();

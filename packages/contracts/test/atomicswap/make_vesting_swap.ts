@@ -3,11 +3,14 @@ import {
   createDefaultAtomicOrder,
   createDefaultVestingAtomicOrder,
   generateOrderID,
+  testTakeSwap,
+  testVestingTakeSwap,
 } from "../../utils/utils";
 import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { ZeroAddress } from "ethers";
 
 describe("AtomicSwap: MakeVestingSwap", () => {
   it("create in-chain vesting swap with native token", async () =>
@@ -105,7 +108,6 @@ describe("AtomicSwap: MakeVestingSwap", () => {
       expireAt: expireAt,
       acceptBid: true,
     };
-
     await expect(
       atomicSwap.makeSwapWithVesting(payload, [])
     ).to.revertedWithCustomError(atomicSwap, "ZeroReleaseSchedule");
@@ -152,5 +154,27 @@ describe("AtomicSwap: MakeVestingSwap", () => {
     await expect(
       atomicSwap.makeSwapWithVesting(payload, releases)
     ).to.revertedWithCustomError(atomicSwap, "OverMaximumReleaseStep");
+  });
+  it("should revert to create in-chain vesting swap with already existing order", async () => {
+    const { vestingManager, orderID, takerReceiver } =
+      await testVestingTakeSwap(true, false);
+    await expect(
+      vestingManager.startVesting(
+        orderID,
+        takerReceiver,
+        ZeroAddress,
+        BigInt(20),
+        [
+          {
+            durationInHours: BigInt(1),
+            percentage: BigInt(9000),
+          },
+          {
+            durationInHours: BigInt(1),
+            percentage: BigInt(1000),
+          },
+        ]
+      )
+    ).to.revertedWithCustomError(vestingManager, "DuplicateReleaseSchedule");
   });
 });

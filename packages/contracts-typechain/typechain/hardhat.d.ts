@@ -66,6 +66,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AtomicSwapStateLogic__factory>;
     getContractFactory(
+      name: "AnteHandler",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AnteHandler__factory>;
+    getContractFactory(
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
@@ -156,6 +160,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.AtomicSwapStateLogic>;
     getContractAt(
+      name: "AnteHandler",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AnteHandler>;
+    getContractAt(
       name: "AtomicSwapMsgValidator",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -239,6 +248,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapStateLogic>;
     deployContract(
+      name: "AnteHandler",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AnteHandler>;
+    deployContract(
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
@@ -328,6 +341,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapStateLogic>;
+    deployContract(
+      name: "AnteHandler",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AnteHandler>;
     deployContract(
       name: "AtomicSwapMsgValidator",
       args: any[],

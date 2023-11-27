@@ -6,6 +6,8 @@ import {
 } from "../../utils/utils";
 import { expect } from "chai";
 import { ZeroAddress } from "ethers";
+import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { BlockTime } from "../../utils/time";
 describe("TakeSwap", () => {
   beforeEach(async () => {});
   it("should take order with native token", async () => testTakeSwap(true));
@@ -68,6 +70,25 @@ describe("TakeSwap", () => {
         takerReceiver: taker.address,
       })
     ).to.be.revertedWithCustomError(atomicSwap, "InactiveOrder");
+  });
+
+  it("should revert when trying to take an expired order", async () => {
+    // Assuming the swap was taken in previous tests
+    const { orderID, atomicSwap, taker } = await createDefaultAtomicOrder(
+      true,
+      false,
+      false,
+      false
+    );
+    const order = await atomicSwap.swapOrder(orderID);
+    const currentTime = await BlockTime.Now();
+    await time.increase(order.expiredAt - BigInt(currentTime) + BigInt(1));
+    await expect(
+      atomicSwap.connect(taker).takeSwap({
+        orderID,
+        takerReceiver: taker.address,
+      })
+    ).to.be.revertedWithCustomError(atomicSwap, "OrderAlreadyExpired");
   });
 
   it("should revert when a non-taker tries to take the swap", async () => {
