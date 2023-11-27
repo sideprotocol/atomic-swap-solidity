@@ -23,7 +23,11 @@ const ETH_USDC = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";
 export const WHALES: string[] = [];
 
 export const Utils = {
-  prepareInChainAtomicTest: async function () {
+  prepareInChainAtomicTest: async function (
+    sellTokenFeeRate?: number,
+    buyTokenFeeRate?: number,
+    treasury?: string
+  ) {
     //import users
     const accounts = await ethers.getSigners();
     const [owner] = accounts;
@@ -42,9 +46,15 @@ export const Utils = {
     );
     const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
 
-    const sellTokenFeeRate = 100;
-    const buyTokenFeeRate = 120;
-    const treasury = accounts[10].address;
+    if (!sellTokenFeeRate) {
+      sellTokenFeeRate = 100;
+    }
+    if (!buyTokenFeeRate) {
+      buyTokenFeeRate = 120;
+    }
+    if (!treasury) {
+      treasury = accounts[10].address;
+    }
 
     // Deploy vesting contract.
     const vestingManagerFactory = await ethers.getContractFactory("Vesting", {
@@ -338,12 +348,14 @@ export const createDefaultVestingAtomicOrder = async (
 export const bidToDefaultAtomicOrder = async (
   withSellNativeToken?: boolean,
   withBuyNativeToken?: boolean,
-  noTaker?: boolean
+  noTaker?: boolean,
+  acceptBid?: boolean
 ) => {
   const orderParams = await createDefaultAtomicOrder(
     withSellNativeToken,
     withBuyNativeToken,
-    noTaker
+    noTaker,
+    acceptBid
   );
   const { atomicSwap, maker, taker, orderID, usdc, usdt } = orderParams;
 
@@ -700,3 +712,14 @@ export function safeFactor(amount: bigint, factor: number): bigint {
   const roundedFactor = Math.floor(factor * 10000);
   return (amount * BigInt(roundedFactor)) / BigInt(10000);
 }
+
+export const getZeroAddressSigner = async () => {
+  // Impersonating address(0) - Note: This is non-standard and might not work as expected
+  await ethers.provider.send("hardhat_impersonateAccount", [
+    "0x0000000000000000000000000000000000000000",
+  ]);
+  const signer = await ethers.provider.getSigner(
+    "0x0000000000000000000000000000000000000000"
+  );
+  return signer;
+};

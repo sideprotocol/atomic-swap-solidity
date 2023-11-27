@@ -1,5 +1,9 @@
 import { time } from "@nomicfoundation/hardhat-network-helpers";
-import { bidToDefaultAtomicOrder, calcSwapAmount } from "../../utils/utils";
+import {
+  bidToDefaultAtomicOrder,
+  calcSwapAmount,
+  getZeroAddressSigner,
+} from "../../utils/utils";
 import { expect } from "chai";
 import { ZeroAddress } from "ethers";
 
@@ -85,6 +89,45 @@ describe("AtomicSwap: AcceptBid", () => {
       usdt,
       treasury,
       buyTokenAmount.feeAmount
+    );
+  });
+
+  it("should accept bid with not accept Bid", async () => {
+    const {
+      atomicSwap,
+      maker,
+      orderID,
+      usdc,
+      usdt,
+      bidAmount,
+      bidder,
+      payload,
+      sellTokenFeeRate,
+      buyTokenFeeRate,
+      treasury,
+    } = await bidToDefaultAtomicOrder(false, false, true, false);
+    const sellTokenAmount = calcSwapAmount(
+      payload.sellToken.amount,
+      buyTokenFeeRate
+    );
+
+    const buyTokenAmount = calcSwapAmount(bidAmount, sellTokenFeeRate);
+
+    const tx = atomicSwap.connect(maker).acceptBid({ orderID, bidder });
+    await expect(tx).to.revertedWithCustomError(atomicSwap, "BidNotAllowed");
+  });
+  it("should accept bid with zero address msg sender", async () => {
+    const { atomicSwap, orderID, bidder, payload, buyTokenFeeRate } =
+      await bidToDefaultAtomicOrder(false, false, true, false);
+    const sellTokenAmount = calcSwapAmount(
+      payload.sellToken.amount,
+      buyTokenFeeRate
+    );
+    const signer = await getZeroAddressSigner();
+    const tx = atomicSwap.connect(signer).acceptBid({ orderID, bidder });
+    await expect(tx).to.revertedWithCustomError(
+      atomicSwap,
+      "UnauthorizedSender"
     );
   });
 

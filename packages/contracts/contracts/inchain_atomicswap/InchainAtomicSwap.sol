@@ -249,6 +249,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert BidAlreadyExpired(_currentBid.expireTimestamp,block.timestamp);
         }
         // Ensure the function caller has previously placed a bid
+         // It doesn't happen in normal senarios
         if (_currentBid.bidder == address(0)) {
             revert NoBidPlaced();
         }
@@ -256,6 +257,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Retrieve the associated AtomicSwapOrder
         AtomicSwapOrder storage _order = swapOrder[_orderID];
 
+        // It doesn't happen in normal senarios 
         if (_currentBid.status != BidStatus.Placed) {
             revert NoBidPlaced();
         }

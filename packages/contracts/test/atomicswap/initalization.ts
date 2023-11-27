@@ -3,6 +3,7 @@ import { Utils } from "../../utils/utils";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { ZeroAddress } from "ethers";
 
 describe("AtomicSwap: Initialization", () => {
   let accounts: HardhatEthersSigner[];
@@ -26,5 +27,15 @@ describe("AtomicSwap: Initialization", () => {
         100
       )
     ).to.be.reverted;
+  });
+  it("should revert to initialize with big sellerFee", async () => {
+    await expect(Utils.prepareInChainAtomicTest(10001, 120)).to.reverted;
+  });
+  it("should revert to initialize with big buyerFee", async () => {
+    await expect(Utils.prepareInChainAtomicTest(100, 10001)).to.reverted;
+  });
+  it("should revert to initialize with zero address treasury", async () => {
+    await expect(Utils.prepareInChainAtomicTest(100, 120, ZeroAddress)).to
+      .reverted;
   });
 });

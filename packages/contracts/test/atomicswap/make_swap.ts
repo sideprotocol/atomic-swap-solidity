@@ -1,5 +1,9 @@
 import { ethers } from "hardhat";
-import { createDefaultAtomicOrder, generateOrderID } from "../../utils/utils";
+import {
+  createDefaultAtomicOrder,
+  generateOrderID,
+  getZeroAddressSigner,
+} from "../../utils/utils";
 import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
@@ -314,14 +318,7 @@ describe("AtomicSwap: MakeSwap", () => {
       acceptBid: true,
     };
 
-    // Impersonating address(0) - Note: This is non-standard and might not work as expected
-    await ethers.provider.send("hardhat_impersonateAccount", [
-      "0x0000000000000000000000000000000000000000",
-    ]);
-    const signer = await ethers.provider.getSigner(
-      "0x0000000000000000000000000000000000000000"
-    );
-
+    const signer = await getZeroAddressSigner();
     await expect(
       atomicSwap.connect(signer).makeSwap(payload)
     ).to.revertedWithCustomError(atomicSwap, "UnauthorizedSender");

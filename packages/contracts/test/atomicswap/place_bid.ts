@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { createDefaultAtomicOrder } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 describe("AtomicSwap: PlaceBid", () => {
   it("should place bid with native token", async () => {
@@ -224,6 +225,65 @@ describe("AtomicSwap: PlaceBid", () => {
       atomicSwap.connect(taker).placeBid(bidPayload, {
         value: bidPayload.bidAmount,
       })
+    ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
+  });
+  it("should revert to place bid with invalid bidder address", async () => {
+    const { atomicSwap, taker, orderID, usdt, maker } =
+      await createDefaultAtomicOrder(false, true);
+
+    const bidPayload = {
+      bidder: maker.address,
+      bidAmount: ethers.parseEther("19"),
+      orderID: orderID,
+      bidderReceiver: taker.address,
+      expireTimestamp: await BlockTime.AfterSeconds(30),
+    };
+    // make bid
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload, {
+        value: bidPayload.bidAmount,
+      })
+    ).to.revertedWithCustomError(atomicSwap, "InvalidBidderAddress");
+  });
+  it("should revert to place bid with expired order", async () => {
+    const { atomicSwap, taker, orderID } = await createDefaultAtomicOrder(
+      false,
+      true
+    );
+
+    const bidPayload = {
+      bidder: taker.address,
+      bidAmount: ethers.parseEther("19"),
+      orderID: orderID,
+      bidderReceiver: taker.address,
+      expireTimestamp: await BlockTime.AfterSeconds(30),
+    };
+    // make bid
+    const order = await atomicSwap.swapOrder(orderID);
+    const timeDiffer = order.expiredAt - BigInt(await BlockTime.Now());
+    await time.increase(timeDiffer + BigInt(1));
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload, {
+        value: bidPayload.bidAmount,
+      })
+    ).to.revertedWithCustomError(atomicSwap, "InvalidExpirationTime");
+  });
+  it("should revert to place bid with invalid bid amount", async () => {
+    const { atomicSwap, taker, orderID } = await createDefaultAtomicOrder(
+      false,
+      true
+    );
+
+    const bidPayload = {
+      bidder: taker.address,
+      bidAmount: ethers.parseEther("19"),
+      orderID: orderID,
+      bidderReceiver: taker.address,
+      expireTimestamp: await BlockTime.AfterSeconds(30),
+    };
+    // make bid
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload)
     ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
   });
 });
