@@ -45,11 +45,9 @@ library AtomicSwapMsgValidator {
             revert IAtomicSwapBase.UnauthorizedTakeAction();
         }
 
-        // change to onlyActive
-        // Ensure the swap order has not already been completed
-        // if (_order.status == IAtomicSwapBase.OrderStatus.COMPLETE) {
-        //     revert IAtomicSwapBase.InactiveOrder();
-        // }
+        if(_order.expiredAt < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(_order.expiredAt, block.timestamp);
+        }
     }
 
     /// @notice Validates the cancellation of a swap.

@@ -40,7 +40,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
-    ) external payable {
+    ) external payable nonReentrant {
         // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
         if (vestingSchedules[beneficiary][orderId].from != address(0)) {
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
@@ -54,10 +54,10 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         } else {
             token.safeTransferFrom(msg.sender, address(this), totalAmount);
         }
-        uint256 vestinStartTime = block.timestamp;
+        uint256 vestingStartTime = block.timestamp;
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
-            start: vestinStartTime,
+            start: vestingStartTime,
             token: token,
             totalAmount: totalAmount,
             amountReleased: 0,
