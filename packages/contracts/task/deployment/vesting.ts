@@ -10,14 +10,12 @@ task("deploy:vesting", "deploy in chain ").setAction(
     const admin = process.env.ADMIN;
     const treasury = process.env.TREASURY;
     const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
-    let tokenTransferHelperAddress =
-      Settings[`tokenTransferHelper_${network.name}` as keyof typeof Settings];
-    if (!ethers.isAddress(tokenTransferHelperAddress)) {
-      const tokenTransferHelperFactory = await ethers.getContractFactory(
-        `TokenTransferHelper`
-      );
-      const tokenTransferHelper = await tokenTransferHelperFactory.deploy();
-      tokenTransferHelperAddress = await tokenTransferHelper.getAddress();
+    let AnteHandlerAddress =
+      Settings[`AnteHandler_${network.name}` as keyof typeof Settings];
+    if (!ethers.isAddress(AnteHandlerAddress)) {
+      const AnteHandlerFactory = await ethers.getContractFactory(`AnteHandler`);
+      const AnteHandler = await AnteHandlerFactory.deploy();
+      AnteHandlerAddress = await AnteHandler.getAddress();
     }
 
     // AtomicSwap contract deploy
