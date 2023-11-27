@@ -10,16 +10,25 @@ task("deploy:vesting", "deploy in chain ").setAction(
     const admin = process.env.ADMIN;
     const treasury = process.env.TREASURY;
     const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
-    let AnteHandlerAddress =
-      Settings[`AnteHandler_${network.name}` as keyof typeof Settings];
-    if (!ethers.isAddress(AnteHandlerAddress)) {
-      const AnteHandlerFactory = await ethers.getContractFactory(`AnteHandler`);
-      const AnteHandler = await AnteHandlerFactory.deploy();
-      AnteHandlerAddress = await AnteHandler.getAddress();
+    let AtomicSwapMsgValidatorAddress =
+      Settings[
+        `AtomicSwapMsgValidator_${network.name}` as keyof typeof Settings
+      ];
+    if (!ethers.isAddress(AtomicSwapMsgValidatorAddress)) {
+      const AtomicSwapMsgValidatorFactory = await ethers.getContractFactory(
+        `AtomicSwapMsgValidator`
+      );
+      const AtomicSwapMsgValidator =
+        await AtomicSwapMsgValidatorFactory.deploy();
+      AtomicSwapMsgValidatorAddress = await AtomicSwapMsgValidator.getAddress();
     }
 
     // AtomicSwap contract deploy
-    const vestingFactory = await ethers.getContractFactory(`Vesting`);
+    const vestingFactory = await ethers.getContractFactory(`Vesting`, {
+      libraries: {
+        AtomicSwapMsgValidator: AtomicSwapMsgValidatorAddress,
+      },
+    });
     // deploy contract
     const vesting = await upgrades.deployProxy(vestingFactory, [admin], {
       initializer: "initialize",

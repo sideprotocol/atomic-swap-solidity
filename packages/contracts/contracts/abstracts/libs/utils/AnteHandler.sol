@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
-import {IAtomicSwapBase} from  "../../interfaces/IAtomicSwapBase.sol";
-
 /// @title Token Transfer Helper
 /// @notice Library providing functions to safely transfer tokens with support for fee deductions.
 /// @dev Used for handling ERC20 token transfers with fee calculations in atomic swap operations.
