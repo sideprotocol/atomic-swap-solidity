@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 
-import { ethers, upgrades } from "hardhat";
+import { ethers, network, upgrades } from "hardhat";
 import {
   Vesting,
   IAtomicSwapBase,
@@ -99,6 +99,8 @@ export const Utils = {
         unsafeAllowLinkedLibraries: true,
       }
     );
+
+    await vestingManager.setAdmin(await atomicSwap.getAddress());
 
     // Deploy Mock Token
     const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");
@@ -222,6 +224,7 @@ export const createDefaultAtomicOrder = async (
 
   return {
     orderID: id,
+    uuid,
     maker,
     taker,
 
@@ -713,13 +716,17 @@ export function safeFactor(amount: bigint, factor: number): bigint {
   return (amount * BigInt(roundedFactor)) / BigInt(10000);
 }
 
-export const getZeroAddressSigner = async () => {
-  // Impersonating address(0) - Note: This is non-standard and might not work as expected
-  await ethers.provider.send("hardhat_impersonateAccount", [
-    "0x0000000000000000000000000000000000000000",
+export const getCustomSigner = async (
+  customAddress: string,
+  initialFund?: bigint
+) => {
+  await ethers.provider.send("hardhat_impersonateAccount", [customAddress]);
+  const signer = await ethers.provider.getSigner(customAddress);
+  const balance = ethers.parseEther(initialFund?.toString() ?? "20"); // 20 Ether as a BigNumber
+  const hexBalance = "0x" + balance.toString(16); //
+  await network.provider.send("hardhat_setBalance", [
+    customAddress,
+    hexBalance,
   ]);
-  const signer = await ethers.provider.getSigner(
-    "0x0000000000000000000000000000000000000000"
-  );
   return signer;
 };

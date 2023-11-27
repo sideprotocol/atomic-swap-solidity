@@ -40,17 +40,6 @@ library AtomicSwapStateLogic {
 
         swapOrder[id] = _order;
     }
-
-    /// @notice Removes an atomic swap order from the mapping.
-    /// @param swapOrder The mapping of swap orders.
-    /// @param id The unique identifier of the swap order to remove.
-    /// @dev This function deletes the order from the mapping.
-    function removeAtomicSwapOrder(mapping(bytes32 => IAtomicSwapBase.AtomicSwapOrder) storage swapOrder, bytes32 id)
-        external
-    {
-        delete swapOrder[id];
-    }
-
     /// @notice Adds a new bid to a swap order.
     /// @param bids The mapping of bids for swap orders.
     /// @param bidMsg The details of the bid to be added.

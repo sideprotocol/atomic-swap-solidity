@@ -56,13 +56,14 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VestingInterface extends Interface {
-    getFunction(nameOrSignature: "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
+    getFunction(nameOrSignature: "initialize" | "owner" | "release" | "releaseInfos" | "renounceOwnership" | "setAdmin" | "startVesting" | "transferOwnership" | "vestingSchedules"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Initialized" | "NewVesting" | "OwnershipTransferred" | "Received" | "Released"): EventFragment;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "owner", values?: undefined): string;
     encodeFunctionData(functionFragment: "release", values: [AddressLike, BytesLike]): string;
     encodeFunctionData(functionFragment: "releaseInfos", values: [AddressLike, BytesLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
+    encodeFunctionData(functionFragment: "setAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "startVesting", values: [
         BytesLike,
         AddressLike,
@@ -77,6 +78,7 @@ export interface VestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "releaseInfos", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "startVesting", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "vestingSchedules", data: BytesLike): Result;
@@ -171,6 +173,7 @@ export interface Vesting extends BaseContract {
         }
     ], "view">;
     renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    setAdmin: TypedContractMethod<[_newAdmin: AddressLike], [void], "nonpayable">;
     startVesting: TypedContractMethod<[
         orderId: BytesLike,
         beneficiary: AddressLike,
@@ -225,6 +228,7 @@ export interface Vesting extends BaseContract {
         }
     ], "view">;
     getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "setAdmin"): TypedContractMethod<[_newAdmin: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "startVesting"): TypedContractMethod<[
         orderId: BytesLike,
         beneficiary: AddressLike,

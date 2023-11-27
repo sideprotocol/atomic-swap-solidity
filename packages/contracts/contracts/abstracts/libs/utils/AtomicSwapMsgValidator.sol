@@ -32,15 +32,10 @@ library AtomicSwapMsgValidator {
     /// @notice Validates parameters for taking an atomic swap.
     /// @param takeswap The take swap message details.
     /// @dev Checks if the order is not already accepted or completed, and if the taker is authorized.
-    function validateTakeSwapParams(
-        IAtomicSwapBase.TakeSwapMsg memory takeswap
-    ) external pure {
+    function validateTakeSwap(IAtomicSwapBase.AtomicSwapOrder storage _order,IAtomicSwapBase.TakeSwapMsg memory takeswap) external view {
         if (takeswap.takerReceiver == address(0)) {
             revert IAtomicSwapBase.UnauthorizedSender();
         }
-    }
-
-    function validateTakeSwap(IAtomicSwapBase.AtomicSwapOrder storage _order) external view {
         if (_order.taker != address(0) && _order.taker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedTakeAction();
         }
@@ -75,10 +70,9 @@ library AtomicSwapMsgValidator {
         uint256 totalPercentage = 0;
         for (uint256 i = 0; i < releases.length; i++) {
             uint256 percentage = releases[i].percentage;
-            if (percentage < 0 || (i > 0 && percentage == 0)) {
+            if (percentage == 0) {
                 revert IAtomicSwapBase.InvalidReleasePercentage();
             }
-
             totalPercentage += percentage;
         }
 

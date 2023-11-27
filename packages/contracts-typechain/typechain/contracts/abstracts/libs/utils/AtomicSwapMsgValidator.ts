@@ -60,16 +60,6 @@ export declare namespace IAtomicSwapBase {
     acceptBid: boolean;
   };
 
-  export type TakeSwapMsgStruct = {
-    orderID: BytesLike;
-    takerReceiver: AddressLike;
-  };
-
-  export type TakeSwapMsgStructOutput = [
-    orderID: string,
-    takerReceiver: string
-  ] & { orderID: string; takerReceiver: string };
-
   export type ReleaseStruct = {
     durationInHours: BigNumberish;
     percentage: BigNumberish;
@@ -86,7 +76,6 @@ export interface AtomicSwapMsgValidatorInterface extends Interface {
     nameOrSignature:
       | "isContract"
       | "validateMakeSwapParams"
-      | "validateTakeSwapParams"
       | "validateVestingParams"
   ): FunctionFragment;
 
@@ -99,10 +88,6 @@ export interface AtomicSwapMsgValidatorInterface extends Interface {
     values: [IAtomicSwapBase.MakeSwapMsgStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "validateTakeSwapParams",
-    values: [IAtomicSwapBase.TakeSwapMsgStruct]
-  ): string;
-  encodeFunctionData(
     functionFragment: "validateVestingParams",
     values: [IAtomicSwapBase.ReleaseStruct[]]
   ): string;
@@ -110,10 +95,6 @@ export interface AtomicSwapMsgValidatorInterface extends Interface {
   decodeFunctionResult(functionFragment: "isContract", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "validateMakeSwapParams",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "validateTakeSwapParams",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -173,12 +154,6 @@ export interface AtomicSwapMsgValidator extends BaseContract {
     "view"
   >;
 
-  validateTakeSwapParams: TypedContractMethod<
-    [takeswap: IAtomicSwapBase.TakeSwapMsgStruct],
-    [void],
-    "view"
-  >;
-
   validateVestingParams: TypedContractMethod<
     [releases: IAtomicSwapBase.ReleaseStruct[]],
     [void],
@@ -196,13 +171,6 @@ export interface AtomicSwapMsgValidator extends BaseContract {
     nameOrSignature: "validateMakeSwapParams"
   ): TypedContractMethod<
     [makeswap: IAtomicSwapBase.MakeSwapMsgStruct],
-    [void],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "validateTakeSwapParams"
-  ): TypedContractMethod<
-    [takeswap: IAtomicSwapBase.TakeSwapMsgStruct],
     [void],
     "view"
   >;

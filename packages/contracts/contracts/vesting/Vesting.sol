@@ -7,13 +7,13 @@ import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.so
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
-
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     using AtomicSwapMsgValidator for *;
     using AnteHandler for *;
+    mapping (address=>bool) admins;
     /// @notice Stores vesting schedules for each beneficiary.
     mapping(address => mapping(bytes32 => VestingSchedule))
         public vestingSchedules;
@@ -28,6 +28,17 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     function initialize(address _admin) external initializer {
         __Ownable_init_unchained(_admin);
     }
+
+    function setAdmin(address _newAdmin) external onlyOwner {
+        admins[_newAdmin] = true;
+    }
+
+    modifier onlyAdmins {
+        if(!admins[msg.sender]) {
+            revert NoPermissionToUserContract();
+        }
+        _;
+    }
     // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
     /// @notice Starts the vesting schedule for a beneficiary.
     /// @param beneficiary The address of the beneficiary.
@@ -41,9 +52,9 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
-    ) external payable nonReentrant {
+    ) external payable nonReentrant onlyAdmins {
         // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
-        if (vestingSchedules[beneficiary][orderId].from != address(0)) {
+        if (vestingSchedules[beneficiary][orderId].from != address(0)) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
@@ -93,11 +104,6 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         IAtomicSwapBase.Release[] storage releases = releaseInfos[beneficiary][
             orderId
         ];
-
-        if (block.timestamp < schedule.start) {
-            revert VestingNotStarted();
-        }
-
         if (
             releases.length == 0 || schedule.lastReleasedStep >= releases.length
         ) {
@@ -133,7 +139,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     
     /// @notice Fallback function to receive Ether.
     /// @dev Emits a Received event when Ether is received.
-    receive() external payable {
+    receive() external payable onlyAdmins {
         emit Received(msg.sender, msg.value);
     }
 }

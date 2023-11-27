@@ -3,6 +3,7 @@ import {
   createDefaultAtomicOrder,
   createDefaultVestingAtomicOrder,
   generateOrderID,
+  getCustomSigner,
   testTakeSwap,
   testVestingTakeSwap,
 } from "../../utils/utils";
@@ -156,15 +157,17 @@ describe("AtomicSwap: MakeVestingSwap", () => {
     ).to.revertedWithCustomError(atomicSwap, "OverMaximumReleaseStep");
   });
   it("should revert to create in-chain vesting swap with already existing order", async () => {
-    const { vestingManager, orderID, takerReceiver } =
+    const { vestingManager, orderID, takerReceiver, atomicSwap } =
       await testVestingTakeSwap(true, false);
+    const schedules = await vestingManager.vestingSchedules(
+      takerReceiver,
+      orderID
+    );
+    const contractSigner = await getCustomSigner(await atomicSwap.getAddress());
     await expect(
-      vestingManager.startVesting(
-        orderID,
-        takerReceiver,
-        ZeroAddress,
-        BigInt(20),
-        [
+      vestingManager
+        .connect(contractSigner)
+        .startVesting(orderID, takerReceiver, ZeroAddress, BigInt(20), [
           {
             durationInHours: BigInt(1),
             percentage: BigInt(9000),
@@ -173,8 +176,53 @@ describe("AtomicSwap: MakeVestingSwap", () => {
             durationInHours: BigInt(1),
             percentage: BigInt(1000),
           },
-        ]
-      )
+        ])
     ).to.revertedWithCustomError(vestingManager, "DuplicateReleaseSchedule");
+  });
+
+  it("should revert to create in-chain vesting swap with zero vesting percentage", async () => {
+    const { atomicSwap, usdc, usdt } = await loadFixture(
+      Utils.prepareInChainAtomicTest
+    );
+    const accounts = await ethers.getSigners();
+    const [maker, taker, makerReceiver, takerReceiver] = accounts;
+    const expireAt = await BlockTime.AfterSeconds(100);
+    const usdcAddress = await usdc.getAddress();
+    const usdtAddress = await usdt.getAddress();
+    const uuid = generateOrderID();
+    const payload = {
+      uuid: uuid,
+      sellToken: {
+        token: usdcAddress,
+        amount: "20",
+      },
+      buyToken: {
+        token: usdtAddress,
+        amount: "20",
+      },
+
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: taker.address,
+      expireAt: expireAt,
+      acceptBid: true,
+    };
+
+    await expect(
+      atomicSwap.makeSwapWithVesting(payload, [
+        {
+          durationInHours: BigInt(1),
+          percentage: BigInt(1000),
+        },
+        {
+          durationInHours: BigInt(1),
+          percentage: BigInt(9000),
+        },
+        {
+          durationInHours: BigInt(1),
+          percentage: BigInt(0),
+        },
+      ])
+    ).to.revertedWithCustomError(atomicSwap, "InvalidReleasePercentage");
   });
 });

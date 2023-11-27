@@ -587,7 +587,7 @@ export interface InchainAtomicSwap extends BaseContract {
   >;
 
   takeSwap: TypedContractMethod<
-    [takeswapMsg: IAtomicSwapBase.TakeSwapMsgStruct],
+    [takeswap: IAtomicSwapBase.TakeSwapMsgStruct],
     [void],
     "payable"
   >;
@@ -742,7 +742,7 @@ export interface InchainAtomicSwap extends BaseContract {
   getFunction(
     nameOrSignature: "takeSwap"
   ): TypedContractMethod<
-    [takeswapMsg: IAtomicSwapBase.TakeSwapMsgStruct],
+    [takeswap: IAtomicSwapBase.TakeSwapMsgStruct],
     [void],
     "payable"
   >;

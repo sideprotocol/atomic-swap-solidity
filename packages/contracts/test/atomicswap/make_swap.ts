@@ -2,19 +2,55 @@ import { ethers } from "hardhat";
 import {
   createDefaultAtomicOrder,
   generateOrderID,
-  getZeroAddressSigner,
+  getCustomSigner,
 } from "../../utils/utils";
 import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { randomBytes } from "crypto";
+import { ZeroAddress } from "ethers";
 
 describe("AtomicSwap: MakeSwap", () => {
   it("create in-chain swap with native token", async () =>
     createDefaultAtomicOrder(true));
   it("create in-chain swap with ERC20 token", async () =>
     createDefaultAtomicOrder());
+  it("should revert to create in-chain order with same orderId", async () => {
+    const { uuid, usdc, usdt, maker, atomicSwap } =
+      await createDefaultAtomicOrder();
+    const payload = {
+      uuid,
+      sellToken: {
+        token: await usdc.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      buyToken: {
+        token: await usdt.getAddress(),
+        amount: ethers.parseEther("20"),
+      },
+      maker: maker.address,
+      minBidAmount: ethers.parseEther("15"),
+      desiredTaker: ethers.ZeroAddress,
+      expireAt: await BlockTime.AfterSeconds(30),
+      acceptBid: true,
+    };
+
+    const amount = await usdc.allowance(maker, await atomicSwap.getAddress());
+    await expect(
+      usdc.approve(
+        await atomicSwap.getAddress(),
+        amount + payload.sellToken.amount
+      )
+    ).not.to.reverted;
+    const tx = atomicSwap.makeSwap(payload, {
+      value: payload.sellToken.amount,
+    });
+    await expect(tx).to.revertedWithCustomError(
+      atomicSwap,
+      "OrderAlreadyExists"
+    );
+  });
 
   it("should revert to create in-chain order with same token address", async () => {
     const { atomicSwap, usdc } = await loadFixture(
@@ -318,7 +354,7 @@ describe("AtomicSwap: MakeSwap", () => {
       acceptBid: true,
     };
 
-    const signer = await getZeroAddressSigner();
+    const signer = await getCustomSigner(ZeroAddress);
     await expect(
       atomicSwap.connect(signer).makeSwap(payload)
     ).to.revertedWithCustomError(atomicSwap, "UnauthorizedSender");

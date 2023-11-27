@@ -98,27 +98,26 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     }
 
     /// @notice Allows a user to complete a swap order.
-    /// @param takeswapMsg Struct containing the ID of the swap order to be taken.
+    /// @param takeswap Struct containing the ID of the swap order to be taken.
     function takeSwap(
-        TakeSwapMsg calldata takeswapMsg
+        TakeSwapMsg calldata takeswap
     )
         external
         payable
         virtual
         nonReentrant // Prevents reentrancy attacks
-        onlyExist(takeswapMsg.orderID) // Ensures the swap order exists
-        onlyActive(takeswapMsg.orderID) // Ensures the swap order active
+        onlyExist(takeswap.orderID) // Ensures the swap order exists
+        onlyActive(takeswap.orderID) // Ensures the swap order active
     {
-        takeswapMsg.validateTakeSwapParams();
-        AtomicSwapOrder storage _order = swapOrder[takeswapMsg.orderID];
-        _order.validateTakeSwap();
+        AtomicSwapOrder storage _order = swapOrder[takeswap.orderID];
+        _order.validateTakeSwap(takeswap);
 
         // Update order details
         _order.status = OrderStatus.COMPLETE;
         _order.completedAt = block.timestamp;
         _order.taker = msg.sender;
         
-        _transferSellTokenToBuyer(_order, takeswapMsg.takerReceiver);
+        _transferSellTokenToBuyer(_order, takeswap.takerReceiver);
         _order.buyToken.token.transferFromWithFee(
             _order.maker,
             _order.buyToken.amount,
@@ -130,7 +129,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         emit AtomicSwapOrderTook(
             _order.maker,
             _order.taker,
-            takeswapMsg.orderID
+            takeswap.orderID
         );
     }
 
@@ -461,4 +460,5 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             }
         }
     }
+    
 }

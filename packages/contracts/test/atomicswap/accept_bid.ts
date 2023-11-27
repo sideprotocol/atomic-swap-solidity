@@ -2,7 +2,7 @@ import { time } from "@nomicfoundation/hardhat-network-helpers";
 import {
   bidToDefaultAtomicOrder,
   calcSwapAmount,
-  getZeroAddressSigner,
+  getCustomSigner,
 } from "../../utils/utils";
 import { expect } from "chai";
 import { ZeroAddress } from "ethers";
@@ -123,7 +123,7 @@ describe("AtomicSwap: AcceptBid", () => {
       payload.sellToken.amount,
       buyTokenFeeRate
     );
-    const signer = await getZeroAddressSigner();
+    const signer = await getCustomSigner(ZeroAddress);
     const tx = atomicSwap.connect(signer).acceptBid({ orderID, bidder });
     await expect(tx).to.revertedWithCustomError(
       atomicSwap,

@@ -89,6 +89,7 @@ export interface VestingInterface extends Interface {
       | "release"
       | "releaseInfos"
       | "renounceOwnership"
+      | "setAdmin"
       | "startVesting"
       | "transferOwnership"
       | "vestingSchedules"
@@ -121,6 +122,10 @@ export interface VestingInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "setAdmin",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "startVesting",
     values: [
       BytesLike,
@@ -150,6 +155,7 @@ export interface VestingInterface extends Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setAdmin", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "startVesting",
     data: BytesLike
@@ -288,6 +294,8 @@ export interface Vesting extends BaseContract {
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
+  setAdmin: TypedContractMethod<[_newAdmin: AddressLike], [void], "nonpayable">;
+
   startVesting: TypedContractMethod<
     [
       orderId: BytesLike,
@@ -348,6 +356,9 @@ export interface Vesting extends BaseContract {
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setAdmin"
+  ): TypedContractMethod<[_newAdmin: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "startVesting"
   ): TypedContractMethod<

@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import { saveItemsToSetting } from "../utils/utils";
 import { task } from "hardhat/config";
-import { Settings } from "@sideprotocol/contracts-typechain";
+import { Settings, Vesting__factory } from "@sideprotocol/contracts-typechain";
 dotenv.config();
 task("deploy:in-chain:lib", "deploy libraries")
   .addOptionalParam("f", "force write")
@@ -56,9 +56,11 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
   async ({}, { ethers, upgrades, network }) => {
     //deploy contracts
     const admin = process.env.ADMIN;
+    const privatekey = process.env.PRIVATE_KEY;
     const treasury = process.env.TREASURY;
     const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
     const buyTokenFeeRate = process.env.BUY_TOKEN_FEE_RATE;
+    const deployer = new ethers.Wallet(privatekey!, ethers.provider);
 
     let atomicSwapStateLogicAddress =
       Settings[`atomicSwapStateLogic_${network.name}` as keyof typeof Settings];
@@ -141,6 +143,10 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
       }
     );
 
+    // atomicsSwap contract ad admin of vesting contract.
+    await Vesting__factory.connect(vestingAddress, deployer).setAdmin(
+      await atomicSwap.getAddress()
+    );
     // Deploy mock token contracts. This will be used for testing purposes.
     const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");
     const mockUSDC = await mockERC20TokenFactory.deploy("USDC", "USDC");
@@ -167,6 +173,7 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
         value: mockUSDTAddress,
       },
     ]);
+
     console.log("Deployed in-chain address:", contractAddress);
     console.log("Deployed mock usdc address:", mockUSDCAddress);
     console.log("Deployed mock usdt address:", mockUSDTAddress);
