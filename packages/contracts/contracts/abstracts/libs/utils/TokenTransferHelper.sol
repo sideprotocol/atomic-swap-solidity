@@ -33,10 +33,8 @@ library TokenTransferHelper {
             _transferEtherWithFee(recipient, treasury, amountAfterFee, fee);
         }
     }
-
     /// @notice Transfers tokens from one address to another with a fee deducted, sending the fee to the treasury.
     /// @param token The address of the token (ERC20) or zero address for Ether.
-    /// @param from The address from which tokens are transferred.
     /// @param recipient The address receiving the tokens.
     /// @param amount The total amount to transfer before fees.
     /// @param feeRate The fee rate to apply.
@@ -45,7 +43,6 @@ library TokenTransferHelper {
     /// @dev Deducts a fee from the amount and transfers the net amount to the recipient and fee to the treasury.
     function transferFromWithFee(
         address token,
-        address from,
         address recipient,
         uint256 amount,
         uint256 feeRate,
@@ -56,8 +53,8 @@ library TokenTransferHelper {
         uint256 amountAfterFee = amount - fee;
 
         if (token != address(0)) {
-            safeTransferFrom(token, from, recipient, amountAfterFee);
-            safeTransferFrom(token, from, treasury, fee);
+            safeTransferFrom(token, msg.sender, recipient, amountAfterFee);
+            safeTransferFrom(token, msg.sender, treasury, fee);
         } else {
             _transferEtherWithFee(recipient, treasury, amountAfterFee, fee);
         }
@@ -73,7 +70,6 @@ library TokenTransferHelper {
         if(recipient == address(0) || treasury == address(0) ){
             revert IAtomicSwapBase.InvalidAddress();
         }
-
         (bool successToRecipient,) = payable(recipient).call{value: amountAfterFee}("");
         if(!successToRecipient) {
             revert IAtomicSwapBase.TransferToRecipientFailed(recipient, amountAfterFee);

@@ -123,7 +123,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         _transferSellTokenToBuyer(_order, takeswapMsg.takerReceiver);
         _order.buyToken.token.transferFromWithFee(
-            msg.sender,
             _order.maker,
             _order.buyToken.amount,
             sellerFeeRate,

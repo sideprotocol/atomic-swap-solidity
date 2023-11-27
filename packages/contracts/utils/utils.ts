@@ -49,12 +49,17 @@ export const Utils = {
     const treasury = accounts[10].address;
 
     // Deploy vesting contract.
-    const vestingManagerFactory = await ethers.getContractFactory("Vesting");
+    const vestingManagerFactory = await ethers.getContractFactory("Vesting", {
+      libraries: {
+        AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
+      },
+    });
     const vestingManager = await upgrades.deployProxy(
       vestingManagerFactory,
       [owner.address],
       {
         initializer: "initialize",
+        unsafeAllowLinkedLibraries: true,
       }
     );
     const vestingManagerAddress = await vestingManager.getAddress();

@@ -53,6 +53,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "DuplicateReleaseSchedule",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InactiveOrder",
     type: "error",
   },

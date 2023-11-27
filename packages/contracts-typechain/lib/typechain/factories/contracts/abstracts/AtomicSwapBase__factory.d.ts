@@ -35,6 +35,10 @@ export declare class AtomicSwapBase__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "DuplicateReleaseSchedule";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InactiveOrder";
         readonly type: "error";
     }, {
