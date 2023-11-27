@@ -70,10 +70,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
     getContractFactory(
-      name: "TokenTransferHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.TokenTransferHelper__factory>;
-    getContractFactory(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.InchainAtomicSwap__factory>;
@@ -165,11 +161,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.AtomicSwapMsgValidator>;
     getContractAt(
-      name: "TokenTransferHelper",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.TokenTransferHelper>;
-    getContractAt(
       name: "InchainAtomicSwap",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -251,10 +242,6 @@ declare module "hardhat/types/runtime" {
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
-    deployContract(
-      name: "TokenTransferHelper",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.TokenTransferHelper>;
     deployContract(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -346,11 +333,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
-    deployContract(
-      name: "TokenTransferHelper",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.TokenTransferHelper>;
     deployContract(
       name: "InchainAtomicSwap",
       args: any[],

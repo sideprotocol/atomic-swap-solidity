@@ -43,7 +43,7 @@ abstract contract AtomicSwapBase is OwnableUpgradeable, ReentrancyGuardUpgradeab
     /// @notice Ensures that the order exists before proceeding.
     /// @param id The unique identifier of the order.
     modifier onlyExist(bytes32 id) {
-        if (swapOrder[id].id == bytes32(0x0)) {
+        if (swapOrder[id].maker == address(0)) {
             revert OrderDoesNotExist();
         }
         _;

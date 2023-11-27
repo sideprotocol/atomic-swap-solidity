@@ -2,11 +2,11 @@
 pragma solidity ^0.8.19;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
+import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
-import {TokenTransferHelper} from "../abstracts/libs/utils/TokenTransferHelper.sol";
+import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
 
@@ -16,8 +16,7 @@ import {IVesting} from "../vesting/interfaces/IVesting.sol";
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     using AtomicSwapMsgValidator for *;
     using AtomicSwapStateLogic for *;
-    using TokenTransferHelper for *;
-
+    using AnteHandler for *;
     /// @notice Initializes the contract with necessary parameters.
     /// @param _admin The admin address for the contract.
     /// @param _vestingManager The address of the vesting manager contract.
@@ -73,7 +72,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             }
         } else {
             // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
-            makeswap.sellToken.token.safeTransferFrom(
+            TransferHelper.safeTransferFrom(
+                makeswap.sellToken.token,
                 msg.sender,
                 address(this),
                 makeswap.sellToken.amount
@@ -121,6 +121,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         _order.completedAt = block.timestamp;
         _order.taker = msg.sender;
 
+        // slither-disable-next-line arbitrary-send
         _transferSellTokenToBuyer(_order, takeswapMsg.takerReceiver);
         _order.buyToken.token.transferFromWithFee(
             _order.maker,
@@ -157,22 +158,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Return the funds/tokens to the maker
         if (_order.sellToken.token == address(0)) {
             // Refund Ether if the sell token was Ether
-            (bool success, ) = payable(msg.sender).call{
-                value: _order.sellToken.amount
-            }("");
-            if (!success) {
-                revert TransferFailed(msg.sender, _order.sellToken.amount);
-            }
+            TransferHelper.safeTransferETH(msg.sender,_order.sellToken.amount);
         } else {
             // Refund ERC20 tokens if the sell token was an ERC20 token
-            if (
-                !IERC20(_order.sellToken.token).transfer(
-                    msg.sender,
-                    _order.sellToken.amount
-                )
-            ) {
-                revert TransferFailed(msg.sender, _order.sellToken.amount);
-            }
+            TransferHelper.safeTransfer(
+                _order.sellToken.token,
+                msg.sender,
+                _order.sellToken.amount
+            );
         }
         // Clean up storage (optimize gas by nullifying order details)
         delete swapOrder[cancelswap.orderID];
@@ -193,9 +186,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     {
         bytes32 _orderID = placeBidMsg.orderID;
         uint256 _bidAmount = placeBidMsg.bidAmount;
-
-        // TODO: Add check for expiration of order
-
         // Ensure the caller is the bidder
         if (placeBidMsg.bidder != msg.sender) {
             revert InvalidBidderAddress();
@@ -225,7 +215,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
             // Transfer the additional bid amount from the bidder to this contract
-            _buyToken.token.safeTransferFrom(
+            TransferHelper.safeTransferFrom(
+                _buyToken.token,
                 msg.sender,
                 address(this),
                 _bidAmount
@@ -291,7 +282,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (_buyToken.token != address(0)) {
             // Bidding with ERC20 token
             // Safely transfer the additional bid amount from the bidder to this contract
-            _buyToken.token.safeTransferFrom(
+            TransferHelper.safeTransferFrom(
+                _buyToken.token,
                 msg.sender,
                 address(this),
                 _addition
@@ -395,18 +387,17 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
         // If buy token is an ERC20 token, transfer it back to the bidder
         if (_buyToken.token != address(0)) {
-            _buyToken.token.safeTransfer(
+            TransferHelper.safeTransfer(
+                _buyToken.token,
                 _selectedBid.bidder,
                 _selectedBid.amount
             );
         } else {
             // If buy token is Ether, transfer it back to the bidder
-            (bool success, ) = payable(msg.sender).call{
-                value: _selectedBid.amount
-            }("");
-            if (!success) {
-                revert TransferFailed(msg.sender, _selectedBid.amount);
-            }
+            TransferHelper.safeTransferETH(
+                msg.sender,
+                _selectedBid.amount
+            );
         }
 
         emit CanceledBid(_orderID, _selectedBid.bidder);
@@ -438,13 +429,12 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             uint256 _sellTokenAmountAfterFee = _order.sellToken.amount -
                 _sellTokenFee;
             if (_order.sellToken.token == address(0)) {
+                TransferHelper.safeTransferETH(
+                    treasury,
+                    _sellTokenFee
+                );
                 // Take Fee.
-                (bool successToTreasury, ) = payable(address(treasury)).call{
-                    value: _sellTokenFee
-                }("");
-                if (!successToTreasury) {
-                    revert TransferFailed(address(treasury), _sellTokenFee);
-                }
+                // slither-disable-next-line arbitrary-send-eth
                 vestingManager.startVesting{value: _sellTokenAmountAfterFee}(
                     _order.id,
                     buyer,
@@ -454,7 +444,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 );
             } else {
                 // Take Fee.
-                _order.sellToken.token.safeTransfer(
+                TransferHelper.safeTransfer(
+                    _order.sellToken.token,
                     address(treasury),
                     _sellTokenFee
                 );

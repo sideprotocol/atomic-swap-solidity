@@ -3,22 +3,23 @@ pragma solidity ^0.8.19;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-
+import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
-import {TokenTransferHelper} from "../abstracts/libs/utils/TokenTransferHelper.sol";
+import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
 
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     using AtomicSwapMsgValidator for *;
-    using TokenTransferHelper for *;
+    using AnteHandler for *;
     /// @notice Stores vesting schedules for each beneficiary.
     mapping(address => mapping(bytes32 => VestingSchedule))
         public vestingSchedules;
 
     /// @notice Stores release information for each beneficiary.
+    // slither-disable-next-line uninitialized-state
     mapping(address => mapping(bytes32 => IAtomicSwapBase.Release[]))
         public releaseInfos;
 
@@ -52,7 +53,10 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
                 revert IAtomicSwapBase.NotEnoughFund(totalAmount, msg.value);
             }
         } else {
-            token.safeTransferFrom(msg.sender, address(this), totalAmount);
+            TransferHelper.safeTransferFrom(
+                token,
+                msg.sender, address(this), totalAmount
+            );
         }
         uint256 vestingStartTime = block.timestamp;
         VestingSchedule memory newVesting = VestingSchedule({
@@ -64,6 +68,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
             lastReleasedStep: 0
         });
         vestingSchedules[beneficiary][orderId] = newVesting;
+        //slither-disable-next-line uninitialized-state-variables
         IAtomicSwapBase.Release[] storage _releases = releaseInfos[beneficiary][
             orderId
         ];
@@ -115,23 +120,17 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
             revert NoVestedTokensForRelease();
         }
         schedule.amountReleased += amountForRelease;
-
         if (schedule.token != address(0)) {
-            schedule.token.safeTransfer(beneficiary, amountForRelease);
+            TransferHelper.safeTransfer(
+                schedule.token,
+                beneficiary, amountForRelease
+            );
         } else {
-            (bool successToRecipient, ) = payable(beneficiary).call{
-                value: amountForRelease
-            }("");
-            if (!successToRecipient) {
-                revert IAtomicSwapBase.TransferToRecipientFailed(
-                    beneficiary,
-                    amountForRelease
-                );
-            }
+            TransferHelper.safeTransferETH(beneficiary, amountForRelease);
         }
         emit Released(beneficiary, amountForRelease);
     }
-
+    
     /// @notice Fallback function to receive Ether.
     /// @dev Emits a Received event when Ether is received.
     receive() external payable {

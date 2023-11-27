@@ -71,9 +71,9 @@ describe("AtomicSwap: MakeSwap", () => {
       acceptBid: true,
     };
 
-    await expect(
-      atomicSwap.connect(taker).makeSwap(payload)
-    ).to.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");
+    await expect(atomicSwap.connect(taker).makeSwap(payload)).to.revertedWith(
+      "TransferHelper::transferFrom: transferFrom failed"
+    );
   });
 
   it("should revert to create in-chain pool with transfer failed", async () => {
@@ -103,9 +103,8 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await usdc.setFailTransferFrom(true);
 
-    await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
-      atomicSwap,
-      "TransferFromFailed"
+    await expect(atomicSwap.makeSwap(payload)).to.revertedWith(
+      "TransferHelper::transferFrom: transferFrom failed"
     );
   });
 

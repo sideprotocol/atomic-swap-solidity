@@ -40,7 +40,7 @@ describe("TakeSwap", () => {
           value: ethers.parseEther("0"),
         }
       )
-    ).to.be.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");
+    ).to.be.revertedWith("TransferHelper::transferFrom: transferFrom failed");
   });
 
   it("should revert when trying to take with insufficient ERC20 allowance", async () => {
@@ -56,7 +56,7 @@ describe("TakeSwap", () => {
         orderID,
         takerReceiver: taker.address,
       })
-    ).to.be.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");
+    ).to.be.revertedWith("TransferHelper::transferFrom: transferFrom failed");
   });
 
   it("should revert when trying to take an already completed swap", async () => {

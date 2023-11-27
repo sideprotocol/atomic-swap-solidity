@@ -34,10 +34,8 @@ export const Utils = {
     );
     const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
 
-    const TokenTransferHelperFactory = await ethers.getContractFactory(
-      "TokenTransferHelper"
-    );
-    const tokenTransferHelper = await TokenTransferHelperFactory.deploy();
+    const AnteHandlerFactory = await ethers.getContractFactory("AnteHandler");
+    const AnteHandler = await AnteHandlerFactory.deploy();
 
     const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
       "AtomicSwapMsgValidator"
@@ -70,7 +68,7 @@ export const Utils = {
       {
         libraries: {
           AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
-          TokenTransferHelper: await tokenTransferHelper.getAddress(),
+          AnteHandler: await AnteHandler.getAddress(),
           AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       }

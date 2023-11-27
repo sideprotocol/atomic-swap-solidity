@@ -182,7 +182,7 @@ describe("AtomicSwap: PlaceBid", () => {
     // make bid
     await expect(
       atomicSwap.connect(taker).placeBid(bidPayload)
-    ).to.revertedWithCustomError(atomicSwap, "NotAllowedTransferAmount");
+    ).to.revertedWith("TransferHelper::transferFrom: transferFrom failed");
   });
   it("should revert to place bid with not enough erc20 token", async () => {
     const { atomicSwap, taker, orderID, usdt } = await createDefaultAtomicOrder(

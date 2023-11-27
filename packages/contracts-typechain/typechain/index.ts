@@ -34,8 +34,6 @@ export type { AtomicSwapStateLogic } from "./contracts/abstracts/libs/logic/Atom
 export { AtomicSwapStateLogic__factory } from "./factories/contracts/abstracts/libs/logic/AtomicSwapStateLogic__factory";
 export type { AtomicSwapMsgValidator } from "./contracts/abstracts/libs/utils/AtomicSwapMsgValidator";
 export { AtomicSwapMsgValidator__factory } from "./factories/contracts/abstracts/libs/utils/AtomicSwapMsgValidator__factory";
-export type { TokenTransferHelper } from "./contracts/abstracts/libs/utils/TokenTransferHelper";
-export { TokenTransferHelper__factory } from "./factories/contracts/abstracts/libs/utils/TokenTransferHelper__factory";
 export type { InchainAtomicSwap } from "./contracts/inchain_atomicswap/InchainAtomicSwap";
 export { InchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/InchainAtomicSwap__factory";
 export type { IInchainAtomicSwap } from "./contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap";
