@@ -1,1 +1,1 @@
-export { OwnableUpgradeable__factory } from "./OwnableUpgradeable__factory";
+export { AccessControlUpgradeable__factory } from "./AccessControlUpgradeable__factory";

@@ -1,1 +1,1 @@
-export type { OwnableUpgradeable } from "./OwnableUpgradeable";
+export type { AccessControlUpgradeable } from "./AccessControlUpgradeable";

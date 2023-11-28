@@ -30,7 +30,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         uint256 _sellerFee,
         uint256 _buyerFee
     ) external initializer {
-        __Ownable_init_unchained(_admin);
+        __OwnablePausableUpgradeable_init(_admin);
         if (_sellerFee > MAX_FEE_RATE_SCALE) {
             revert InvalidSellerFee();
         }
@@ -51,7 +51,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @return Returns the unique identifier of the created swap order.
     function makeSwap(
         MakeSwapMsg calldata makeswap
-    ) public payable nonReentrant returns (bytes32) {
+    ) public payable nonReentrant whenNotPaused returns (bytes32) {
         // Ensure the sell token and buy token are not the same non-zero address.
         if (makeswap.sellToken.token == makeswap.buyToken.token) {
             revert UnsupportedTokenPair();
@@ -105,9 +105,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         external
         payable
         virtual
+        whenNotPaused
         nonReentrant // Prevents reentrancy attacks
         onlyExist(takeswap.orderID) // Ensures the swap order exists
-        onlyActive(takeswap.orderID) // Ensures the swap order active
+        onlyActiveOrder(takeswap.orderID) // Ensures the swap order active
     {
         AtomicSwapOrder storage _order = swapOrder[takeswap.orderID];
         _order.validateTakeSwap(takeswap);
@@ -142,9 +143,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         external
         payable
         virtual
+        whenNotPaused
         nonReentrant // Prevents reentrancy attacks
         onlyExist(cancelswap.orderID)
-        onlyActive(cancelswap.orderID) // Ensures the swap order exists
+        onlyActiveOrder(cancelswap.orderID) // Ensures the swap order exists
     {
         AtomicSwapOrder storage _order = swapOrder[cancelswap.orderID];
         _order.validateCancelSwap();
@@ -176,8 +178,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         external
         payable
         nonReentrant
+        whenNotPaused
         onlyExist(placeBidMsg.orderID)
-        onlyActive(placeBidMsg.orderID)
+        onlyActiveOrder(placeBidMsg.orderID)
     {
         bytes32 _orderID = placeBidMsg.orderID;
         uint256 _bidAmount = placeBidMsg.bidAmount;
@@ -235,9 +238,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     )
         external
         payable
+        whenNotPaused
         nonReentrant // Ensures the function cannot be re-entered during execution
         onlyExist(updateBidMsg.orderID)
-        onlyActive(updateBidMsg.orderID) // Ensures the order exists
+        onlyActiveOrder(updateBidMsg.orderID) // Ensures the order exists
     {
         // Extracting details from the updateBidMsg for easy reference
         bytes32 _orderID = updateBidMsg.orderID;
@@ -301,9 +305,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     )
         external
         payable
+        whenNotPaused
         nonReentrant
         onlyExist(acceptBidMsg.orderID)
-        onlyActive(acceptBidMsg.orderID)
+        onlyActiveOrder(acceptBidMsg.orderID)
     {
         // Ensure no unnecessary Ether is sent with the transaction
         bytes32 _orderID = acceptBidMsg.orderID;
@@ -363,7 +368,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @param _orderID The unique identifier of the swap order.
     function cancelBid(
         bytes32 _orderID
-    ) external payable nonReentrant onlyExist(_orderID) {
+    ) external payable whenNotPaused nonReentrant onlyExist(_orderID) {
         // Retrieve the selected bid from storage
         Bid storage _selectedBid = bids[_orderID][msg.sender];
 
@@ -460,5 +465,4 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             }
         }
     }
-    
 }

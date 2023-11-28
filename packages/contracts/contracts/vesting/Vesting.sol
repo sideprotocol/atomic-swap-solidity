@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OwnablePausableUpgradeable} from "../abstracts/OwnablePausableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
-import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
-contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
+contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     using AtomicSwapMsgValidator for *;
-    using AnteHandler for *;
-    mapping (address=>bool) admins;
     /// @notice Stores vesting schedules for each beneficiary.
     mapping(address => mapping(bytes32 => VestingSchedule))
         public vestingSchedules;
@@ -26,18 +23,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     /// @notice Initializes the vesting contract with necessary parameters.
     /// @param _admin The address of the admin.
     function initialize(address _admin) external initializer {
-        __Ownable_init_unchained(_admin);
-    }
-
-    function setAdmin(address _newAdmin) external onlyOwner {
-        admins[_newAdmin] = true;
-    }
-
-    modifier onlyAdmins {
-        if(!admins[msg.sender]) {
-            revert NoPermissionToUserContract();
-        }
-        _;
+        __OwnablePausableUpgradeable_init(_admin);
     }
     // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
     /// @notice Starts the vesting schedule for a beneficiary.
@@ -52,7 +38,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
-    ) external payable nonReentrant onlyAdmins {
+    ) external payable nonReentrant onlyAdmin {
         // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
         if (vestingSchedules[beneficiary][orderId].from != address(0)) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
@@ -97,7 +83,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     function release(
         address beneficiary,
         bytes32 orderId
-    ) external nonReentrant {
+    ) external nonReentrant whenNotPaused {
         VestingSchedule storage schedule = vestingSchedules[beneficiary][
             orderId
         ];
@@ -139,7 +125,7 @@ contract Vesting is OwnableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
     
     /// @notice Fallback function to receive Ether.
     /// @dev Emits a Received event when Ether is received.
-    receive() external payable onlyAdmins {
+    receive() external payable onlyAdmin {
         emit Received(msg.sender, msg.value);
     }
 }

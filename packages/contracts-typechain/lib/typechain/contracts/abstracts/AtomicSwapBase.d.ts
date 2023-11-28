@@ -11,26 +11,58 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface AtomicSwapBaseInterface extends Interface {
-    getFunction(nameOrSignature: "bids" | "buyerFeeRate" | "counteroffers" | "owner" | "renounceOwnership" | "sellerFeeRate" | "swapOrder" | "swapOrderVestingParams" | "transferOwnership"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "OwnershipTransferred" | "PlacedBid" | "ReceivedNewBid" | "UpdatedBid"): EventFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "bids" | "buyerFeeRate" | "counteroffers" | "getRoleAdmin" | "grantRole" | "hasRole" | "isAdmin" | "isPauser" | "paginationSize" | "pause" | "paused" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "sellerFeeRate" | "setPaginationSize" | "supportsInterface" | "swapOrder" | "swapOrderVestingParams" | "unpause"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "Paused" | "PlacedBid" | "ReceivedNewBid" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "UpdatedBid"): EventFragment;
+    encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
+    encodeFunctionData(functionFragment: "PAUSER_ROLE", values?: undefined): string;
+    encodeFunctionData(functionFragment: "addAdmin", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "addPauser", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "bids", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "buyerFeeRate", values?: undefined): string;
     encodeFunctionData(functionFragment: "counteroffers", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-    encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
+    encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "isPauser", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "paginationSize", values?: undefined): string;
+    encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+    encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+    encodeFunctionData(functionFragment: "removeAdmin", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "removePauser", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "sellerFeeRate", values?: undefined): string;
+    encodeFunctionData(functionFragment: "setPaginationSize", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "swapOrder", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "swapOrderVestingParams", values: [BytesLike, BigNumberish]): string;
-    encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+    decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "PAUSER_ROLE", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "addPauser", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "buyerFeeRate", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "counteroffers", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getRoleAdmin", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "isPauser", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "paginationSize", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "removeAdmin", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "removePauser", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "sellerFeeRate", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setPaginationSize", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "swapOrderVestingParams", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 }
 export declare namespace AcceptedBidEvent {
     type InputTuple = [
@@ -111,12 +143,11 @@ export declare namespace InitializedEvent {
     type Log = TypedEventLog<Event>;
     type LogDescription = TypedLogDescription<Event>;
 }
-export declare namespace OwnershipTransferredEvent {
-    type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
-    type OutputTuple = [previousOwner: string, newOwner: string];
+export declare namespace PausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
     interface OutputObject {
-        previousOwner: string;
-        newOwner: string;
+        account: string;
     }
     type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
     type Filter = TypedDeferredTopicFilter<Event>;
@@ -157,6 +188,72 @@ export declare namespace ReceivedNewBidEvent {
     type Log = TypedEventLog<Event>;
     type LogDescription = TypedLogDescription<Event>;
 }
+export declare namespace RoleAdminChangedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        previousAdminRole: BytesLike,
+        newAdminRole: BytesLike
+    ];
+    type OutputTuple = [
+        role: string,
+        previousAdminRole: string,
+        newAdminRole: string
+    ];
+    interface OutputObject {
+        role: string;
+        previousAdminRole: string;
+        newAdminRole: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export declare namespace RoleGrantedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export declare namespace RoleRevokedEvent {
+    type InputTuple = [
+        role: BytesLike,
+        account: AddressLike,
+        sender: AddressLike
+    ];
+    type OutputTuple = [role: string, account: string, sender: string];
+    interface OutputObject {
+        role: string;
+        account: string;
+        sender: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export declare namespace UnpausedEvent {
+    type InputTuple = [account: AddressLike];
+    type OutputTuple = [account: string];
+    interface OutputObject {
+        account: string;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
 export declare namespace UpdatedBidEvent {
     type InputTuple = [
         orderID: BytesLike,
@@ -187,6 +284,10 @@ export interface AtomicSwapBase extends BaseContract {
     listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
+    DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+    PAUSER_ROLE: TypedContractMethod<[], [string], "view">;
+    addAdmin: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    addPauser: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
     bids: TypedContractMethod<[
         arg0: BytesLike,
         arg1: AddressLike
@@ -214,9 +315,57 @@ export interface AtomicSwapBase extends BaseContract {
     ], [
         bigint
     ], "view">;
-    owner: TypedContractMethod<[], [string], "view">;
-    renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+    grantRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    hasRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    isAdmin: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    isPauser: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    paginationSize: TypedContractMethod<[], [bigint], "view">;
+    pause: TypedContractMethod<[], [void], "nonpayable">;
+    paused: TypedContractMethod<[], [boolean], "view">;
+    removeAdmin: TypedContractMethod<[
+        _account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    removePauser: TypedContractMethod<[
+        _account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    renounceRole: TypedContractMethod<[
+        role: BytesLike,
+        callerConfirmation: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    revokeRole: TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
     sellerFeeRate: TypedContractMethod<[], [bigint], "view">;
+    setPaginationSize: TypedContractMethod<[
+        _paginationSize: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    supportsInterface: TypedContractMethod<[
+        interfaceId: BytesLike
+    ], [
+        boolean
+    ], "view">;
     swapOrder: TypedContractMethod<[
         arg0: BytesLike
     ], [
@@ -257,12 +406,12 @@ export interface AtomicSwapBase extends BaseContract {
             percentage: bigint;
         }
     ], "view">;
-    transferOwnership: TypedContractMethod<[
-        newOwner: AddressLike
-    ], [
-        void
-    ], "nonpayable">;
+    unpause: TypedContractMethod<[], [void], "nonpayable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "PAUSER_ROLE"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "addAdmin"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "addPauser"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "bids"): TypedContractMethod<[
         arg0: BytesLike,
         arg1: AddressLike
@@ -290,9 +439,41 @@ export interface AtomicSwapBase extends BaseContract {
     ], [
         bigint
     ], "view">;
-    getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "getRoleAdmin"): TypedContractMethod<[role: BytesLike], [string], "view">;
+    getFunction(nameOrSignature: "grantRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "hasRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        boolean
+    ], "view">;
+    getFunction(nameOrSignature: "isAdmin"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "isPauser"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "paginationSize"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
+    getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
+    getFunction(nameOrSignature: "removeAdmin"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "removePauser"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "renounceRole"): TypedContractMethod<[
+        role: BytesLike,
+        callerConfirmation: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "revokeRole"): TypedContractMethod<[
+        role: BytesLike,
+        account: AddressLike
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "sellerFeeRate"): TypedContractMethod<[], [bigint], "view">;
+    getFunction(nameOrSignature: "setPaginationSize"): TypedContractMethod<[_paginationSize: BigNumberish], [void], "nonpayable">;
+    getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
     getFunction(nameOrSignature: "swapOrder"): TypedContractMethod<[
         arg0: BytesLike
     ], [
@@ -333,16 +514,20 @@ export interface AtomicSwapBase extends BaseContract {
             percentage: bigint;
         }
     ], "view">;
-    getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
     getEvent(key: "AcceptedBid"): TypedContractEvent<AcceptedBidEvent.InputTuple, AcceptedBidEvent.OutputTuple, AcceptedBidEvent.OutputObject>;
     getEvent(key: "AtomicSwapOrderCanceled"): TypedContractEvent<AtomicSwapOrderCanceledEvent.InputTuple, AtomicSwapOrderCanceledEvent.OutputTuple, AtomicSwapOrderCanceledEvent.OutputObject>;
     getEvent(key: "AtomicSwapOrderCreated"): TypedContractEvent<AtomicSwapOrderCreatedEvent.InputTuple, AtomicSwapOrderCreatedEvent.OutputTuple, AtomicSwapOrderCreatedEvent.OutputObject>;
     getEvent(key: "AtomicSwapOrderTook"): TypedContractEvent<AtomicSwapOrderTookEvent.InputTuple, AtomicSwapOrderTookEvent.OutputTuple, AtomicSwapOrderTookEvent.OutputObject>;
     getEvent(key: "CanceledBid"): TypedContractEvent<CanceledBidEvent.InputTuple, CanceledBidEvent.OutputTuple, CanceledBidEvent.OutputObject>;
     getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
-    getEvent(key: "OwnershipTransferred"): TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+    getEvent(key: "Paused"): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
     getEvent(key: "PlacedBid"): TypedContractEvent<PlacedBidEvent.InputTuple, PlacedBidEvent.OutputTuple, PlacedBidEvent.OutputObject>;
     getEvent(key: "ReceivedNewBid"): TypedContractEvent<ReceivedNewBidEvent.InputTuple, ReceivedNewBidEvent.OutputTuple, ReceivedNewBidEvent.OutputObject>;
+    getEvent(key: "RoleAdminChanged"): TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+    getEvent(key: "RoleGranted"): TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+    getEvent(key: "RoleRevoked"): TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+    getEvent(key: "Unpaused"): TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     getEvent(key: "UpdatedBid"): TypedContractEvent<UpdatedBidEvent.InputTuple, UpdatedBidEvent.OutputTuple, UpdatedBidEvent.OutputObject>;
     filters: {
         "AcceptedBid(bytes32,address,uint256)": TypedContractEvent<AcceptedBidEvent.InputTuple, AcceptedBidEvent.OutputTuple, AcceptedBidEvent.OutputObject>;
@@ -357,12 +542,20 @@ export interface AtomicSwapBase extends BaseContract {
         CanceledBid: TypedContractEvent<CanceledBidEvent.InputTuple, CanceledBidEvent.OutputTuple, CanceledBidEvent.OutputObject>;
         "Initialized(uint64)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
         Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
-        "OwnershipTransferred(address,address)": TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
-        OwnershipTransferred: TypedContractEvent<OwnershipTransferredEvent.InputTuple, OwnershipTransferredEvent.OutputTuple, OwnershipTransferredEvent.OutputObject>;
+        "Paused(address)": TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+        Paused: TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
         "PlacedBid(bytes32,address,uint256)": TypedContractEvent<PlacedBidEvent.InputTuple, PlacedBidEvent.OutputTuple, PlacedBidEvent.OutputObject>;
         PlacedBid: TypedContractEvent<PlacedBidEvent.InputTuple, PlacedBidEvent.OutputTuple, PlacedBidEvent.OutputObject>;
         "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<ReceivedNewBidEvent.InputTuple, ReceivedNewBidEvent.OutputTuple, ReceivedNewBidEvent.OutputObject>;
         ReceivedNewBid: TypedContractEvent<ReceivedNewBidEvent.InputTuple, ReceivedNewBidEvent.OutputTuple, ReceivedNewBidEvent.OutputObject>;
+        "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        RoleAdminChanged: TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
+        "RoleGranted(bytes32,address,address)": TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        RoleGranted: TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
+        "RoleRevoked(bytes32,address,address)": TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        RoleRevoked: TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        "Unpaused(address)": TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
+        Unpaused: TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
         "UpdatedBid(bytes32,address,uint256)": TypedContractEvent<UpdatedBidEvent.InputTuple, UpdatedBidEvent.OutputTuple, UpdatedBidEvent.OutputObject>;
         UpdatedBid: TypedContractEvent<UpdatedBidEvent.InputTuple, UpdatedBidEvent.OutputTuple, UpdatedBidEvent.OutputObject>;
     };

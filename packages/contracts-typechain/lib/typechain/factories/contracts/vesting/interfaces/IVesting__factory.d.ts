@@ -11,10 +11,6 @@ export declare class IVesting__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "NoPermissionToUserContract";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
         readonly name: "NoVestedTokensAvailable";
         readonly type: "error";
     }, {

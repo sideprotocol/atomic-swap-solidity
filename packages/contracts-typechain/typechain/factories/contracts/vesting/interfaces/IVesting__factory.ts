@@ -21,11 +21,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "NoPermissionToUserContract",
-    type: "error",
-  },
-  {
-    inputs: [],
     name: "NoVestedTokensAvailable",
     type: "error",
   },

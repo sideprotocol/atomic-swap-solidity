@@ -100,9 +100,9 @@ export const Utils = {
       }
     );
 
-    await vestingManager.setAdmin(await atomicSwap.getAddress());
+    await vestingManager.addAdmin(await atomicSwap.getAddress());
 
-    // Deploy Mock Token
+    // Deploy Mock Contracts
     const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");
     const mockUSDC = await mockERC20TokenFactory.deploy("USDC", "USDC");
     const mockUSDT = await mockERC20TokenFactory.deploy("USDT", "USDT");

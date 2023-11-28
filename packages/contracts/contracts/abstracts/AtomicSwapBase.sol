@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
+import {OwnablePausableUpgradeable} from  "./OwnablePausableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from  "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
 import { IAtomicSwapBase } from "./interfaces/IAtomicSwapBase.sol";
@@ -11,7 +10,7 @@ import {IVesting} from  "../vesting/interfaces/IVesting.sol";
 /// @title AtomicSwapBase
 /// @notice Abstract contract for creating atomic swap orders with support for vesting parameters.
 /// @dev Inherits from OpenZeppelin's OwnableUpgradeable and ReentrancyGuardUpgradeable.
-abstract contract AtomicSwapBase is OwnableUpgradeable, ReentrancyGuardUpgradeable, IAtomicSwapBase {
+abstract contract AtomicSwapBase is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IAtomicSwapBase {
     /// @notice Stores each atomic swap order by its unique identifier.
     mapping(bytes32 => AtomicSwapOrder) public swapOrder;
 
@@ -49,7 +48,7 @@ abstract contract AtomicSwapBase is OwnableUpgradeable, ReentrancyGuardUpgradeab
         _;
     }
 
-    modifier onlyActive(bytes32 id) {
+    modifier onlyActiveOrder(bytes32 id) {
         if (swapOrder[id].status != OrderStatus.INITIAL) {
             revert InactiveOrder();
         }

@@ -19,8 +19,11 @@ describe("AtomicSwap: Vesting", () => {
     const { orderID, taker, vestingManager, takerReceiver, atomicSwap } =
       await testVestingTakeSwap(true, false);
     await expect(
-      vestingManager.connect(taker).setAdmin(taker.address)
-    ).to.revertedWithCustomError(vestingManager, "OwnableUnauthorizedAccount");
+      vestingManager.connect(taker).addAdmin(taker.address)
+    ).to.revertedWithCustomError(
+      vestingManager,
+      "AccessControlUnauthorizedAccount"
+    );
   });
   it("should revert to start vesting with invalid fund", async () => {
     const { atomicSwap, treasury, vestingManager } = await loadFixture(
@@ -44,14 +47,17 @@ describe("AtomicSwap: Vesting", () => {
       Utils.prepareInChainAtomicTest
     );
     const orderId = randomBytes(32);
+    const [, , taker] = await ethers.getSigners();
     await expect(
-      vestingManager.startVesting(orderId, treasury, ZeroAddress, BigInt(10), [
-        {
-          durationInHours: BigInt(1),
-          percentage: 10000,
-        },
-      ])
-    ).to.revertedWithCustomError(vestingManager, "NoPermissionToUserContract");
+      vestingManager
+        .connect(taker)
+        .startVesting(orderId, treasury, ZeroAddress, BigInt(10), [
+          {
+            durationInHours: BigInt(1),
+            percentage: 10000,
+          },
+        ])
+    ).to.revertedWith("OwnablePausable: access denied");
   });
   it("should revert to release fund with invalid start time", async () => {
     const { orderID, taker, vestingManager, takerReceiver, atomicSwap } =

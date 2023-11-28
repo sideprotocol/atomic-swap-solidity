@@ -62,6 +62,4 @@ interface IVesting {
     error OverMaximumReleaseStep();
     error InvalidTotalPercentage();
     error NoVestedTokensForRelease();
-
-    error NoPermissionToUserContract();
 }

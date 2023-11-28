@@ -14,9 +14,9 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
-      name: "OwnableUpgradeable",
+      name: "AccessControlUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.OwnableUpgradeable__factory>;
+    ): Promise<Contracts.AccessControlUpgradeable__factory>;
     getContractFactory(
       name: "Initializable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -26,9 +26,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ContextUpgradeable__factory>;
     getContractFactory(
+      name: "ERC165Upgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC165Upgradeable__factory>;
+    getContractFactory(
+      name: "PausableUpgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PausableUpgradeable__factory>;
+    getContractFactory(
       name: "ReentrancyGuardUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuardUpgradeable__factory>;
+    getContractFactory(
+      name: "IAccessControl",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IAccessControl__factory>;
     getContractFactory(
       name: "IERC1155Errors",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -54,6 +66,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20__factory>;
     getContractFactory(
+      name: "IERC165",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC165__factory>;
+    getContractFactory(
       name: "AtomicSwapBase",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AtomicSwapBase__factory>;
@@ -61,6 +77,10 @@ declare module "hardhat/types/runtime" {
       name: "IAtomicSwapBase",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IAtomicSwapBase__factory>;
+    getContractFactory(
+      name: "IOwnablePausable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IOwnablePausable__factory>;
     getContractFactory(
       name: "AtomicSwapStateLogic",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -73,6 +93,10 @@ declare module "hardhat/types/runtime" {
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
+    getContractFactory(
+      name: "OwnablePausableUpgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.OwnablePausableUpgradeable__factory>;
     getContractFactory(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -95,10 +119,10 @@ declare module "hardhat/types/runtime" {
     ): Promise<Contracts.Vesting__factory>;
 
     getContractAt(
-      name: "OwnableUpgradeable",
+      name: "AccessControlUpgradeable",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.OwnableUpgradeable>;
+    ): Promise<Contracts.AccessControlUpgradeable>;
     getContractAt(
       name: "Initializable",
       address: string | ethers.Addressable,
@@ -110,10 +134,25 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ContextUpgradeable>;
     getContractAt(
+      name: "ERC165Upgradeable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC165Upgradeable>;
+    getContractAt(
+      name: "PausableUpgradeable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PausableUpgradeable>;
+    getContractAt(
       name: "ReentrancyGuardUpgradeable",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuardUpgradeable>;
+    getContractAt(
+      name: "IAccessControl",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IAccessControl>;
     getContractAt(
       name: "IERC1155Errors",
       address: string | ethers.Addressable,
@@ -145,6 +184,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
     getContractAt(
+      name: "IERC165",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC165>;
+    getContractAt(
       name: "AtomicSwapBase",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -154,6 +198,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IAtomicSwapBase>;
+    getContractAt(
+      name: "IOwnablePausable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IOwnablePausable>;
     getContractAt(
       name: "AtomicSwapStateLogic",
       address: string | ethers.Addressable,
@@ -169,6 +218,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.AtomicSwapMsgValidator>;
+    getContractAt(
+      name: "OwnablePausableUpgradeable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.OwnablePausableUpgradeable>;
     getContractAt(
       name: "InchainAtomicSwap",
       address: string | ethers.Addressable,
@@ -196,9 +250,9 @@ declare module "hardhat/types/runtime" {
     ): Promise<Contracts.Vesting>;
 
     deployContract(
-      name: "OwnableUpgradeable",
+      name: "AccessControlUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.OwnableUpgradeable>;
+    ): Promise<Contracts.AccessControlUpgradeable>;
     deployContract(
       name: "Initializable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -208,9 +262,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ContextUpgradeable>;
     deployContract(
+      name: "ERC165Upgradeable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ERC165Upgradeable>;
+    deployContract(
+      name: "PausableUpgradeable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.PausableUpgradeable>;
+    deployContract(
       name: "ReentrancyGuardUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuardUpgradeable>;
+    deployContract(
+      name: "IAccessControl",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IAccessControl>;
     deployContract(
       name: "IERC1155Errors",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -236,6 +302,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC20>;
     deployContract(
+      name: "IERC165",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC165>;
+    deployContract(
       name: "AtomicSwapBase",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapBase>;
@@ -243,6 +313,10 @@ declare module "hardhat/types/runtime" {
       name: "IAtomicSwapBase",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAtomicSwapBase>;
+    deployContract(
+      name: "IOwnablePausable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IOwnablePausable>;
     deployContract(
       name: "AtomicSwapStateLogic",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -255,6 +329,10 @@ declare module "hardhat/types/runtime" {
       name: "AtomicSwapMsgValidator",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
+      name: "OwnablePausableUpgradeable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.OwnablePausableUpgradeable>;
     deployContract(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -277,10 +355,10 @@ declare module "hardhat/types/runtime" {
     ): Promise<Contracts.Vesting>;
 
     deployContract(
-      name: "OwnableUpgradeable",
+      name: "AccessControlUpgradeable",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.OwnableUpgradeable>;
+    ): Promise<Contracts.AccessControlUpgradeable>;
     deployContract(
       name: "Initializable",
       args: any[],
@@ -292,10 +370,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ContextUpgradeable>;
     deployContract(
+      name: "ERC165Upgradeable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ERC165Upgradeable>;
+    deployContract(
+      name: "PausableUpgradeable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.PausableUpgradeable>;
+    deployContract(
       name: "ReentrancyGuardUpgradeable",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuardUpgradeable>;
+    deployContract(
+      name: "IAccessControl",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IAccessControl>;
     deployContract(
       name: "IERC1155Errors",
       args: any[],
@@ -327,6 +420,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC20>;
     deployContract(
+      name: "IERC165",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC165>;
+    deployContract(
       name: "AtomicSwapBase",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -336,6 +434,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAtomicSwapBase>;
+    deployContract(
+      name: "IOwnablePausable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IOwnablePausable>;
     deployContract(
       name: "AtomicSwapStateLogic",
       args: any[],
@@ -351,6 +454,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
+      name: "OwnablePausableUpgradeable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.OwnablePausableUpgradeable>;
     deployContract(
       name: "InchainAtomicSwap",
       args: any[],

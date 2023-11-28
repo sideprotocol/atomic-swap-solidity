@@ -130,23 +130,39 @@ export declare namespace IAtomicSwapBase {
 export interface InchainAtomicSwapInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "DEFAULT_ADMIN_ROLE"
+      | "PAUSER_ROLE"
       | "acceptBid"
+      | "addAdmin"
+      | "addPauser"
       | "bids"
       | "buyerFeeRate"
       | "cancelBid"
       | "cancelSwap"
       | "counteroffers"
+      | "getRoleAdmin"
+      | "grantRole"
+      | "hasRole"
       | "initialize"
+      | "isAdmin"
+      | "isPauser"
       | "makeSwap"
       | "makeSwapWithVesting"
-      | "owner"
+      | "paginationSize"
+      | "pause"
+      | "paused"
       | "placeBid"
-      | "renounceOwnership"
+      | "removeAdmin"
+      | "removePauser"
+      | "renounceRole"
+      | "revokeRole"
       | "sellerFeeRate"
+      | "setPaginationSize"
+      | "supportsInterface"
       | "swapOrder"
       | "swapOrderVestingParams"
       | "takeSwap"
-      | "transferOwnership"
+      | "unpause"
       | "updateBid"
   ): FunctionFragment;
 
@@ -158,15 +174,35 @@ export interface InchainAtomicSwapInterface extends Interface {
       | "AtomicSwapOrderTook"
       | "CanceledBid"
       | "Initialized"
-      | "OwnershipTransferred"
+      | "Paused"
       | "PlacedBid"
       | "ReceivedNewBid"
+      | "RoleAdminChanged"
+      | "RoleGranted"
+      | "RoleRevoked"
+      | "Unpaused"
       | "UpdatedBid"
   ): EventFragment;
 
   encodeFunctionData(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "PAUSER_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "acceptBid",
     values: [IAtomicSwapBase.AcceptBidMsgStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addAdmin",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addPauser",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "bids",
@@ -189,8 +225,28 @@ export interface InchainAtomicSwapInterface extends Interface {
     values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getRoleAdmin",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "initialize",
     values: [AddressLike, AddressLike, AddressLike, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isAdmin",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isPauser",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "makeSwap",
@@ -200,18 +256,43 @@ export interface InchainAtomicSwapInterface extends Interface {
     functionFragment: "makeSwapWithVesting",
     values: [IAtomicSwapBase.MakeSwapMsgStruct, IAtomicSwapBase.ReleaseStruct[]]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "paginationSize",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "placeBid",
     values: [IAtomicSwapBase.PlaceBidMsgStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
+    functionFragment: "removeAdmin",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "removePauser",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "renounceRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeRole",
+    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "sellerFeeRate",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPaginationSize",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "swapOrder",
@@ -225,16 +306,23 @@ export interface InchainAtomicSwapInterface extends Interface {
     functionFragment: "takeSwap",
     values: [IAtomicSwapBase.TakeSwapMsgStruct]
   ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [AddressLike]
-  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "updateBid",
     values: [IAtomicSwapBase.UpdateBidMsgStruct]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "PAUSER_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "acceptBid", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "addPauser", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "buyerFeeRate",
@@ -246,20 +334,50 @@ export interface InchainAtomicSwapInterface extends Interface {
     functionFragment: "counteroffers",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoleAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isPauser", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "makeSwap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "makeSwapWithVesting",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "paginationSize",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "removeAdmin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "removePauser",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "sellerFeeRate",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setPaginationSize",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "swapOrder", data: BytesLike): Result;
@@ -268,10 +386,7 @@ export interface InchainAtomicSwapInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "takeSwap", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "updateBid", data: BytesLike): Result;
 }
 
@@ -360,12 +475,11 @@ export namespace InitializedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace OwnershipTransferredEvent {
-  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
-  export type OutputTuple = [previousOwner: string, newOwner: string];
+export namespace PausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
   export interface OutputObject {
-    previousOwner: string;
-    newOwner: string;
+    account: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -402,6 +516,76 @@ export namespace ReceivedNewBidEvent {
     orderID: string;
     bidder: string;
     amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleAdminChangedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    previousAdminRole: BytesLike,
+    newAdminRole: BytesLike
+  ];
+  export type OutputTuple = [
+    role: string,
+    previousAdminRole: string,
+    newAdminRole: string
+  ];
+  export interface OutputObject {
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleGrantedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleRevokedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace UnpausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -470,11 +654,19 @@ export interface InchainAtomicSwap extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+
+  PAUSER_ROLE: TypedContractMethod<[], [string], "view">;
+
   acceptBid: TypedContractMethod<
     [acceptBidMsg: IAtomicSwapBase.AcceptBidMsgStruct],
     [void],
     "payable"
   >;
+
+  addAdmin: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+
+  addPauser: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
 
   bids: TypedContractMethod<
     [arg0: BytesLike, arg1: AddressLike],
@@ -507,6 +699,20 @@ export interface InchainAtomicSwap extends BaseContract {
     "view"
   >;
 
+  getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+
+  grantRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  hasRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
+
   initialize: TypedContractMethod<
     [
       _admin: AddressLike,
@@ -518,6 +724,10 @@ export interface InchainAtomicSwap extends BaseContract {
     [void],
     "nonpayable"
   >;
+
+  isAdmin: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+
+  isPauser: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
 
   makeSwap: TypedContractMethod<
     [makeswap: IAtomicSwapBase.MakeSwapMsgStruct],
@@ -534,7 +744,11 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  owner: TypedContractMethod<[], [string], "view">;
+  paginationSize: TypedContractMethod<[], [bigint], "view">;
+
+  pause: TypedContractMethod<[], [void], "nonpayable">;
+
+  paused: TypedContractMethod<[], [boolean], "view">;
 
   placeBid: TypedContractMethod<
     [placeBidMsg: IAtomicSwapBase.PlaceBidMsgStruct],
@@ -542,9 +756,43 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+  removeAdmin: TypedContractMethod<
+    [_account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  removePauser: TypedContractMethod<
+    [_account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  renounceRole: TypedContractMethod<
+    [role: BytesLike, callerConfirmation: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  revokeRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   sellerFeeRate: TypedContractMethod<[], [bigint], "view">;
+
+  setPaginationSize: TypedContractMethod<
+    [_paginationSize: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  supportsInterface: TypedContractMethod<
+    [interfaceId: BytesLike],
+    [boolean],
+    "view"
+  >;
 
   swapOrder: TypedContractMethod<
     [arg0: BytesLike],
@@ -592,11 +840,7 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
 
-  transferOwnership: TypedContractMethod<
-    [newOwner: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
 
   updateBid: TypedContractMethod<
     [updateBidMsg: IAtomicSwapBase.UpdateBidMsgStruct],
@@ -609,12 +853,24 @@ export interface InchainAtomicSwap extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "PAUSER_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "acceptBid"
   ): TypedContractMethod<
     [acceptBidMsg: IAtomicSwapBase.AcceptBidMsgStruct],
     [void],
     "payable"
   >;
+  getFunction(
+    nameOrSignature: "addAdmin"
+  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "addPauser"
+  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "bids"
   ): TypedContractMethod<
@@ -652,6 +908,23 @@ export interface InchainAtomicSwap extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getRoleAdmin"
+  ): TypedContractMethod<[role: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "grantRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "hasRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
     [
@@ -664,6 +937,12 @@ export interface InchainAtomicSwap extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "isAdmin"
+  ): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isPauser"
+  ): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "makeSwap"
   ): TypedContractMethod<
@@ -682,8 +961,14 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "owner"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: "paginationSize"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "pause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "paused"
+  ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
     nameOrSignature: "placeBid"
   ): TypedContractMethod<
@@ -692,11 +977,34 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "renounceOwnership"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: "removeAdmin"
+  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "removePauser"
+  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "renounceRole"
+  ): TypedContractMethod<
+    [role: BytesLike, callerConfirmation: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "revokeRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "sellerFeeRate"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "setPaginationSize"
+  ): TypedContractMethod<[_paginationSize: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "swapOrder"
   ): TypedContractMethod<
@@ -747,8 +1055,8 @@ export interface InchainAtomicSwap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "transferOwnership"
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "unpause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "updateBid"
   ): TypedContractMethod<
@@ -800,11 +1108,11 @@ export interface InchainAtomicSwap extends BaseContract {
     InitializedEvent.OutputObject
   >;
   getEvent(
-    key: "OwnershipTransferred"
+    key: "Paused"
   ): TypedContractEvent<
-    OwnershipTransferredEvent.InputTuple,
-    OwnershipTransferredEvent.OutputTuple,
-    OwnershipTransferredEvent.OutputObject
+    PausedEvent.InputTuple,
+    PausedEvent.OutputTuple,
+    PausedEvent.OutputObject
   >;
   getEvent(
     key: "PlacedBid"
@@ -819,6 +1127,34 @@ export interface InchainAtomicSwap extends BaseContract {
     ReceivedNewBidEvent.InputTuple,
     ReceivedNewBidEvent.OutputTuple,
     ReceivedNewBidEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleAdminChanged"
+  ): TypedContractEvent<
+    RoleAdminChangedEvent.InputTuple,
+    RoleAdminChangedEvent.OutputTuple,
+    RoleAdminChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleGranted"
+  ): TypedContractEvent<
+    RoleGrantedEvent.InputTuple,
+    RoleGrantedEvent.OutputTuple,
+    RoleGrantedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleRevoked"
+  ): TypedContractEvent<
+    RoleRevokedEvent.InputTuple,
+    RoleRevokedEvent.OutputTuple,
+    RoleRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Unpaused"
+  ): TypedContractEvent<
+    UnpausedEvent.InputTuple,
+    UnpausedEvent.OutputTuple,
+    UnpausedEvent.OutputObject
   >;
   getEvent(
     key: "UpdatedBid"
@@ -895,15 +1231,15 @@ export interface InchainAtomicSwap extends BaseContract {
       InitializedEvent.OutputObject
     >;
 
-    "OwnershipTransferred(address,address)": TypedContractEvent<
-      OwnershipTransferredEvent.InputTuple,
-      OwnershipTransferredEvent.OutputTuple,
-      OwnershipTransferredEvent.OutputObject
+    "Paused(address)": TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
     >;
-    OwnershipTransferred: TypedContractEvent<
-      OwnershipTransferredEvent.InputTuple,
-      OwnershipTransferredEvent.OutputTuple,
-      OwnershipTransferredEvent.OutputObject
+    Paused: TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
     >;
 
     "PlacedBid(bytes32,address,uint256)": TypedContractEvent<
@@ -926,6 +1262,50 @@ export interface InchainAtomicSwap extends BaseContract {
       ReceivedNewBidEvent.InputTuple,
       ReceivedNewBidEvent.OutputTuple,
       ReceivedNewBidEvent.OutputObject
+    >;
+
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+    RoleAdminChanged: TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+
+    "RoleGranted(bytes32,address,address)": TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+    RoleGranted: TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+
+    "RoleRevoked(bytes32,address,address)": TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+    RoleRevoked: TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+
+    "Unpaused(address)": TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+    Unpaused: TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
     >;
 
     "UpdatedBid(bytes32,address,uint256)": TypedContractEvent<

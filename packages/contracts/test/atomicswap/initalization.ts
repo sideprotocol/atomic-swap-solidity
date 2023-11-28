@@ -14,7 +14,7 @@ describe("AtomicSwap: Initialization", () => {
     const { atomicSwap } = await loadFixture(Utils.prepareInChainAtomicTest);
     // assert that specific variables or settings are initialized as expected
     // for instance, if there's a owner or admin variable:
-    expect(await atomicSwap.owner()).to.equal(accounts[0].address);
+    expect(await atomicSwap.isAdmin(accounts[0].address)).to.equal(true);
   });
   it("should not allow re-initialization", async () => {
     const { atomicSwap } = await loadFixture(Utils.prepareInChainAtomicTest);

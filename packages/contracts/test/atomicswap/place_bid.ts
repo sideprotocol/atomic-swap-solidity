@@ -185,6 +185,27 @@ describe("AtomicSwap: PlaceBid", () => {
       atomicSwap.connect(taker).placeBid(bidPayload)
     ).to.revertedWith("TransferHelper::transferFrom: transferFrom failed");
   });
+  it("should revert to place bid with not enough native token", async () => {
+    const { atomicSwap, taker, orderID, usdt } = await createDefaultAtomicOrder(
+      false,
+      true,
+      true
+    );
+    // try to take swap
+    const minBidCap = (await atomicSwap.swapOrder(orderID)).minBidAmount;
+    const bidPayload = {
+      bidder: taker.address,
+      bidAmount: minBidCap - BigInt(10),
+      orderID: orderID,
+      bidderReceiver: taker.address,
+      expireTimestamp: await BlockTime.AfterSeconds(30),
+    };
+
+    // make bid
+    await expect(
+      atomicSwap.connect(taker).placeBid(bidPayload)
+    ).to.revertedWithCustomError(atomicSwap, "MismatchedBidAmount");
+  });
   it("should revert to place bid with not enough erc20 token", async () => {
     const { atomicSwap, taker, orderID, usdt } = await createDefaultAtomicOrder(
       false,
