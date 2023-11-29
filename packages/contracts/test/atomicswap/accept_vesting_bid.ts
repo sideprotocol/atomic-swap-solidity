@@ -58,7 +58,7 @@ describe("AtomicSwap: AcceptBid with Vesting", () => {
       ).to.changeTokenBalance(usdc, bidder, releaseAmount);
     }
     // after 1 hours, release again
-    await time.increase(3600);
+    await time.increase(3600 * 1);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
         await vestingManager.release(bidder, orderID)
@@ -69,7 +69,8 @@ describe("AtomicSwap: AcceptBid with Vesting", () => {
       ).to.changeTokenBalance(usdc, bidder, releaseAmount);
     }
   };
-  it("should accept bid with native token", async () => acceptBid(true));
+  it("should accept bid(native token) with vesting plan", async () =>
+    acceptBid(true));
 
   it("should accept bid with erc20 token", async () => acceptBid(false));
 });

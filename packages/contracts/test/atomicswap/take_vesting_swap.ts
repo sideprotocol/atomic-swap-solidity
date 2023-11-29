@@ -9,9 +9,9 @@ import { expect } from "chai";
 describe("TakeSwap With Vesting", () => {
   beforeEach(async () => {});
 
-  it("should take order with native token", async () =>
+  it("should take order(native token) with vesting plan", async () =>
     testVestingTakeSwap(true, false));
-  it("should take order with erc20 token", async () =>
+  it("should take order(erc20 token) with vesting plan", async () =>
     testVestingTakeSwap(false, true));
 
   it("should revert to release from vesting with no release tokens", async () => {

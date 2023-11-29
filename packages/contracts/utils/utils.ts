@@ -617,7 +617,7 @@ export const testVestingTakeSwap = async (
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
   }
   // after 1 hours, release again
-  await time.increase(3600 * 2);
+  await time.increase(3600 * 1);
   if (order.sellToken.token == ethers.ZeroAddress) {
     expect(
       await vestingManager.release(takerReceiver, orderID)
@@ -626,6 +626,18 @@ export const testVestingTakeSwap = async (
     expect(
       await vestingManager.release(takerReceiver, orderID)
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
+  }
+
+  // after 1 hours, release again
+  await time.increase(3600 * 1);
+  if (order.sellToken.token == ethers.ZeroAddress) {
+    await expect(
+      vestingManager.release(takerReceiver, orderID)
+    ).to.revertedWithCustomError(vestingManager, "InvalidVesting");
+  } else {
+    await expect(
+      vestingManager.release(takerReceiver, orderID)
+    ).to.revertedWithCustomError(vestingManager, "InvalidVesting");
   }
   expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
   return {
