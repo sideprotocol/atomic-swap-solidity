@@ -59,6 +59,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
             start: vestingStartTime,
+            lastReleasedTime: vestingStartTime,
             token: token,
             totalAmount: totalAmount,
             amountReleased: 0,
@@ -97,13 +98,14 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         }
         uint256 amountForRelease = 0;
         uint256 releaseTime = schedule.start;
-        for (uint256 i = schedule.lastReleasedStep; i < releases.length; i++) {
+        for (uint256 i = 0; i < releases.length; i++) {
             releaseTime += releases[i].durationInHours * 1 hours;
+            if (i < schedule.lastReleasedStep) continue; // continue to next
             if (block.timestamp < releaseTime) {
                 break;
             }
             uint256 releaseAmount = (schedule.totalAmount *
-                releases[i].percentage) / 10000;
+            releases[i].percentage) / 10000;
             amountForRelease += releaseAmount;
             schedule.lastReleasedStep = i + 1;
         }

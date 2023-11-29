@@ -617,7 +617,7 @@ export const testVestingTakeSwap = async (
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
   }
   // after 1 hours, release again
-  await time.increase(3600);
+  await time.increase(3600 * 2);
   if (order.sellToken.token == ethers.ZeroAddress) {
     expect(
       await vestingManager.release(takerReceiver, orderID)

@@ -16,7 +16,7 @@ describe("AtomicSwap: CancelSwap", () => {
       order.sellToken.amount
     );
     const orderAfterCancel = await atomicSwap.swapOrder(orderID);
-    expect(orderAfterCancel.id).to.equal(ethers.ZeroHash);
+    expect(orderAfterCancel.status).to.equal(1);
   });
   it("cancel swap with erc20 token", async () => {
     const { orderID, atomicSwap, maker, taker, usdc } =
@@ -32,7 +32,7 @@ describe("AtomicSwap: CancelSwap", () => {
       order.sellToken.amount
     );
     const orderAfterCancel = await atomicSwap.swapOrder(orderID);
-    expect(orderAfterCancel.id).to.equal(ethers.ZeroHash);
+    expect(orderAfterCancel.status).to.equal(1);
   });
 
   it("should revert when sender is not the maker", async () => {

@@ -17,6 +17,7 @@ interface IVesting {
     struct VestingSchedule {
         address from;
         uint256 start;
+        uint256 lastReleasedTime;
         address token;
         uint256 totalAmount;
         uint256 amountReleased;

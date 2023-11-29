@@ -4,6 +4,7 @@ export declare namespace IVesting {
     type VestingScheduleStruct = {
         from: AddressLike;
         start: BigNumberish;
+        lastReleasedTime: BigNumberish;
         token: AddressLike;
         totalAmount: BigNumberish;
         amountReleased: BigNumberish;
@@ -12,6 +13,7 @@ export declare namespace IVesting {
     type VestingScheduleStructOutput = [
         from: string,
         start: bigint,
+        lastReleasedTime: bigint,
         token: string,
         totalAmount: bigint,
         amountReleased: bigint,
@@ -19,6 +21,7 @@ export declare namespace IVesting {
     ] & {
         from: string;
         start: bigint;
+        lastReleasedTime: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;

@@ -164,8 +164,6 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 _order.sellToken.amount
             );
         }
-        // Clean up storage (optimize gas by nullifying order details)
-        delete swapOrder[cancelswap.orderID];
         // Emit an event to notify that the swap order has been canceled
         emit AtomicSwapOrderCanceled(cancelswap.orderID);
     }
@@ -195,10 +193,12 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
         // Update last bidder expire time in order
         AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
+        if(!_order.acceptBid) {
+            revert BidNotAllowed();
+        }
         if (_order.expiredAt < block.timestamp) {
             revert InvalidExpirationTime(_order.expiredAt, block.timestamp);
         }
-
         // Ensure bid amount meet bid requirements.
         if (
             _bidAmount < _order.minBidAmount ||

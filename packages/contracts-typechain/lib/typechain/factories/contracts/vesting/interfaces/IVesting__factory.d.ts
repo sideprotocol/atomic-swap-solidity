@@ -46,6 +46,10 @@ export declare class IVesting__factory {
                     readonly name: "start";
                     readonly type: "uint256";
                 }, {
+                    readonly internalType: "uint256";
+                    readonly name: "lastReleasedTime";
+                    readonly type: "uint256";
+                }, {
                     readonly internalType: "address";
                     readonly name: "token";
                     readonly type: "address";
