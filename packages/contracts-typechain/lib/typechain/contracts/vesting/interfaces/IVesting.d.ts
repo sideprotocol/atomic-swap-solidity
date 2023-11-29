@@ -4,28 +4,25 @@ export declare namespace IVesting {
     type VestingScheduleStruct = {
         from: AddressLike;
         start: BigNumberish;
-        lastReleasedTime: BigNumberish;
         token: AddressLike;
         totalAmount: BigNumberish;
         amountReleased: BigNumberish;
-        lastReleasedStep: BigNumberish;
+        nextReleaseStep: BigNumberish;
     };
     type VestingScheduleStructOutput = [
         from: string,
         start: bigint,
-        lastReleasedTime: bigint,
         token: string,
         totalAmount: bigint,
         amountReleased: bigint,
-        lastReleasedStep: bigint
+        nextReleaseStep: bigint
     ] & {
         from: string;
         start: bigint;
-        lastReleasedTime: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;
-        lastReleasedStep: bigint;
+        nextReleaseStep: bigint;
     };
     type VestingInfoStruct = {
         schedule: IVesting.VestingScheduleStruct;

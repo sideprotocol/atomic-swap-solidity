@@ -59,11 +59,10 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
             start: vestingStartTime,
-            lastReleasedTime: vestingStartTime,
             token: token,
             totalAmount: totalAmount,
             amountReleased: 0,
-            lastReleasedStep: 0
+            nextReleaseStep: 0
         });
         vestingSchedules[beneficiary][orderId] = newVesting;
         //slither-disable-next-line uninitialized-state-variables
@@ -92,7 +91,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             orderId
         ];
         if (
-            releases.length == 0 || schedule.lastReleasedStep >= releases.length
+            releases.length == 0 || schedule.nextReleaseStep >= releases.length
         ) {
             revert InvalidVesting();
         }
@@ -100,14 +99,14 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         uint256 releaseTime = schedule.start;
         for (uint256 i = 0; i < releases.length; i++) {
             releaseTime += releases[i].durationInHours * 1 hours;
-            if (i < schedule.lastReleasedStep) continue; // continue to next
+            if (i < schedule.nextReleaseStep) continue; // continue to next
             if (block.timestamp < releaseTime) {
                 break;
             }
             uint256 releaseAmount = (schedule.totalAmount *
             releases[i].percentage) / 10000;
             amountForRelease += releaseAmount;
-            schedule.lastReleasedStep = i + 1;
+            schedule.nextReleaseStep = i + 1;
         }
 
         if (amountForRelease <= 0) {

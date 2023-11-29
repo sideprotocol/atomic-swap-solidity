@@ -46,10 +46,6 @@ export declare class IVesting__factory {
                     readonly name: "start";
                     readonly type: "uint256";
                 }, {
-                    readonly internalType: "uint256";
-                    readonly name: "lastReleasedTime";
-                    readonly type: "uint256";
-                }, {
                     readonly internalType: "address";
                     readonly name: "token";
                     readonly type: "address";
@@ -63,7 +59,7 @@ export declare class IVesting__factory {
                     readonly type: "uint256";
                 }, {
                     readonly internalType: "uint256";
-                    readonly name: "lastReleasedStep";
+                    readonly name: "nextReleaseStep";
                     readonly type: "uint256";
                 }];
                 readonly internalType: "struct IVesting.VestingSchedule";

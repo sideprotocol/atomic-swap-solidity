@@ -4,28 +4,25 @@ export declare namespace IVesting {
     type VestingScheduleStruct = {
         from: AddressLike;
         start: BigNumberish;
-        lastReleasedTime: BigNumberish;
         token: AddressLike;
         totalAmount: BigNumberish;
         amountReleased: BigNumberish;
-        lastReleasedStep: BigNumberish;
+        nextReleaseStep: BigNumberish;
     };
     type VestingScheduleStructOutput = [
         from: string,
         start: bigint,
-        lastReleasedTime: bigint,
         token: string,
         totalAmount: bigint,
         amountReleased: bigint,
-        lastReleasedStep: bigint
+        nextReleaseStep: bigint
     ] & {
         from: string;
         start: bigint;
-        lastReleasedTime: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;
-        lastReleasedStep: bigint;
+        nextReleaseStep: bigint;
     };
     type VestingInfoStruct = {
         schedule: IVesting.VestingScheduleStruct;
@@ -340,7 +337,6 @@ export interface Vesting extends BaseContract {
         [
             string,
             bigint,
-            bigint,
             string,
             bigint,
             bigint,
@@ -348,11 +344,10 @@ export interface Vesting extends BaseContract {
         ] & {
             from: string;
             start: bigint;
-            lastReleasedTime: bigint;
             token: string;
             totalAmount: bigint;
             amountReleased: bigint;
-            lastReleasedStep: bigint;
+            nextReleaseStep: bigint;
         }
     ], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
@@ -428,7 +423,6 @@ export interface Vesting extends BaseContract {
         [
             string,
             bigint,
-            bigint,
             string,
             bigint,
             bigint,
@@ -436,11 +430,10 @@ export interface Vesting extends BaseContract {
         ] & {
             from: string;
             start: bigint;
-            lastReleasedTime: bigint;
             token: string;
             totalAmount: bigint;
             amountReleased: bigint;
-            lastReleasedStep: bigint;
+            nextReleaseStep: bigint;
         }
     ], "view">;
     getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;

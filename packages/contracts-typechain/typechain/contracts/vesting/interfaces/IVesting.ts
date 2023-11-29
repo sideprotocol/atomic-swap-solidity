@@ -27,29 +27,26 @@ export declare namespace IVesting {
   export type VestingScheduleStruct = {
     from: AddressLike;
     start: BigNumberish;
-    lastReleasedTime: BigNumberish;
     token: AddressLike;
     totalAmount: BigNumberish;
     amountReleased: BigNumberish;
-    lastReleasedStep: BigNumberish;
+    nextReleaseStep: BigNumberish;
   };
 
   export type VestingScheduleStructOutput = [
     from: string,
     start: bigint,
-    lastReleasedTime: bigint,
     token: string,
     totalAmount: bigint,
     amountReleased: bigint,
-    lastReleasedStep: bigint
+    nextReleaseStep: bigint
   ] & {
     from: string;
     start: bigint;
-    lastReleasedTime: bigint;
     token: string;
     totalAmount: bigint;
     amountReleased: bigint;
-    lastReleasedStep: bigint;
+    nextReleaseStep: bigint;
   };
 
   export type VestingInfoStruct = {

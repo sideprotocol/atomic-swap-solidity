@@ -27,29 +27,26 @@ export declare namespace IVesting {
   export type VestingScheduleStruct = {
     from: AddressLike;
     start: BigNumberish;
-    lastReleasedTime: BigNumberish;
     token: AddressLike;
     totalAmount: BigNumberish;
     amountReleased: BigNumberish;
-    lastReleasedStep: BigNumberish;
+    nextReleaseStep: BigNumberish;
   };
 
   export type VestingScheduleStructOutput = [
     from: string,
     start: bigint,
-    lastReleasedTime: bigint,
     token: string,
     totalAmount: bigint,
     amountReleased: bigint,
-    lastReleasedStep: bigint
+    nextReleaseStep: bigint
   ] & {
     from: string;
     start: bigint;
-    lastReleasedTime: bigint;
     token: string;
     totalAmount: bigint;
     amountReleased: bigint;
-    lastReleasedStep: bigint;
+    nextReleaseStep: bigint;
   };
 
   export type VestingInfoStruct = {
@@ -556,14 +553,13 @@ export interface Vesting extends BaseContract {
   vestingSchedules: TypedContractMethod<
     [arg0: AddressLike, arg1: BytesLike],
     [
-      [string, bigint, bigint, string, bigint, bigint, bigint] & {
+      [string, bigint, string, bigint, bigint, bigint] & {
         from: string;
         start: bigint;
-        lastReleasedTime: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;
-        lastReleasedStep: bigint;
+        nextReleaseStep: bigint;
       }
     ],
     "view"
@@ -681,14 +677,13 @@ export interface Vesting extends BaseContract {
   ): TypedContractMethod<
     [arg0: AddressLike, arg1: BytesLike],
     [
-      [string, bigint, bigint, string, bigint, bigint, bigint] & {
+      [string, bigint, string, bigint, bigint, bigint] & {
         from: string;
         start: bigint;
-        lastReleasedTime: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;
-        lastReleasedStep: bigint;
+        nextReleaseStep: bigint;
       }
     ],
     "view"

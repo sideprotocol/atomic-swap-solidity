@@ -65,11 +65,6 @@ const _abi = [
                                 type: "uint256",
                             },
                             {
-                                internalType: "uint256",
-                                name: "lastReleasedTime",
-                                type: "uint256",
-                            },
-                            {
                                 internalType: "address",
                                 name: "token",
                                 type: "address",
@@ -86,7 +81,7 @@ const _abi = [
                             },
                             {
                                 internalType: "uint256",
-                                name: "lastReleasedStep",
+                                name: "nextReleaseStep",
                                 type: "uint256",
                             },
                         ],
