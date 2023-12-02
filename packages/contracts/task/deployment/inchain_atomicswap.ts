@@ -144,7 +144,7 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
     );
 
     // atomicsSwap contract ad admin of vesting contract.
-    await Vesting__factory.connect(vestingAddress, deployer).setAdmin(
+    await Vesting__factory.connect(vestingAddress, deployer).addAdmin(
       await atomicSwap.getAddress()
     );
     // Deploy mock token contracts. This will be used for testing purposes.

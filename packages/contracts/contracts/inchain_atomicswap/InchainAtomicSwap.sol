@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
@@ -9,7 +10,6 @@ import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic
 import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
-
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
 /// @dev Extends the AtomicSwapBase and implements the IInchainAtomicSwap interface.

@@ -18,6 +18,11 @@ const _abi = [
     },
     {
         inputs: [],
+        name: "NoPermissionToRelease",
+        type: "error",
+    },
+    {
+        inputs: [],
         name: "NoVestedTokensAvailable",
         type: "error",
     },
@@ -173,7 +178,7 @@ const _abi = [
             },
             {
                 internalType: "address",
-                name: "beneficiary",
+                name: "buyer",
                 type: "address",
             },
             {

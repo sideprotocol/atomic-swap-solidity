@@ -31,17 +31,19 @@ interface IVesting {
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
-    /// @param beneficiary The address of the beneficiary.
+    /// @param buyer The token id of the TakerIdentity Contract.
     /// @param token The token to be vested.
     /// @param totalAmount The total amount of tokens to be vested.
     /// @param releases The release schedule parameters.
     function startVesting(
         bytes32 orderId, 
-        address beneficiary,
+        address buyer,
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external payable;
+
+    
 
     event NewVesting(VestingInfo indexed vesting);
     /// @notice Event emitted when tokens are released to a beneficiary.
@@ -62,4 +64,5 @@ interface IVesting {
     error OverMaximumReleaseStep();
     error InvalidTotalPercentage();
     error NoVestedTokensForRelease();
+    error NoPermissionToRelease();
 }

@@ -15,6 +15,11 @@
     },
     {
       "inputs": [],
+      "name": "NoPermissionToRelease",
+      "type": "error"
+    },
+    {
+      "inputs": [],
       "name": "NoVestedTokensAvailable",
       "type": "error"
     },
@@ -170,7 +175,7 @@
         },
         {
           "internalType": "address",
-          "name": "beneficiary",
+          "name": "buyer",
           "type": "address"
         },
         {

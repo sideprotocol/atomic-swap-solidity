@@ -56,27 +56,36 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VestingInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isPauser" | "paginationSize" | "pause" | "paused" | "release" | "releaseInfos" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "setPaginationSize" | "startVesting" | "supportsInterface" | "unpause" | "vestingSchedules"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "Initialized" | "NewVesting" | "Paused" | "Received" | "Released" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused"): EventFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "approve" | "balanceOf" | "getApproved" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isApprovedForAll" | "isPauser" | "name" | "ownerOf" | "paginationSize" | "pause" | "paused" | "release" | "releaseInfos" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setPaginationSize" | "startVesting" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unpause" | "vestingSchedules"): FunctionFragment;
+    getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "Initialized" | "NewVesting" | "Paused" | "Received" | "Released" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Transfer" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "PAUSER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "addAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "addPauser", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "approve", values: [AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "getApproved", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "isPauser", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "name", values?: undefined): string;
+    encodeFunctionData(functionFragment: "ownerOf", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "paginationSize", values?: undefined): string;
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-    encodeFunctionData(functionFragment: "release", values: [AddressLike, BytesLike]): string;
-    encodeFunctionData(functionFragment: "releaseInfos", values: [AddressLike, BytesLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "release", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "releaseInfos", values: [BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "removeAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "removePauser", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "revokeRole", values: [BytesLike, AddressLike]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256)", values: [AddressLike, AddressLike, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", values: [AddressLike, AddressLike, BigNumberish, BytesLike]): string;
+    encodeFunctionData(functionFragment: "setApprovalForAll", values: [AddressLike, boolean]): string;
     encodeFunctionData(functionFragment: "setPaginationSize", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "startVesting", values: [
         BytesLike,
@@ -86,18 +95,27 @@ export interface VestingInterface extends Interface {
         IAtomicSwapBase.ReleaseStruct[]
     ]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
+    encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+    encodeFunctionData(functionFragment: "tokenURI", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-    encodeFunctionData(functionFragment: "vestingSchedules", values: [AddressLike, BytesLike]): string;
+    encodeFunctionData(functionFragment: "vestingSchedules", values: [BigNumberish]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "PAUSER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addPauser", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "getApproved", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getRoleAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "isApprovedForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isPauser", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paginationSize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -107,11 +125,55 @@ export interface VestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "removePauser", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "safeTransferFrom(address,address,uint256)", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "safeTransferFrom(address,address,uint256,bytes)", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "setApprovalForAll", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "setPaginationSize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "startVesting", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "supportsInterface", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "vestingSchedules", data: BytesLike): Result;
+}
+export declare namespace ApprovalEvent {
+    type InputTuple = [
+        owner: AddressLike,
+        approved: AddressLike,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [owner: string, approved: string, tokenId: bigint];
+    interface OutputObject {
+        owner: string;
+        approved: string;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export declare namespace ApprovalForAllEvent {
+    type InputTuple = [
+        owner: AddressLike,
+        operator: AddressLike,
+        approved: boolean
+    ];
+    type OutputTuple = [
+        owner: string,
+        operator: string,
+        approved: boolean
+    ];
+    interface OutputObject {
+        owner: string;
+        operator: string;
+        approved: boolean;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
 }
 export declare namespace InitializedEvent {
     type InputTuple = [version: BigNumberish];
@@ -225,6 +287,23 @@ export declare namespace RoleRevokedEvent {
     type Log = TypedEventLog<Event>;
     type LogDescription = TypedLogDescription<Event>;
 }
+export declare namespace TransferEvent {
+    type InputTuple = [
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ];
+    type OutputTuple = [from: string, to: string, tokenId: bigint];
+    interface OutputObject {
+        from: string;
+        to: string;
+        tokenId: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
 export declare namespace UnpausedEvent {
     type InputTuple = [account: AddressLike];
     type OutputTuple = [account: string];
@@ -253,6 +332,14 @@ export interface Vesting extends BaseContract {
     PAUSER_ROLE: TypedContractMethod<[], [string], "view">;
     addAdmin: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
     addPauser: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    approve: TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    balanceOf: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
     getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
     grantRole: TypedContractMethod<[
         role: BytesLike,
@@ -268,20 +355,22 @@ export interface Vesting extends BaseContract {
     ], "view">;
     initialize: TypedContractMethod<[_admin: AddressLike], [void], "nonpayable">;
     isAdmin: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    isApprovedForAll: TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
     isPauser: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    name: TypedContractMethod<[], [string], "view">;
+    ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
     paginationSize: TypedContractMethod<[], [bigint], "view">;
     pause: TypedContractMethod<[], [void], "nonpayable">;
     paused: TypedContractMethod<[], [boolean], "view">;
-    release: TypedContractMethod<[
-        beneficiary: AddressLike,
-        orderId: BytesLike
-    ], [
-        void
-    ], "nonpayable">;
+    release: TypedContractMethod<[vestingId: BigNumberish], [void], "nonpayable">;
     releaseInfos: TypedContractMethod<[
-        arg0: AddressLike,
-        arg1: BytesLike,
-        arg2: BigNumberish
+        arg0: BigNumberish,
+        arg1: BigNumberish
     ], [
         [bigint, bigint] & {
             durationInHours: bigint;
@@ -310,6 +399,27 @@ export interface Vesting extends BaseContract {
     ], [
         void
     ], "nonpayable">;
+    "safeTransferFrom(address,address,uint256)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    "safeTransferFrom(address,address,uint256,bytes)": TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    setApprovalForAll: TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
     setPaginationSize: TypedContractMethod<[
         _paginationSize: BigNumberish
     ], [
@@ -317,7 +427,7 @@ export interface Vesting extends BaseContract {
     ], "nonpayable">;
     startVesting: TypedContractMethod<[
         orderId: BytesLike,
-        beneficiary: AddressLike,
+        buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
         releases: IAtomicSwapBase.ReleaseStruct[]
@@ -329,10 +439,18 @@ export interface Vesting extends BaseContract {
     ], [
         boolean
     ], "view">;
+    symbol: TypedContractMethod<[], [string], "view">;
+    tokenURI: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    transferFrom: TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     unpause: TypedContractMethod<[], [void], "nonpayable">;
     vestingSchedules: TypedContractMethod<[
-        arg0: AddressLike,
-        arg1: BytesLike
+        arg0: BigNumberish
     ], [
         [
             string,
@@ -355,6 +473,14 @@ export interface Vesting extends BaseContract {
     getFunction(nameOrSignature: "PAUSER_ROLE"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "addAdmin"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "addPauser"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "approve"): TypedContractMethod<[
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "balanceOf"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+    getFunction(nameOrSignature: "getApproved"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
     getFunction(nameOrSignature: "getRoleAdmin"): TypedContractMethod<[role: BytesLike], [string], "view">;
     getFunction(nameOrSignature: "grantRole"): TypedContractMethod<[
         role: BytesLike,
@@ -370,20 +496,22 @@ export interface Vesting extends BaseContract {
     ], "view">;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[_admin: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "isAdmin"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
+        owner: AddressLike,
+        operator: AddressLike
+    ], [
+        boolean
+    ], "view">;
     getFunction(nameOrSignature: "isPauser"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    getFunction(nameOrSignature: "name"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "ownerOf"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
     getFunction(nameOrSignature: "paginationSize"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
-    getFunction(nameOrSignature: "release"): TypedContractMethod<[
-        beneficiary: AddressLike,
-        orderId: BytesLike
-    ], [
-        void
-    ], "nonpayable">;
+    getFunction(nameOrSignature: "release"): TypedContractMethod<[vestingId: BigNumberish], [void], "nonpayable">;
     getFunction(nameOrSignature: "releaseInfos"): TypedContractMethod<[
-        arg0: AddressLike,
-        arg1: BytesLike,
-        arg2: BigNumberish
+        arg0: BigNumberish,
+        arg1: BigNumberish
     ], [
         [bigint, bigint] & {
             durationInHours: bigint;
@@ -404,10 +532,31 @@ export interface Vesting extends BaseContract {
     ], [
         void
     ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom(address,address,uint256)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "safeTransferFrom(address,address,uint256,bytes)"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish,
+        data: BytesLike
+    ], [
+        void
+    ], "nonpayable">;
+    getFunction(nameOrSignature: "setApprovalForAll"): TypedContractMethod<[
+        operator: AddressLike,
+        approved: boolean
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "setPaginationSize"): TypedContractMethod<[_paginationSize: BigNumberish], [void], "nonpayable">;
     getFunction(nameOrSignature: "startVesting"): TypedContractMethod<[
         orderId: BytesLike,
-        beneficiary: AddressLike,
+        buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
         releases: IAtomicSwapBase.ReleaseStruct[]
@@ -415,10 +564,18 @@ export interface Vesting extends BaseContract {
         void
     ], "payable">;
     getFunction(nameOrSignature: "supportsInterface"): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    getFunction(nameOrSignature: "symbol"): TypedContractMethod<[], [string], "view">;
+    getFunction(nameOrSignature: "tokenURI"): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+    getFunction(nameOrSignature: "transferFrom"): TypedContractMethod<[
+        from: AddressLike,
+        to: AddressLike,
+        tokenId: BigNumberish
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "vestingSchedules"): TypedContractMethod<[
-        arg0: AddressLike,
-        arg1: BytesLike
+        arg0: BigNumberish
     ], [
         [
             string,
@@ -436,6 +593,8 @@ export interface Vesting extends BaseContract {
             nextReleaseStep: bigint;
         }
     ], "view">;
+    getEvent(key: "Approval"): TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+    getEvent(key: "ApprovalForAll"): TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
     getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     getEvent(key: "NewVesting"): TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
     getEvent(key: "Paused"): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
@@ -444,8 +603,13 @@ export interface Vesting extends BaseContract {
     getEvent(key: "RoleAdminChanged"): TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
     getEvent(key: "RoleGranted"): TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
     getEvent(key: "RoleRevoked"): TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+    getEvent(key: "Transfer"): TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
     getEvent(key: "Unpaused"): TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     filters: {
+        "Approval(address,address,uint256)": TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+        Approval: TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
+        "ApprovalForAll(address,address,bool)": TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
+        ApprovalForAll: TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
         "Initialized(uint64)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
         Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
         "NewVesting(tuple)": TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
@@ -462,6 +626,8 @@ export interface Vesting extends BaseContract {
         RoleGranted: TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
         "RoleRevoked(bytes32,address,address)": TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
         RoleRevoked: TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
+        "Transfer(address,address,uint256)": TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
+        Transfer: TypedContractEvent<TransferEvent.InputTuple, TransferEvent.OutputTuple, TransferEvent.OutputObject>;
         "Unpaused(address)": TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
         Unpaused: TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
     };

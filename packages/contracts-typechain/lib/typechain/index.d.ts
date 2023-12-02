@@ -7,6 +7,8 @@ export type { AccessControlUpgradeable } from "./@openzeppelin/contracts-upgrade
 export { AccessControlUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable__factory";
 export type { Initializable } from "./@openzeppelin/contracts-upgradeable/proxy/utils/Initializable";
 export { Initializable__factory } from "./factories/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable__factory";
+export type { ERC721Upgradeable } from "./@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable";
+export { ERC721Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable__factory";
 export type { ContextUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable";
 export { ContextUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable__factory";
 export type { ERC165Upgradeable } from "./@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable";
@@ -29,8 +31,18 @@ export type { IERC20Metadata } from "./@openzeppelin/contracts/token/ERC20/exten
 export { IERC20Metadata__factory } from "./factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata__factory";
 export type { IERC20 } from "./@openzeppelin/contracts/token/ERC20/IERC20";
 export { IERC20__factory } from "./factories/@openzeppelin/contracts/token/ERC20/IERC20__factory";
+export type { IERC721Metadata } from "./@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata";
+export { IERC721Metadata__factory } from "./factories/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata__factory";
+export type { IERC721 } from "./@openzeppelin/contracts/token/ERC721/IERC721";
+export { IERC721__factory } from "./factories/@openzeppelin/contracts/token/ERC721/IERC721__factory";
+export type { IERC721Receiver } from "./@openzeppelin/contracts/token/ERC721/IERC721Receiver";
+export { IERC721Receiver__factory } from "./factories/@openzeppelin/contracts/token/ERC721/IERC721Receiver__factory";
 export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC165";
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
+export type { Math } from "./@openzeppelin/contracts/utils/math/Math";
+export { Math__factory } from "./factories/@openzeppelin/contracts/utils/math/Math__factory";
+export type { Strings } from "./@openzeppelin/contracts/utils/Strings";
+export { Strings__factory } from "./factories/@openzeppelin/contracts/utils/Strings__factory";
 export type { AtomicSwapBase } from "./contracts/abstracts/AtomicSwapBase";
 export { AtomicSwapBase__factory } from "./factories/contracts/abstracts/AtomicSwapBase__factory";
 export type { IAtomicSwapBase } from "./contracts/abstracts/interfaces/IAtomicSwapBase";

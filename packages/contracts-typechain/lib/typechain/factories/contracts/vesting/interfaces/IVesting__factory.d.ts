@@ -11,6 +11,10 @@ export declare class IVesting__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "NoPermissionToRelease";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "NoVestedTokensAvailable";
         readonly type: "error";
     }, {
@@ -131,7 +135,7 @@ export declare class IVesting__factory {
             readonly type: "bytes32";
         }, {
             readonly internalType: "address";
-            readonly name: "beneficiary";
+            readonly name: "buyer";
             readonly type: "address";
         }, {
             readonly internalType: "address";
