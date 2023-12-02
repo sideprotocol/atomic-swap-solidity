@@ -134,8 +134,6 @@ describe("TakeSwap With Vesting", () => {
   });
 
   it("should revert to take order(native token) with vesting plan without vestingID", async () => {
-    // const { takerReceiver, vestingManager, orderID } =
-    //   await testVestingTakeSwap(true, false);
     const [, , takerReceiver] = await ethers.getSigners();
     const vestingParams = [
       {

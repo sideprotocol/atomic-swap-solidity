@@ -18,8 +18,6 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     mapping(uint => VestingSchedule)
         public vestingSchedules;
 
-    uint256 private _nextVestingId;
-
     /// @notice Stores release information for each beneficiary.
     // slither-disable-next-line uninitialized-state
     mapping(uint => IAtomicSwapBase.Release[])
