@@ -44,8 +44,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         IAtomicSwapBase.Release[] memory releases
     ) external payable nonReentrant onlyAdmin {
         // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
-        uint newVestingId = _issueVestingID(buyer, orderId);
-        if (vestingSchedules[newVestingId].from != address(0)) { 
+        uint _vestingId = _issueVestingID(buyer, orderId);
+        if (vestingSchedules[_vestingId].from != address(0)) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
@@ -69,16 +69,16 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             amountReleased: 0,
             nextReleaseStep: 0
         });
-        vestingSchedules[newVestingId] = newVesting;
+        vestingSchedules[_vestingId] = newVesting;
         //slither-disable-next-line uninitialized-state-variables
-        IAtomicSwapBase.Release[] storage _releases = releaseInfos[newVestingId];
+        IAtomicSwapBase.Release[] storage _releases = releaseInfos[_vestingId];
         for (uint256 i = 0; i < releases.length; i++) {
             _releases.push(releases[i]);
         }
 
         
         emit NewVesting(
-            VestingInfo(newVesting, releases, msg.sender, orderId)
+            VestingInfo(newVesting, releases, orderId)
         );
     }
 
@@ -136,15 +136,13 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         emit Released(msg.sender, amountForRelease);
     }
     
-    /// @notice Fallback function to receive Ether.
-    /// @dev Emits a Received event when Ether is received.
     receive() external payable onlyAdmin {
         emit Received(msg.sender, msg.value);
     }
 
     function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
         _mint(to, uint(orderId));
-        return uint(orderId);
+        return uint(orderId);                                                                                                                                                                                                                                                                        
     }
 
     function supportsInterface(bytes4 interfaceId)

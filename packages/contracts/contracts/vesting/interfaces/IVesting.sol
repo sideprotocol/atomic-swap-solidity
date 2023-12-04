@@ -26,7 +26,6 @@ interface IVesting {
     struct VestingInfo {
         VestingSchedule schedule;
         IAtomicSwapBase.Release[] release;
-        address beneficiary; 
         bytes32 orderId;
     }
 
