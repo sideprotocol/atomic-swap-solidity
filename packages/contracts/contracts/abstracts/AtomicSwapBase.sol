@@ -48,6 +48,8 @@ abstract contract AtomicSwapBase is OwnablePausableUpgradeable, ReentrancyGuardU
         _;
     }
 
+    /// @notice Ensures that the order status is initial.
+    /// @param id The unique identifier of the order.
     modifier onlyActiveOrder(bytes32 id) {
         if (swapOrder[id].status != OrderStatus.INITIAL) {
             revert InactiveOrder();

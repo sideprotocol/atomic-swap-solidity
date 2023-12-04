@@ -8,7 +8,12 @@
   "workspaces": {
     "packages": [
       "packages/contracts-typechain",
-      "packages/contracts"
+      "packages/contracts",
+      "packages/cli"
+    ],
+    "nohoist": [
+      "**/@openzeppelin/**",
+      "**/@uniswap/**"
     ]
   },
   "packageManager": "yarn@3.1.0",
@@ -16,15 +21,16 @@
     "hoistingLimits": "workspaces"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "scripts": {
     "lint": "eslintg .",
     "lint-fix": "eslint --fix .",
     "typechain:build": "cd packages/contracts-typechain && yarn build",
-    "hh:node": "cd packages/blockchain && npx hardhat node",
+    "hh:node": "cd packages/contracts && npx hardhat node",
     "hh:build": "cd packages/contracts && npx hardhat clean && npx hardhat compile --force && cd .. && yarn typechain:build",
     "hh:test": "yarn hh:build && cd packages/contracts && npx hardhat test",
+    "forge:test": "cd packages/contracts && forge test",
     "hh:coverage": "cd packages/contracts && npx hardhat coverage",
     "hh:deploy:local": "cd packages/contracts && npx hardhat run --network localhost scripts/deploy.ts && cd .. && yarn typechain:build",
     "hh:deploy:sepolia": "cd packages/contracts && npx hardhat run --network sepolia scripts/deploy.ts && cd .. && yarn typechain:build",

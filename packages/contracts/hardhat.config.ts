@@ -8,6 +8,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "@nomicfoundation/hardhat-chai-matchers";
 import "hardhat-contract-sizer";
 import "@nomiclabs/hardhat-solhint";
+import "@nomicfoundation/hardhat-foundry";
 dotenv.config();
 
 import "./task/deployment/inchain_atomicswap";

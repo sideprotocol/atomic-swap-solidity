@@ -52,19 +52,16 @@ export declare namespace IVesting {
   export type VestingInfoStruct = {
     schedule: IVesting.VestingScheduleStruct;
     release: IAtomicSwapBase.ReleaseStruct[];
-    beneficiary: AddressLike;
     orderId: BytesLike;
   };
 
   export type VestingInfoStructOutput = [
     schedule: IVesting.VestingScheduleStructOutput,
     release: IAtomicSwapBase.ReleaseStructOutput[],
-    beneficiary: string,
     orderId: string
   ] & {
     schedule: IVesting.VestingScheduleStructOutput;
     release: IAtomicSwapBase.ReleaseStructOutput[];
-    beneficiary: string;
     orderId: string;
   };
 }

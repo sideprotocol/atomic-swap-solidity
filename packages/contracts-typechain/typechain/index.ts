@@ -66,6 +66,8 @@ export type { IInchainAtomicSwap } from "./contracts/inchain_atomicswap/interfac
 export { IInchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap__factory";
 export type { MockToken } from "./contracts/mocks/MockToken";
 export { MockToken__factory } from "./factories/contracts/mocks/MockToken__factory";
+export type { VestingEchidnaTest } from "./contracts/test/Vesting.t.sol/VestingEchidnaTest";
+export { VestingEchidnaTest__factory } from "./factories/contracts/test/Vesting.t.sol/VestingEchidnaTest__factory";
 export type { IVesting } from "./contracts/vesting/interfaces/IVesting";
 export { IVesting__factory } from "./factories/contracts/vesting/interfaces/IVesting__factory";
 export type { Vesting } from "./contracts/vesting/Vesting";

@@ -8,17 +8,16 @@ import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.so
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {console} from "hardhat/console.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting,ERC721Upgradeable {
     using AtomicSwapMsgValidator for *;
-    /// @notice Stores vesting schedules for each beneficiary.
+    /// @notice Stores vesting schedules for each vestingId.
     mapping(uint => VestingSchedule)
         public vestingSchedules;
 
-    /// @notice Stores release information for each beneficiary.
+    /// @notice Stores release information for each vestingId.
     // slither-disable-next-line uninitialized-state
     mapping(uint => IAtomicSwapBase.Release[])
         public releaseInfos;
@@ -140,9 +139,16 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         emit Received(msg.sender, msg.value);
     }
 
-    function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
-        _mint(to, uint(orderId));
-        return uint(orderId);                                                                                                                                                                                                                                                                        
+    /// @notice Issues a new vesting ID based on the provided order ID and mints tokens to the specified address.
+    /// @dev The function takes an order ID, converts it to a vesting ID, and then mints tokens corresponding to this ID.
+    /// This function can only be called by an administrator of the contract.
+    /// @param to The address to which the vesting ID and corresponding tokens will be issued.
+    /// @param orderId The order ID based on which the vesting ID is generated.
+    /// @return _vestingID The generated vesting ID as a uint.
+
+    function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint _vestingID) {
+        _vestingID = uint(orderId);
+        _mint(to, _vestingID);                                                                                                                                                                                                                                                                  
     }
 
     function supportsInterface(bytes4 interfaceId)
