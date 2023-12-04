@@ -59,11 +59,11 @@ describe("AtomicSwap: Vesting", () => {
         ])
     ).to.revertedWith("OwnablePausable: access denied");
   });
-  it("should revert to release fund with invalid start time", async () => {
+  it("should revert to release fund after release all", async () => {
     const { orderID, taker, vestingManager, takerReceiver, atomicSwap } =
       await testVestingTakeSwap(true, false);
     await expect(
-      vestingManager.release(takerReceiver, orderID)
-    ).to.revertedWithCustomError(vestingManager, "InvalidVesting");
+      vestingManager.connect(takerReceiver).release(BigInt(orderID))
+    ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
   });
 });

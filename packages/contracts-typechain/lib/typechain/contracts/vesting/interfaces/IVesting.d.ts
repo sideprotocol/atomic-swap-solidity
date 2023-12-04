@@ -117,7 +117,7 @@ export interface IVesting extends BaseContract {
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     startVesting: TypedContractMethod<[
         orderId: BytesLike,
-        beneficiary: AddressLike,
+        buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
         releases: IAtomicSwapBase.ReleaseStruct[]
@@ -127,7 +127,7 @@ export interface IVesting extends BaseContract {
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "startVesting"): TypedContractMethod<[
         orderId: BytesLike,
-        beneficiary: AddressLike,
+        buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
         releases: IAtomicSwapBase.ReleaseStruct[]

@@ -21,12 +21,8 @@ describe("AtomicSwap: AcceptBid with Vesting", () => {
       buyTokenFeeRate,
       vestingManager,
       treasury,
+      taker,
     } = await bidToDefaultVestingAtomicOrder(isNativeSellToken, false);
-
-    const sellTokenAmount = calcSwapAmount(
-      payload.sellToken.amount,
-      buyTokenFeeRate
-    );
 
     const buyTokenAmount = calcSwapAmount(bidAmount, sellTokenFeeRate);
 
@@ -50,27 +46,28 @@ describe("AtomicSwap: AcceptBid with Vesting", () => {
     const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.release(bidder, orderID)
+        await vestingManager.connect(taker).release(BigInt(orderID))
       ).to.changeEtherBalance(bidder, releaseAmount);
     } else {
       expect(
-        await vestingManager.release(bidder, orderID)
+        await vestingManager.connect(taker).release(BigInt(orderID))
       ).to.changeTokenBalance(usdc, bidder, releaseAmount);
     }
     // after 1 hours, release again
     await time.increase(3600 * 1);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.release(bidder, orderID)
+        await vestingManager.connect(taker).release(BigInt(orderID))
       ).to.changeEtherBalance(bidder, releaseAmount);
     } else {
       expect(
-        await vestingManager.release(bidder, orderID)
+        await vestingManager.connect(taker).release(BigInt(orderID))
       ).to.changeTokenBalance(usdc, bidder, releaseAmount);
     }
   };
   it("should accept bid(native token) with vesting plan", async () =>
     acceptBid(true));
 
-  it("should accept bid with erc20 token", async () => acceptBid(false));
+  it("should accept bid with erc20 token with vesting plan", async () =>
+    acceptBid(false));
 });

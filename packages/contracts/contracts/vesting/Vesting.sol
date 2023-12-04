@@ -1,46 +1,51 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-
+import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import {OwnablePausableUpgradeable} from "../abstracts/OwnablePausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {console} from "hardhat/console.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
-contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting {
+contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting,ERC721Upgradeable {
     using AtomicSwapMsgValidator for *;
     /// @notice Stores vesting schedules for each beneficiary.
-    mapping(address => mapping(bytes32 => VestingSchedule))
+    mapping(uint => VestingSchedule)
         public vestingSchedules;
 
     /// @notice Stores release information for each beneficiary.
     // slither-disable-next-line uninitialized-state
-    mapping(address => mapping(bytes32 => IAtomicSwapBase.Release[]))
+    mapping(uint => IAtomicSwapBase.Release[])
         public releaseInfos;
 
     /// @notice Initializes the vesting contract with necessary parameters.
     /// @param _admin The address of the admin.
     function initialize(address _admin) external initializer {
         __OwnablePausableUpgradeable_init(_admin);
+        __ERC721_init("SideVestingID", "SideVestingID");
     }
     // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
     /// @notice Starts the vesting schedule for a beneficiary.
-    /// @param beneficiary The address of the beneficiary.
+    /// @param buyer The address of the beneficiary.
     /// @param token The token address for vesting.
     /// @param totalAmount The total amount of tokens to be vested.
     /// @param releases Array of release schedules.
     /// @dev Sets up the vesting schedule and release information for the beneficiary.
     function startVesting(
         bytes32 orderId,
-        address beneficiary,
+        address buyer,
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external payable nonReentrant onlyAdmin {
         // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
-        if (vestingSchedules[beneficiary][orderId].from != address(0)) { 
+        uint _vestingId = _issueVestingID(buyer, orderId);
+        if (vestingSchedules[_vestingId].from != address(0)) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
@@ -64,32 +69,32 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             amountReleased: 0,
             nextReleaseStep: 0
         });
-        vestingSchedules[beneficiary][orderId] = newVesting;
+        vestingSchedules[_vestingId] = newVesting;
         //slither-disable-next-line uninitialized-state-variables
-        IAtomicSwapBase.Release[] storage _releases = releaseInfos[beneficiary][
-            orderId
-        ];
+        IAtomicSwapBase.Release[] storage _releases = releaseInfos[_vestingId];
         for (uint256 i = 0; i < releases.length; i++) {
             _releases.push(releases[i]);
         }
+
+        
         emit NewVesting(
-            VestingInfo(newVesting, releases, beneficiary, orderId)
+            VestingInfo(newVesting, releases, orderId)
         );
     }
 
     /// @notice Releases vested tokens to the beneficiary.
-    /// @param beneficiary The address of the beneficiary to release tokens to.
+    /// @param vestingId The uint of the identity to release tokens to.
     /// @dev Calculates the amount of tokens to be released and transfers them to the beneficiary.
     function release(
-        address beneficiary,
-        bytes32 orderId
+        uint vestingId
     ) external nonReentrant whenNotPaused {
-        VestingSchedule storage schedule = vestingSchedules[beneficiary][
-            orderId
-        ];
-        IAtomicSwapBase.Release[] storage releases = releaseInfos[beneficiary][
-            orderId
-        ];
+        // Try to remove identifiers 
+        if (ownerOf(vestingId) != msg.sender) {
+            revert NoPermissionToRelease();
+        }
+    
+        VestingSchedule storage schedule = vestingSchedules[vestingId];
+        IAtomicSwapBase.Release[] storage releases = releaseInfos[vestingId];
         if (
             releases.length == 0 || schedule.nextReleaseStep >= releases.length
         ) {
@@ -112,21 +117,40 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         if (amountForRelease <= 0) {
             revert NoVestedTokensForRelease();
         }
+        
         schedule.amountReleased += amountForRelease;
         if (schedule.token != address(0)) {
             TransferHelper.safeTransfer(
                 schedule.token,
-                beneficiary, amountForRelease
+                msg.sender, amountForRelease
             );
         } else {
-            TransferHelper.safeTransferETH(beneficiary, amountForRelease);
+            TransferHelper.safeTransferETH(msg.sender, amountForRelease);
         }
-        emit Released(beneficiary, amountForRelease);
+
+        // burn NFT at last release time. frontend need to approve this. 
+        if(schedule.amountReleased == schedule.totalAmount) {
+            transferFrom(msg.sender,address(this), vestingId);
+            _burn(vestingId);
+        }
+        emit Released(msg.sender, amountForRelease);
     }
     
-    /// @notice Fallback function to receive Ether.
-    /// @dev Emits a Received event when Ether is received.
     receive() external payable onlyAdmin {
         emit Received(msg.sender, msg.value);
+    }
+
+    function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
+        _mint(to, uint(orderId));
+        return uint(orderId);                                                                                                                                                                                                                                                                        
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+    override(AccessControlUpgradeable, ERC721Upgradeable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

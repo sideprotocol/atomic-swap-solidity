@@ -158,16 +158,18 @@ describe("AtomicSwap: MakeVestingSwap", () => {
   });
   it("should revert to create in-chain vesting swap with already existing order", async () => {
     const { vestingManager, orderID, takerReceiver, atomicSwap } =
-      await testVestingTakeSwap(true, false);
-    const schedules = await vestingManager.vestingSchedules(
-      takerReceiver,
-      orderID
+      await testVestingTakeSwap(false, true);
+    const contractSigner = await getCustomSigner(
+      await atomicSwap.getAddress(),
+      ethers.parseEther("50")
     );
-    const contractSigner = await getCustomSigner(await atomicSwap.getAddress());
     await expect(
-      vestingManager
-        .connect(contractSigner)
-        .startVesting(orderID, takerReceiver, ZeroAddress, BigInt(20), [
+      vestingManager.connect(contractSigner).startVesting(
+        orderID,
+        takerReceiver,
+        ZeroAddress,
+        BigInt(20),
+        [
           {
             durationInHours: BigInt(1),
             percentage: BigInt(9000),
@@ -176,7 +178,9 @@ describe("AtomicSwap: MakeVestingSwap", () => {
             durationInHours: BigInt(1),
             percentage: BigInt(1000),
           },
-        ])
+        ],
+        { value: BigInt(20) }
+      )
     ).to.revertedWithCustomError(vestingManager, "DuplicateReleaseSchedule");
   });
 

@@ -455,7 +455,7 @@ export const testTakeSwap = async (
   isNativeSellToken?: boolean,
   isNativeBuyToken?: boolean
 ) => {
-  const [, , takerReceiver] = await ethers.getSigners();
+  const [, , , takerReceiver] = await ethers.getSigners();
   const {
     orderID,
     atomicSwap,
@@ -607,37 +607,38 @@ export const testVestingTakeSwap = async (
   );
 
   const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
+  const vestingId = BigInt(orderID);
   if (order.sellToken.token == ethers.ZeroAddress) {
     expect(
-      await vestingManager.release(takerReceiver, orderID)
+      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
     ).to.changeEtherBalance(takerReceiver, releaseAmount);
   } else {
     expect(
-      await vestingManager.release(takerReceiver, orderID)
+      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
   }
   // after 1 hours, release again
   await time.increase(3600 * 1);
   if (order.sellToken.token == ethers.ZeroAddress) {
     expect(
-      await vestingManager.release(takerReceiver, orderID)
+      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
     ).to.changeEtherBalance(takerReceiver, releaseAmount);
   } else {
     expect(
-      await vestingManager.release(takerReceiver, orderID)
+      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
   }
 
-  // after 1 hours, release again
+  // // after 1 hours, release again
   await time.increase(3600 * 1);
   if (order.sellToken.token == ethers.ZeroAddress) {
     await expect(
-      vestingManager.release(takerReceiver, orderID)
-    ).to.revertedWithCustomError(vestingManager, "InvalidVesting");
+      vestingManager.release(BigInt(orderID))
+    ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
   } else {
     await expect(
-      vestingManager.release(takerReceiver, orderID)
-    ).to.revertedWithCustomError(vestingManager, "InvalidVesting");
+      vestingManager.release(BigInt(orderID))
+    ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
   }
   expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
   return {

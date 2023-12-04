@@ -189,7 +189,7 @@ export interface IVesting extends BaseContract {
   startVesting: TypedContractMethod<
     [
       orderId: BytesLike,
-      beneficiary: AddressLike,
+      buyer: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
       releases: IAtomicSwapBase.ReleaseStruct[]
@@ -207,7 +207,7 @@ export interface IVesting extends BaseContract {
   ): TypedContractMethod<
     [
       orderId: BytesLike,
-      beneficiary: AddressLike,
+      buyer: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
       releases: IAtomicSwapBase.ReleaseStruct[]
