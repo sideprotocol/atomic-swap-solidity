@@ -13,22 +13,30 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting,ERC721Upgradeable {
     using AtomicSwapMsgValidator for *;
+    string private _baseURL;
+    /// @dev Maximum scale for release percent calculations.
+    uint256 constant internal RELEASE_PERCENT_SCALE_FACTOR = 1e4;
+
     /// @notice Stores vesting schedules for each vestingId.
     mapping(uint => VestingSchedule)
-        public vestingSchedules;
+        public vesting;
 
     /// @notice Stores release information for each vestingId.
     // slither-disable-next-line uninitialized-state
     mapping(uint => IAtomicSwapBase.Release[])
-        public releaseInfos;
+        public releaseInfo;
 
     /// @notice Initializes the vesting contract with necessary parameters.
-    /// @param _admin The address of the admin.
-    function initialize(address _admin) external initializer {
-        __OwnablePausableUpgradeable_init(_admin);
-        __ERC721_init("SideVestingID", "SideVestingID");
+    /// @param admin The address of the admin.
+    /// @param name The address of the vesting NFT.
+    /// @param symbol The address of the vesting NFT.
+    /// @param baseURL The address of the vesting NFT.
+    function initialize(address admin, string memory name, string memory symbol, string memory baseURL) external initializer {
+        __OwnablePausableUpgradeable_init(admin);
+        __ERC721_init(name, symbol);
+        _baseURL = baseURL;
     }
-    // TODO: Check this function, anyone can call startVesting directly without takeSwap operation
+
     /// @notice Starts the vesting schedule for a beneficiary.
     /// @param buyer The address of the beneficiary.
     /// @param token The token address for vesting.
@@ -42,9 +50,9 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external payable nonReentrant onlyAdmin {
-        // Ensure the uniqueness of 'beneficiary-orderId', to avoid an override call attack.
-        uint _vestingId = _issueVestingID(buyer, orderId);
-        if (vestingSchedules[_vestingId].from != address(0)) { 
+
+        uint vestingId = _issueVestingID(buyer, orderId);
+        if (vesting[vestingId].from != address(0)) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
@@ -68,14 +76,14 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             amountReleased: 0,
             nextReleaseStep: 0
         });
-        vestingSchedules[_vestingId] = newVesting;
+
+        vesting[vestingId] = newVesting;
         //slither-disable-next-line uninitialized-state-variables
-        IAtomicSwapBase.Release[] storage _releases = releaseInfos[_vestingId];
+        IAtomicSwapBase.Release[] storage _releases = releaseInfo[vestingId];
         for (uint256 i = 0; i < releases.length; i++) {
             _releases.push(releases[i]);
         }
 
-        
         emit NewVesting(
             VestingInfo(newVesting, releases, orderId)
         );
@@ -92,8 +100,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             revert NoPermissionToRelease();
         }
     
-        VestingSchedule storage schedule = vestingSchedules[vestingId];
-        IAtomicSwapBase.Release[] storage releases = releaseInfos[vestingId];
+        VestingSchedule storage schedule = vesting[vestingId];
+        IAtomicSwapBase.Release[] storage releases = releaseInfo[vestingId];
         if (
             releases.length == 0 || schedule.nextReleaseStep >= releases.length
         ) {
@@ -108,7 +116,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
                 break;
             }
             uint256 releaseAmount = (schedule.totalAmount *
-            releases[i].percentage) / 10000;
+            releases[i].percentage) / RELEASE_PERCENT_SCALE_FACTOR;
             amountForRelease += releaseAmount;
             schedule.nextReleaseStep = i + 1;
         }
@@ -134,8 +142,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         }
         emit Released(msg.sender, amountForRelease);
     }
-    
-    receive() external payable onlyAdmin {
+
+    receive() external payable {
         emit Received(msg.sender, msg.value);
     }
 
@@ -144,11 +152,11 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// This function can only be called by an administrator of the contract.
     /// @param to The address to which the vesting ID and corresponding tokens will be issued.
     /// @param orderId The order ID based on which the vesting ID is generated.
-    /// @return _vestingID The generated vesting ID as a uint.
+    /// @return vestingID The generated vesting ID as a uint.
 
-    function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint _vestingID) {
-        _vestingID = uint(orderId);
-        _mint(to, _vestingID);                                                                                                                                                                                                                                                                  
+    function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint vestingID) {
+        vestingID = uint(orderId);
+        _mint(to, vestingID);                                                                                                                                                                                                                                                                  
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -158,5 +166,13 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
+     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
+     */
+    function _baseURI() internal view virtual override returns (string memory) {
+        return _baseURL;
     }
 }

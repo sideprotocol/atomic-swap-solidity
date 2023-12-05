@@ -180,14 +180,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyExist(placeBidMsg.orderID)
         onlyActiveOrder(placeBidMsg.orderID)
     {
-        bytes32 _orderID = placeBidMsg.orderID;
-        uint256 _bidAmount = placeBidMsg.bidAmount;
+        bytes32 orderID = placeBidMsg.orderID;
+        uint256 bidAmount = placeBidMsg.bidAmount;
         // Ensure the caller is the bidder
         if (placeBidMsg.bidder != msg.sender) {
             revert InvalidBidderAddress();
         }
 
-        Bid storage _currentBid = bids[_orderID][msg.sender];
+        Bid storage _currentBid = bids[orderID][msg.sender];
         if (_currentBid.bidder != address(0)) {
             revert BidAlreadyPlaced();
         }
@@ -201,14 +201,14 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
         // Ensure bid amount meet bid requirements.
         if (
-            _bidAmount < _order.minBidAmount ||
-            _bidAmount > _order.buyToken.amount
+            bidAmount < _order.minBidAmount ||
+            bidAmount > _order.buyToken.amount
         ) {
-            revert MismatchedBidAmount(_bidAmount);
+            revert MismatchedBidAmount(bidAmount);
         }
 
         // Calculate the additional token amount being bid
-        Coin storage _buyToken = swapOrder[_orderID].buyToken;
+        Coin storage _buyToken = swapOrder[orderID].buyToken;
         // Handle ERC20 token or Ether bids
         if (_buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
@@ -217,18 +217,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 _buyToken.token,
                 msg.sender,
                 address(this),
-                _bidAmount
+                bidAmount
             );
         } else {
             // Ensure the bidder has sent sufficient Ether for the bid
-            if (msg.value != _bidAmount) {
+            if (msg.value != bidAmount) {
                 revert MismatchedBidAmount(msg.value);
             }
         }
 
         // Record the new bid
         bids.addNewBid(placeBidMsg);
-        emit PlacedBid(_orderID, msg.sender, _bidAmount);
+        emit PlacedBid(orderID, msg.sender, bidAmount);
     }
 
     /// @notice Updates an existing bid on a swap order.
@@ -244,10 +244,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyActiveOrder(updateBidMsg.orderID) // Ensures the order exists
     {
         // Extracting details from the updateBidMsg for easy reference
-        bytes32 _orderID = updateBidMsg.orderID;
-        uint256 _addition = updateBidMsg.addition;
+        bytes32 orderID = updateBidMsg.orderID;
+        uint256 addition = updateBidMsg.addition;
         // Retrieving the current bid for this order and sender
-        Bid storage _currentBid = bids[_orderID][msg.sender];
+        Bid storage _currentBid = bids[orderID][msg.sender];
         if(_currentBid.expireTimestamp < block.timestamp) {
             revert BidAlreadyExpired(_currentBid.expireTimestamp,block.timestamp);
         }
@@ -258,7 +258,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Retrieve the associated AtomicSwapOrder
-        AtomicSwapOrder storage _order = swapOrder[_orderID];
+        AtomicSwapOrder storage _order = swapOrder[orderID];
 
         // It doesn't happen in normal senarios 
         if (_currentBid.status != BidStatus.Placed) {
@@ -266,12 +266,12 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Ensure the additional bid amount is non-zero
-        if (_addition == 0) {
-            revert MismatchedBidAmount(_addition);
+        if (addition == 0) {
+            revert MismatchedBidAmount(addition);
         }
 
         // Update the bid amount
-        _currentBid.amount += _addition;
+        _currentBid.amount += addition;
         if (_currentBid.amount > _order.buyToken.amount) {
             revert MismatchedBidAmount(_currentBid.amount);
         }
@@ -287,15 +287,15 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 _buyToken.token,
                 msg.sender,
                 address(this),
-                _addition
+                addition
             );
         } else {
             // Ensure the sent Ether matches the additional bid amount
-            if (msg.value != _addition) {
+            if (msg.value != addition) {
                 revert MismatchedBidAmount(msg.value);
             }
         }
-        emit UpdatedBid(_orderID, _currentBid.bidder, _currentBid.amount);
+        emit UpdatedBid(orderID, _currentBid.bidder, _currentBid.amount);
     }
 
     /// @notice Allows the maker to accept a bid on their swap order.
@@ -311,12 +311,12 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyActiveOrder(acceptBidMsg.orderID)
     {
         // Ensure no unnecessary Ether is sent with the transaction
-        bytes32 _orderID = acceptBidMsg.orderID;
-        address _bidder = acceptBidMsg.bidder;
+        bytes32 orderID = acceptBidMsg.orderID;
+        address bidder = acceptBidMsg.bidder;
         if (msg.sender == address(0)) {
             revert UnauthorizedSender();
         }
-        AtomicSwapOrder storage _order = swapOrder[_orderID];
+        AtomicSwapOrder storage _order = swapOrder[orderID];
         if (!_order.acceptBid) {
             revert BidNotAllowed();
         }
@@ -326,7 +326,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Retrieve the bid from storage
-        Bid storage _selectedBid = bids[_orderID][_bidder];
+        Bid storage _selectedBid = bids[orderID][bidder];
         // Ensure the bid is in 'Placed' status
         if (_selectedBid.status != BidStatus.Placed) {
             revert BidNotInPlacedStatus(_selectedBid.status);
@@ -343,12 +343,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // update the order status to 'COMPLETE'
         _order.status = OrderStatus.COMPLETE;
         _order.completedAt = block.timestamp;
-        _order.taker = _bidder;
+        _order.taker = bidder;
 
         // Update the bid status to 'Executed'
         _selectedBid.status = BidStatus.Executed;
 
-        // TODO: Check and process vesting releases
         // Process sell token transfers
         _transferSellTokenToBuyer(_order, _selectedBid.bidder);
         // Process buy token transfers
@@ -361,16 +360,16 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             treasury
         );
 
-        emit AcceptedBid(_orderID, _bidder, _selectedBid.amount);
+        emit AcceptedBid(orderID, bidder, _selectedBid.amount);
     }
 
     /// @notice Allows a bidder to cancel their bid on a swap order.
-    /// @param _orderID The unique identifier of the swap order.
+    /// @param orderID The unique identifier of the swap order.
     function cancelBid(
-        bytes32 _orderID
-    ) external payable whenNotPaused nonReentrant onlyExist(_orderID) {
+        bytes32 orderID
+    ) external payable whenNotPaused nonReentrant onlyExist(orderID) {
         // Retrieve the selected bid from storage
-        Bid storage _selectedBid = bids[_orderID][msg.sender];
+        Bid storage _selectedBid = bids[orderID][msg.sender];
 
         // Ensure that msg.sender is same with bidder.
         if (_selectedBid.bidder != msg.sender) {
@@ -385,7 +384,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         _selectedBid.status = BidStatus.Cancelled;
 
         // Retrieve the buy tokens details from storage
-        Coin storage _buyToken = swapOrder[_orderID].buyToken;
+        Coin storage _buyToken = swapOrder[orderID].buyToken;
 
         // If buy token is an ERC20 token, transfer it back to the bidder
         if (_buyToken.token != address(0)) {
@@ -402,7 +401,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             );
         }
 
-        emit CanceledBid(_orderID, _selectedBid.bidder);
+        emit CanceledBid(orderID, _selectedBid.bidder);
     }
 
     /// @notice Transfers the sell token to the buyer with optional vesting

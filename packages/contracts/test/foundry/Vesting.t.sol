@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 import "forge-std/Test.sol";
-import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import "../../contracts/vesting/Vesting.sol";
+import {Vesting} from "../../contracts/vesting/Vesting.sol";
+import {InchainAtomicSwap} from "../../contracts/inchain_atomicswap/InchainAtomicSwap.sol";
 import {IAtomicSwapBase} from "../../contracts/abstracts/interfaces/IAtomicSwapBase.sol";
 import {IVesting} from "../../contracts/vesting/interfaces/IVesting.sol";
-
+import {TestHelper} from  "./utils/TestHelper.sol";
 
 contract VestingTest is Test {
+    InchainAtomicSwap atomicswap;
     Vesting vesting;
-    TransparentUpgradeableProxy proxy;
     address admin = address(0x90);
     // Setup function runs before each test
     function setUp() public {
+        // Deploy vesting contract
         vesting = new Vesting();
         bytes memory initData = abi.encodeWithSelector(
             vesting.initialize.selector,
             admin
         );
 
-        proxy = new TransparentUpgradeableProxy(
+        address proxy = TestHelper.deployWithTP(
             address(vesting),
             admin,
             initData
         );
-
         vesting = Vesting(payable(address(proxy)));
     }
 
