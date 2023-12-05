@@ -27,18 +27,15 @@ export declare namespace IVesting {
     type VestingInfoStruct = {
         schedule: IVesting.VestingScheduleStruct;
         release: IAtomicSwapBase.ReleaseStruct[];
-        beneficiary: AddressLike;
         orderId: BytesLike;
     };
     type VestingInfoStructOutput = [
         schedule: IVesting.VestingScheduleStructOutput,
         release: IAtomicSwapBase.ReleaseStructOutput[],
-        beneficiary: string,
         orderId: string
     ] & {
         schedule: IVesting.VestingScheduleStructOutput;
         release: IAtomicSwapBase.ReleaseStructOutput[];
-        beneficiary: string;
         orderId: string;
     };
 }
@@ -56,7 +53,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VestingInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "approve" | "balanceOf" | "getApproved" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isApprovedForAll" | "isPauser" | "name" | "ownerOf" | "paginationSize" | "pause" | "paused" | "release" | "releaseInfos" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setPaginationSize" | "startVesting" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unpause" | "vestingSchedules"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "approve" | "balanceOf" | "getApproved" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isApprovedForAll" | "isPauser" | "name" | "ownerOf" | "paginationSize" | "pause" | "paused" | "release" | "releaseInfo" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setPaginationSize" | "startVesting" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unpause" | "vesting"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "Initialized" | "NewVesting" | "Paused" | "Received" | "Released" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Transfer" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "PAUSER_ROLE", values?: undefined): string;
@@ -68,7 +65,7 @@ export interface VestingInterface extends Interface {
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [AddressLike]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, string, string, string]): string;
     encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "isPauser", values: [AddressLike]): string;
@@ -78,7 +75,7 @@ export interface VestingInterface extends Interface {
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
     encodeFunctionData(functionFragment: "release", values: [BigNumberish]): string;
-    encodeFunctionData(functionFragment: "releaseInfos", values: [BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "releaseInfo", values: [BigNumberish, BigNumberish]): string;
     encodeFunctionData(functionFragment: "removeAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "removePauser", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "renounceRole", values: [BytesLike, AddressLike]): string;
@@ -99,7 +96,7 @@ export interface VestingInterface extends Interface {
     encodeFunctionData(functionFragment: "tokenURI", values: [BigNumberish]): string;
     encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-    encodeFunctionData(functionFragment: "vestingSchedules", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "vesting", values: [BigNumberish]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "PAUSER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
@@ -120,7 +117,7 @@ export interface VestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "releaseInfos", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "releaseInfo", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removeAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "removePauser", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "renounceRole", data: BytesLike): Result;
@@ -135,7 +132,7 @@ export interface VestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "vestingSchedules", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "vesting", data: BytesLike): Result;
 }
 export declare namespace ApprovalEvent {
     type InputTuple = [
@@ -353,7 +350,14 @@ export interface Vesting extends BaseContract {
     ], [
         boolean
     ], "view">;
-    initialize: TypedContractMethod<[_admin: AddressLike], [void], "nonpayable">;
+    initialize: TypedContractMethod<[
+        admin: AddressLike,
+        name: string,
+        symbol: string,
+        baseURL: string
+    ], [
+        void
+    ], "nonpayable">;
     isAdmin: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
     isApprovedForAll: TypedContractMethod<[
         owner: AddressLike,
@@ -368,7 +372,7 @@ export interface Vesting extends BaseContract {
     pause: TypedContractMethod<[], [void], "nonpayable">;
     paused: TypedContractMethod<[], [boolean], "view">;
     release: TypedContractMethod<[vestingId: BigNumberish], [void], "nonpayable">;
-    releaseInfos: TypedContractMethod<[
+    releaseInfo: TypedContractMethod<[
         arg0: BigNumberish,
         arg1: BigNumberish
     ], [
@@ -449,7 +453,7 @@ export interface Vesting extends BaseContract {
         void
     ], "nonpayable">;
     unpause: TypedContractMethod<[], [void], "nonpayable">;
-    vestingSchedules: TypedContractMethod<[
+    vesting: TypedContractMethod<[
         arg0: BigNumberish
     ], [
         [
@@ -494,7 +498,14 @@ export interface Vesting extends BaseContract {
     ], [
         boolean
     ], "view">;
-    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[_admin: AddressLike], [void], "nonpayable">;
+    getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
+        admin: AddressLike,
+        name: string,
+        symbol: string,
+        baseURL: string
+    ], [
+        void
+    ], "nonpayable">;
     getFunction(nameOrSignature: "isAdmin"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "isApprovedForAll"): TypedContractMethod<[
         owner: AddressLike,
@@ -509,7 +520,7 @@ export interface Vesting extends BaseContract {
     getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
     getFunction(nameOrSignature: "release"): TypedContractMethod<[vestingId: BigNumberish], [void], "nonpayable">;
-    getFunction(nameOrSignature: "releaseInfos"): TypedContractMethod<[
+    getFunction(nameOrSignature: "releaseInfo"): TypedContractMethod<[
         arg0: BigNumberish,
         arg1: BigNumberish
     ], [
@@ -574,7 +585,7 @@ export interface Vesting extends BaseContract {
         void
     ], "nonpayable">;
     getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
-    getFunction(nameOrSignature: "vestingSchedules"): TypedContractMethod<[
+    getFunction(nameOrSignature: "vesting"): TypedContractMethod<[
         arg0: BigNumberish
     ], [
         [

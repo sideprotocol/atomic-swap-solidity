@@ -83,10 +83,6 @@ export declare class IVesting__factory {
                 readonly name: "release";
                 readonly type: "tuple[]";
             }, {
-                readonly internalType: "address";
-                readonly name: "beneficiary";
-                readonly type: "address";
-            }, {
                 readonly internalType: "bytes32";
                 readonly name: "orderId";
                 readonly type: "bytes32";

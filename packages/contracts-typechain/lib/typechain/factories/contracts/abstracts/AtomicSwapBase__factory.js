@@ -527,31 +527,6 @@ const _abi = [
             {
                 indexed: true,
                 internalType: "bytes32",
-                name: "orderID",
-                type: "bytes32",
-            },
-            {
-                indexed: true,
-                internalType: "address",
-                name: "bidder",
-                type: "address",
-            },
-            {
-                indexed: true,
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-            },
-        ],
-        name: "ReceivedNewBid",
-        type: "event",
-    },
-    {
-        anonymous: false,
-        inputs: [
-            {
-                indexed: true,
-                internalType: "bytes32",
                 name: "role",
                 type: "bytes32",
             },

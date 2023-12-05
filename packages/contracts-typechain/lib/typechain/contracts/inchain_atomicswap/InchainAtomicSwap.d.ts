@@ -108,7 +108,7 @@ export declare namespace IAtomicSwapBase {
 }
 export interface InchainAtomicSwapInterface extends Interface {
     getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "acceptBid" | "addAdmin" | "addPauser" | "bids" | "buyerFeeRate" | "cancelBid" | "cancelSwap" | "counteroffers" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isPauser" | "makeSwap" | "makeSwapWithVesting" | "paginationSize" | "pause" | "paused" | "placeBid" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "sellerFeeRate" | "setPaginationSize" | "supportsInterface" | "swapOrder" | "swapOrderVestingParams" | "takeSwap" | "unpause" | "updateBid"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "Paused" | "PlacedBid" | "ReceivedNewBid" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "UpdatedBid"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "AcceptedBid" | "AtomicSwapOrderCanceled" | "AtomicSwapOrderCreated" | "AtomicSwapOrderTook" | "CanceledBid" | "Initialized" | "Paused" | "PlacedBid" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "UpdatedBid"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "PAUSER_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "acceptBid", values: [IAtomicSwapBase.AcceptBidMsgStruct]): string;
@@ -285,23 +285,6 @@ export declare namespace PlacedBidEvent {
     type Log = TypedEventLog<Event>;
     type LogDescription = TypedLogDescription<Event>;
 }
-export declare namespace ReceivedNewBidEvent {
-    type InputTuple = [
-        orderID: BytesLike,
-        bidder: AddressLike,
-        amount: BigNumberish
-    ];
-    type OutputTuple = [orderID: string, bidder: string, amount: bigint];
-    interface OutputObject {
-        orderID: string;
-        bidder: string;
-        amount: bigint;
-    }
-    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-    type Filter = TypedDeferredTopicFilter<Event>;
-    type Log = TypedEventLog<Event>;
-    type LogDescription = TypedLogDescription<Event>;
-}
 export declare namespace RoleAdminChangedEvent {
     type InputTuple = [
         role: BytesLike,
@@ -428,7 +411,7 @@ export interface InchainAtomicSwap extends BaseContract {
         }
     ], "view">;
     buyerFeeRate: TypedContractMethod<[], [bigint], "view">;
-    cancelBid: TypedContractMethod<[_orderID: BytesLike], [void], "payable">;
+    cancelBid: TypedContractMethod<[orderID: BytesLike], [void], "payable">;
     cancelSwap: TypedContractMethod<[
         cancelswap: IAtomicSwapBase.CancelSwapMsgStruct
     ], [
@@ -598,7 +581,7 @@ export interface InchainAtomicSwap extends BaseContract {
         }
     ], "view">;
     getFunction(nameOrSignature: "buyerFeeRate"): TypedContractMethod<[], [bigint], "view">;
-    getFunction(nameOrSignature: "cancelBid"): TypedContractMethod<[_orderID: BytesLike], [void], "payable">;
+    getFunction(nameOrSignature: "cancelBid"): TypedContractMethod<[orderID: BytesLike], [void], "payable">;
     getFunction(nameOrSignature: "cancelSwap"): TypedContractMethod<[
         cancelswap: IAtomicSwapBase.CancelSwapMsgStruct
     ], [
@@ -729,7 +712,6 @@ export interface InchainAtomicSwap extends BaseContract {
     getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     getEvent(key: "Paused"): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
     getEvent(key: "PlacedBid"): TypedContractEvent<PlacedBidEvent.InputTuple, PlacedBidEvent.OutputTuple, PlacedBidEvent.OutputObject>;
-    getEvent(key: "ReceivedNewBid"): TypedContractEvent<ReceivedNewBidEvent.InputTuple, ReceivedNewBidEvent.OutputTuple, ReceivedNewBidEvent.OutputObject>;
     getEvent(key: "RoleAdminChanged"): TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
     getEvent(key: "RoleGranted"): TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;
     getEvent(key: "RoleRevoked"): TypedContractEvent<RoleRevokedEvent.InputTuple, RoleRevokedEvent.OutputTuple, RoleRevokedEvent.OutputObject>;
@@ -752,8 +734,6 @@ export interface InchainAtomicSwap extends BaseContract {
         Paused: TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
         "PlacedBid(bytes32,address,uint256)": TypedContractEvent<PlacedBidEvent.InputTuple, PlacedBidEvent.OutputTuple, PlacedBidEvent.OutputObject>;
         PlacedBid: TypedContractEvent<PlacedBidEvent.InputTuple, PlacedBidEvent.OutputTuple, PlacedBidEvent.OutputObject>;
-        "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<ReceivedNewBidEvent.InputTuple, ReceivedNewBidEvent.OutputTuple, ReceivedNewBidEvent.OutputObject>;
-        ReceivedNewBid: TypedContractEvent<ReceivedNewBidEvent.InputTuple, ReceivedNewBidEvent.OutputTuple, ReceivedNewBidEvent.OutputObject>;
         "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
         RoleAdminChanged: TypedContractEvent<RoleAdminChangedEvent.InputTuple, RoleAdminChangedEvent.OutputTuple, RoleAdminChangedEvent.OutputObject>;
         "RoleGranted(bytes32,address,address)": TypedContractEvent<RoleGrantedEvent.InputTuple, RoleGrantedEvent.OutputTuple, RoleGrantedEvent.OutputObject>;

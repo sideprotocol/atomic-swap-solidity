@@ -164,7 +164,6 @@ interface IAtomicSwapBase {
     event AtomicSwapOrderCreated(bytes32 indexed id);
     event AtomicSwapOrderTook(address indexed maker, address indexed taker, bytes32 indexed id);
     event AtomicSwapOrderCanceled(bytes32 indexed id);
-    event ReceivedNewBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
     event UpdatedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
     event AcceptedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
     event CanceledBid(bytes32 indexed orderID, address indexed bidder);

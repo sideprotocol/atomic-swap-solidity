@@ -72,7 +72,6 @@ export interface AtomicSwapBaseInterface extends Interface {
       | "Initialized"
       | "Paused"
       | "PlacedBid"
-      | "ReceivedNewBid"
       | "RoleAdminChanged"
       | "RoleGranted"
       | "RoleRevoked"
@@ -336,24 +335,6 @@ export namespace PausedEvent {
 }
 
 export namespace PlacedBidEvent {
-  export type InputTuple = [
-    orderID: BytesLike,
-    bidder: AddressLike,
-    amount: BigNumberish
-  ];
-  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
-  export interface OutputObject {
-    orderID: string;
-    bidder: string;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace ReceivedNewBidEvent {
   export type InputTuple = [
     orderID: BytesLike,
     bidder: AddressLike,
@@ -843,13 +824,6 @@ export interface AtomicSwapBase extends BaseContract {
     PlacedBidEvent.OutputObject
   >;
   getEvent(
-    key: "ReceivedNewBid"
-  ): TypedContractEvent<
-    ReceivedNewBidEvent.InputTuple,
-    ReceivedNewBidEvent.OutputTuple,
-    ReceivedNewBidEvent.OutputObject
-  >;
-  getEvent(
     key: "RoleAdminChanged"
   ): TypedContractEvent<
     RoleAdminChangedEvent.InputTuple,
@@ -972,17 +946,6 @@ export interface AtomicSwapBase extends BaseContract {
       PlacedBidEvent.InputTuple,
       PlacedBidEvent.OutputTuple,
       PlacedBidEvent.OutputObject
-    >;
-
-    "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<
-      ReceivedNewBidEvent.InputTuple,
-      ReceivedNewBidEvent.OutputTuple,
-      ReceivedNewBidEvent.OutputObject
-    >;
-    ReceivedNewBid: TypedContractEvent<
-      ReceivedNewBidEvent.InputTuple,
-      ReceivedNewBidEvent.OutputTuple,
-      ReceivedNewBidEvent.OutputObject
     >;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<

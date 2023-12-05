@@ -134,10 +134,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
-      name: "VestingEchidnaTest",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VestingEchidnaTest__factory>;
-    getContractFactory(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVesting__factory>;
@@ -297,11 +293,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
     getContractAt(
-      name: "VestingEchidnaTest",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VestingEchidnaTest>;
-    getContractAt(
       name: "IVesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -432,10 +423,6 @@ declare module "hardhat/types/runtime" {
       name: "MockToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
-    deployContract(
-      name: "VestingEchidnaTest",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.VestingEchidnaTest>;
     deployContract(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -595,11 +582,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
-    deployContract(
-      name: "VestingEchidnaTest",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.VestingEchidnaTest>;
     deployContract(
       name: "IVesting",
       args: any[],

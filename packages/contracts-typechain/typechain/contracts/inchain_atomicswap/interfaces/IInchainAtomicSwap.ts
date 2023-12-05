@@ -147,7 +147,6 @@ export interface IInchainAtomicSwapInterface extends Interface {
       | "AtomicSwapOrderTook"
       | "CanceledBid"
       | "PlacedBid"
-      | "ReceivedNewBid"
       | "UpdatedBid"
   ): EventFragment;
 
@@ -266,24 +265,6 @@ export namespace CanceledBidEvent {
 }
 
 export namespace PlacedBidEvent {
-  export type InputTuple = [
-    orderID: BytesLike,
-    bidder: AddressLike,
-    amount: BigNumberish
-  ];
-  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
-  export interface OutputObject {
-    orderID: string;
-    bidder: string;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace ReceivedNewBidEvent {
   export type InputTuple = [
     orderID: BytesLike,
     bidder: AddressLike,
@@ -507,13 +488,6 @@ export interface IInchainAtomicSwap extends BaseContract {
     PlacedBidEvent.OutputObject
   >;
   getEvent(
-    key: "ReceivedNewBid"
-  ): TypedContractEvent<
-    ReceivedNewBidEvent.InputTuple,
-    ReceivedNewBidEvent.OutputTuple,
-    ReceivedNewBidEvent.OutputObject
-  >;
-  getEvent(
     key: "UpdatedBid"
   ): TypedContractEvent<
     UpdatedBidEvent.InputTuple,
@@ -586,17 +560,6 @@ export interface IInchainAtomicSwap extends BaseContract {
       PlacedBidEvent.InputTuple,
       PlacedBidEvent.OutputTuple,
       PlacedBidEvent.OutputObject
-    >;
-
-    "ReceivedNewBid(bytes32,address,uint256)": TypedContractEvent<
-      ReceivedNewBidEvent.InputTuple,
-      ReceivedNewBidEvent.OutputTuple,
-      ReceivedNewBidEvent.OutputObject
-    >;
-    ReceivedNewBid: TypedContractEvent<
-      ReceivedNewBidEvent.InputTuple,
-      ReceivedNewBidEvent.OutputTuple,
-      ReceivedNewBidEvent.OutputObject
     >;
 
     "UpdatedBid(bytes32,address,uint256)": TypedContractEvent<

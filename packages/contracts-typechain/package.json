@@ -9,7 +9,6 @@
     "build": "tsc --preserveSymlinks"
   },
   "peerDependencies": {
-    "@ethersproject/providers": "*",
     "@typechain/ethers-v6": "*",
     "ethers": "*",
     "typechain": "*",

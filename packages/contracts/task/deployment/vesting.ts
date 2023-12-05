@@ -30,7 +30,7 @@ task("deploy:vesting", "deploy in chain ").setAction(
       },
     });
     // deploy contract
-    const vesting = await upgrades.deployProxy(vestingFactory, [admin], {
+    const vesting = await upgrades.deployProxy(vestingFactory, [admin, "vSide", "vSide", "https://nft.side.market/metadata/"], {
       initializer: "initialize",
       unsafeAllowLinkedLibraries: true,
     });

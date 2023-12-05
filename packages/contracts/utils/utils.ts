@@ -64,7 +64,7 @@ export const Utils = {
     });
     const vestingManager = await upgrades.deployProxy(
       vestingManagerFactory,
-      [owner.address],
+      [owner.address, "vSide", "vSide", "https://nft.side.market/metadata/"],
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,

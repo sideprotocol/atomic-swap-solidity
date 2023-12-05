@@ -101,7 +101,7 @@ export interface VestingInterface extends Interface {
       | "pause"
       | "paused"
       | "release"
-      | "releaseInfos"
+      | "releaseInfo"
       | "removeAdmin"
       | "removePauser"
       | "renounceRole"
@@ -116,7 +116,7 @@ export interface VestingInterface extends Interface {
       | "tokenURI"
       | "transferFrom"
       | "unpause"
-      | "vestingSchedules"
+      | "vesting"
   ): FunctionFragment;
 
   getEvent(
@@ -177,7 +177,7 @@ export interface VestingInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [AddressLike]
+    values: [AddressLike, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "isAdmin",
@@ -207,7 +207,7 @@ export interface VestingInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "releaseInfos",
+    functionFragment: "releaseInfo",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -267,7 +267,7 @@ export interface VestingInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "vestingSchedules",
+    functionFragment: "vesting",
     values: [BigNumberish]
   ): string;
 
@@ -310,7 +310,7 @@ export interface VestingInterface extends Interface {
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "releaseInfos",
+    functionFragment: "releaseInfo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -357,10 +357,7 @@ export interface VestingInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "vestingSchedules",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "vesting", data: BytesLike): Result;
 }
 
 export namespace ApprovalEvent {
@@ -628,7 +625,11 @@ export interface Vesting extends BaseContract {
     "view"
   >;
 
-  initialize: TypedContractMethod<[_admin: AddressLike], [void], "nonpayable">;
+  initialize: TypedContractMethod<
+    [admin: AddressLike, name: string, symbol: string, baseURL: string],
+    [void],
+    "nonpayable"
+  >;
 
   isAdmin: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
 
@@ -652,7 +653,7 @@ export interface Vesting extends BaseContract {
 
   release: TypedContractMethod<[vestingId: BigNumberish], [void], "nonpayable">;
 
-  releaseInfos: TypedContractMethod<
+  releaseInfo: TypedContractMethod<
     [arg0: BigNumberish, arg1: BigNumberish],
     [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
     "view"
@@ -741,7 +742,7 @@ export interface Vesting extends BaseContract {
 
   unpause: TypedContractMethod<[], [void], "nonpayable">;
 
-  vestingSchedules: TypedContractMethod<
+  vesting: TypedContractMethod<
     [arg0: BigNumberish],
     [
       [string, bigint, string, bigint, bigint, bigint] & {
@@ -804,7 +805,11 @@ export interface Vesting extends BaseContract {
   >;
   getFunction(
     nameOrSignature: "initialize"
-  ): TypedContractMethod<[_admin: AddressLike], [void], "nonpayable">;
+  ): TypedContractMethod<
+    [admin: AddressLike, name: string, symbol: string, baseURL: string],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "isAdmin"
   ): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
@@ -837,7 +842,7 @@ export interface Vesting extends BaseContract {
     nameOrSignature: "release"
   ): TypedContractMethod<[vestingId: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "releaseInfos"
+    nameOrSignature: "releaseInfo"
   ): TypedContractMethod<
     [arg0: BigNumberish, arg1: BigNumberish],
     [[bigint, bigint] & { durationInHours: bigint; percentage: bigint }],
@@ -925,7 +930,7 @@ export interface Vesting extends BaseContract {
     nameOrSignature: "unpause"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "vestingSchedules"
+    nameOrSignature: "vesting"
   ): TypedContractMethod<
     [arg0: BigNumberish],
     [

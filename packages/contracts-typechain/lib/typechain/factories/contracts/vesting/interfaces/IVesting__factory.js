@@ -112,11 +112,6 @@ const _abi = [
                         type: "tuple[]",
                     },
                     {
-                        internalType: "address",
-                        name: "beneficiary",
-                        type: "address",
-                    },
-                    {
                         internalType: "bytes32",
                         name: "orderId",
                         type: "bytes32",

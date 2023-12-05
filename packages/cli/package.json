@@ -10,7 +10,6 @@
     "start": "ts-node index.ts"
   },
   "peerDependencies": {
-    "@ethersproject/providers": "*",
     "@sideprotocol/contracts-typechain": "*",
     "@typechain/ethers-v6": "*",
     "ethers": "*",
