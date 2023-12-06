@@ -13,7 +13,7 @@ interface IVesting {
     /// @param token The token address being vested.
     /// @param totalAmount The total amount of tokens to be vested.
     /// @param amountReleased The amount of tokens already released.
-    /// @param lastReleasedStep The last step index that was processed for release.
+    /// @param nextReleaseStep The last step index that was processed for release.
     struct VestingSchedule {
         address from;
         uint256 start;
@@ -30,7 +30,7 @@ interface IVesting {
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
-    /// @param buyer The token id of the TakerIdentity Contract.
+    /// @param buyer The receiver of this vesting.
     /// @param token The token to be vested.
     /// @param totalAmount The total amount of tokens to be vested.
     /// @param releases The release schedule parameters.

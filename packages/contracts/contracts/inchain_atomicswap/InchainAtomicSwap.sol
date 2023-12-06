@@ -110,26 +110,26 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyExist(takeswap.orderID) // Ensures the swap order exists
         onlyActiveOrder(takeswap.orderID) // Ensures the swap order active
     {
-        AtomicSwapOrder storage _order = swapOrder[takeswap.orderID];
-        _order.validateTakeSwap(takeswap);
+        AtomicSwapOrder storage order = swapOrder[takeswap.orderID];
+        order.validateTakeSwap(takeswap);
 
         // Update order details
-        _order.status = OrderStatus.COMPLETE;
-        _order.completedAt = block.timestamp;
-        _order.taker = msg.sender;
+        order.status = OrderStatus.COMPLETE;
+        order.completedAt = block.timestamp;
+        order.taker = msg.sender;
         
-        _transferSellTokenToBuyer(_order, takeswap.takerReceiver);
-        _order.buyToken.token.transferFromWithFee(
-            _order.maker,
-            _order.buyToken.amount,
+        _transferSellTokenToBuyer(order, takeswap.takerReceiver);
+        order.buyToken.token.transferFromWithFee(
+            order.maker,
+            order.buyToken.amount,
             sellerFeeRate,
             MAX_FEE_RATE_SCALE,
             treasury
         );
         // Emit an event signaling the swap was completed
         emit AtomicSwapOrderTook(
-            _order.maker,
-            _order.taker,
+            order.maker,
+            order.taker,
             takeswap.orderID
         );
     }
@@ -148,20 +148,20 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         onlyExist(cancelswap.orderID)
         onlyActiveOrder(cancelswap.orderID) // Ensures the swap order exists
     {
-        AtomicSwapOrder storage _order = swapOrder[cancelswap.orderID];
-        _order.validateCancelSwap();
+        AtomicSwapOrder storage order = swapOrder[cancelswap.orderID];
+        order.validateCancelSwap();
         // Update the status of the swap order to 'CANCEL'
-        _order.status = OrderStatus.CANCEL;
+        order.status = OrderStatus.CANCEL;
         // Return the funds/tokens to the maker
-        if (_order.sellToken.token == address(0)) {
+        if (order.sellToken.token == address(0)) {
             // Refund Ether if the sell token was Ether
-            TransferHelper.safeTransferETH(msg.sender,_order.sellToken.amount);
+            TransferHelper.safeTransferETH(msg.sender,order.sellToken.amount);
         } else {
             // Refund ERC20 tokens if the sell token was an ERC20 token
             TransferHelper.safeTransfer(
-                _order.sellToken.token,
+                order.sellToken.token,
                 msg.sender,
-                _order.sellToken.amount
+                order.sellToken.amount
             );
         }
         // Emit an event to notify that the swap order has been canceled
@@ -187,34 +187,34 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert InvalidBidderAddress();
         }
 
-        Bid storage _currentBid = bids[orderID][msg.sender];
-        if (_currentBid.bidder != address(0)) {
+        Bid storage currentBid = bids[orderID][msg.sender];
+        if (currentBid.bidder != address(0)) {
             revert BidAlreadyPlaced();
         }
         // Update last bidder expire time in order
-        AtomicSwapOrder storage _order = swapOrder[placeBidMsg.orderID];
-        if(!_order.acceptBid) {
+        AtomicSwapOrder storage order = swapOrder[placeBidMsg.orderID];
+        if(!order.acceptBid) {
             revert BidNotAllowed();
         }
-        if (_order.expiredAt < block.timestamp) {
-            revert InvalidExpirationTime(_order.expiredAt, block.timestamp);
+        if (order.expiredAt < block.timestamp) {
+            revert InvalidExpirationTime(order.expiredAt, block.timestamp);
         }
         // Ensure bid amount meet bid requirements.
         if (
-            bidAmount < _order.minBidAmount ||
-            bidAmount > _order.buyToken.amount
+            bidAmount < order.minBidAmount ||
+            bidAmount > order.buyToken.amount
         ) {
             revert MismatchedBidAmount(bidAmount);
         }
 
         // Calculate the additional token amount being bid
-        Coin storage _buyToken = swapOrder[orderID].buyToken;
+        Coin storage buyToken = swapOrder[orderID].buyToken;
         // Handle ERC20 token or Ether bids
-        if (_buyToken.token != address(0)) {
+        if (buyToken.token != address(0)) {
             // Ensure the bidder has sufficient funds for the bid
             // Transfer the additional bid amount from the bidder to this contract
             TransferHelper.safeTransferFrom(
-                _buyToken.token,
+                buyToken.token,
                 msg.sender,
                 address(this),
                 bidAmount
@@ -247,21 +247,21 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         bytes32 orderID = updateBidMsg.orderID;
         uint256 addition = updateBidMsg.addition;
         // Retrieving the current bid for this order and sender
-        Bid storage _currentBid = bids[orderID][msg.sender];
-        if(_currentBid.expireTimestamp < block.timestamp) {
-            revert BidAlreadyExpired(_currentBid.expireTimestamp,block.timestamp);
+        Bid storage currentBid = bids[orderID][msg.sender];
+        if(currentBid.expireTimestamp < block.timestamp) {
+            revert BidAlreadyExpired(currentBid.expireTimestamp,block.timestamp);
         }
         // Ensure the function caller has previously placed a bid
          // It doesn't happen in normal senarios
-        if (_currentBid.bidder == address(0)) {
+        if (currentBid.bidder == address(0)) {
             revert NoBidPlaced();
         }
 
         // Retrieve the associated AtomicSwapOrder
-        AtomicSwapOrder storage _order = swapOrder[orderID];
+        AtomicSwapOrder storage order = swapOrder[orderID];
 
         // It doesn't happen in normal senarios 
-        if (_currentBid.status != BidStatus.Placed) {
+        if (currentBid.status != BidStatus.Placed) {
             revert NoBidPlaced();
         }
 
@@ -271,20 +271,20 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         }
 
         // Update the bid amount
-        _currentBid.amount += addition;
-        if (_currentBid.amount > _order.buyToken.amount) {
-            revert MismatchedBidAmount(_currentBid.amount);
+        currentBid.amount += addition;
+        if (currentBid.amount > order.buyToken.amount) {
+            revert MismatchedBidAmount(currentBid.amount);
         }
 
         // Retrieving details of the buy token for this order
-        Coin storage _buyToken = _order.buyToken;
+        Coin storage buyToken = order.buyToken;
 
         // Check if the bid is in ERC20 tokens or in Ether
-        if (_buyToken.token != address(0)) {
+        if (buyToken.token != address(0)) {
             // Bidding with ERC20 token
             // Safely transfer the additional bid amount from the bidder to this contract
             TransferHelper.safeTransferFrom(
-                _buyToken.token,
+                buyToken.token,
                 msg.sender,
                 address(this),
                 addition
@@ -295,7 +295,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 revert MismatchedBidAmount(msg.value);
             }
         }
-        emit UpdatedBid(orderID, _currentBid.bidder, _currentBid.amount);
+        emit UpdatedBid(orderID, currentBid.bidder, currentBid.amount);
     }
 
     /// @notice Allows the maker to accept a bid on their swap order.
@@ -316,51 +316,51 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         if (msg.sender == address(0)) {
             revert UnauthorizedSender();
         }
-        AtomicSwapOrder storage _order = swapOrder[orderID];
-        if (!_order.acceptBid) {
+        AtomicSwapOrder storage order = swapOrder[orderID];
+        if (!order.acceptBid) {
             revert BidNotAllowed();
         }
         // Ensure the caller is the maker of the order
-        if (_order.maker != msg.sender) {
-            revert UnauthorizedAcceptAction(_order.maker, msg.sender);
+        if (order.maker != msg.sender) {
+            revert UnauthorizedAcceptAction(order.maker, msg.sender);
         }
 
         // Retrieve the bid from storage
-        Bid storage _selectedBid = bids[orderID][bidder];
+        Bid storage selectedBid = bids[orderID][bidder];
         // Ensure the bid is in 'Placed' status
-        if (_selectedBid.status != BidStatus.Placed) {
-            revert BidNotInPlacedStatus(_selectedBid.status);
+        if (selectedBid.status != BidStatus.Placed) {
+            revert BidNotInPlacedStatus(selectedBid.status);
         }
 
         // Ensure the bid is expired or not
-        if (_selectedBid.expireTimestamp < block.timestamp) {
+        if (selectedBid.expireTimestamp < block.timestamp) {
             revert BidAlreadyExpired(
-                _selectedBid.expireTimestamp,
+                selectedBid.expireTimestamp,
                 block.timestamp
             );
         }
 
         // update the order status to 'COMPLETE'
-        _order.status = OrderStatus.COMPLETE;
-        _order.completedAt = block.timestamp;
-        _order.taker = bidder;
+        order.status = OrderStatus.COMPLETE;
+        order.completedAt = block.timestamp;
+        order.taker = bidder;
 
         // Update the bid status to 'Executed'
-        _selectedBid.status = BidStatus.Executed;
+        selectedBid.status = BidStatus.Executed;
 
         // Process sell token transfers
-        _transferSellTokenToBuyer(_order, _selectedBid.bidder);
+        _transferSellTokenToBuyer(order, selectedBid.bidder);
         // Process buy token transfers
-        Coin storage _buyToken = _order.buyToken;
-        _buyToken.token.transferWithFee(
-            _order.maker,
-            _selectedBid.amount,
+        Coin storage buyToken = order.buyToken;
+        buyToken.token.transferWithFee(
+            order.maker,
+            selectedBid.amount,
             sellerFeeRate,
             MAX_FEE_RATE_SCALE,
             treasury
         );
 
-        emit AcceptedBid(orderID, bidder, _selectedBid.amount);
+        emit AcceptedBid(orderID, bidder, selectedBid.amount);
     }
 
     /// @notice Allows a bidder to cancel their bid on a swap order.
@@ -369,97 +369,97 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         bytes32 orderID
     ) external payable whenNotPaused nonReentrant onlyExist(orderID) {
         // Retrieve the selected bid from storage
-        Bid storage _selectedBid = bids[orderID][msg.sender];
+        Bid storage selectedBid = bids[orderID][msg.sender];
 
         // Ensure that msg.sender is same with bidder.
-        if (_selectedBid.bidder != msg.sender) {
+        if (selectedBid.bidder != msg.sender) {
             revert UnauthorizedCancelAction();
         }
 
         // Ensure that the bid is in the 'Placed' status
-        if (_selectedBid.status != BidStatus.Placed) {
-            revert BidNotInPlacedStatus(_selectedBid.status);
+        if (selectedBid.status != BidStatus.Placed) {
+            revert BidNotInPlacedStatus(selectedBid.status);
         }
         // Update the bid status to 'Cancelled'
-        _selectedBid.status = BidStatus.Cancelled;
+        selectedBid.status = BidStatus.Cancelled;
 
         // Retrieve the buy tokens details from storage
-        Coin storage _buyToken = swapOrder[orderID].buyToken;
+        Coin storage buyToken = swapOrder[orderID].buyToken;
 
         // If buy token is an ERC20 token, transfer it back to the bidder
-        if (_buyToken.token != address(0)) {
+        if (buyToken.token != address(0)) {
             TransferHelper.safeTransfer(
-                _buyToken.token,
-                _selectedBid.bidder,
-                _selectedBid.amount
+                buyToken.token,
+                selectedBid.bidder,
+                selectedBid.amount
             );
         } else {
             // If buy token is Ether, transfer it back to the bidder
             TransferHelper.safeTransferETH(
                 msg.sender,
-                _selectedBid.amount
+                selectedBid.amount
             );
         }
 
-        emit CanceledBid(orderID, _selectedBid.bidder);
+        emit CanceledBid(orderID, selectedBid.bidder);
     }
 
     /// @notice Transfers the sell token to the buyer with optional vesting
     /// @dev This function handles both immediate transfers and vesting-based transfers of the sell token.
-    /// @param _order The atomic swap order containing details of the transaction
+    /// @param order The atomic swap order containing details of the transaction
     /// @param buyer The address of the buyer receiving the sell token
     function _transferSellTokenToBuyer(
-        AtomicSwapOrder storage _order,
+        AtomicSwapOrder storage order,
         address buyer
     ) internal {
-        Release[] memory _releases = swapOrderVestingParams[_order.id];
-        if (_releases.length == 0) {
+        Release[] memory releases = swapOrderVestingParams[order.id];
+        if (releases.length == 0) {
             // Exchange the tokens
             // If buying with ERC20 tokens
-            _order.sellToken.token.transferWithFee(
+            order.sellToken.token.transferWithFee(
                 buyer,
-                _order.sellToken.amount,
+                order.sellToken.amount,
                 buyerFeeRate,
                 MAX_FEE_RATE_SCALE,
                 treasury
             );
         } else {
             // Transfer sell token to vesting contract
-            uint256 _sellTokenFee = (_order.sellToken.amount * buyerFeeRate) /
+            uint256 sellTokenFee = (order.sellToken.amount * buyerFeeRate) /
                 MAX_FEE_RATE_SCALE;
-            uint256 _sellTokenAmountAfterFee = _order.sellToken.amount -
-                _sellTokenFee;
-            if (_order.sellToken.token == address(0)) {
+            uint256 sellTokenAmountAfterFee = order.sellToken.amount -
+                sellTokenFee;
+            if (order.sellToken.token == address(0)) {
                 TransferHelper.safeTransferETH(
                     treasury,
-                    _sellTokenFee
+                    sellTokenFee
                 );
                 // Take Fee.
                 // slither-disable-next-line arbitrary-send-eth
-                vestingManager.startVesting{value: _sellTokenAmountAfterFee}(
-                    _order.id,
+                vestingManager.startVesting{value: sellTokenAmountAfterFee}(
+                    order.id,
                     buyer,
-                    _order.sellToken.token,
-                    _sellTokenAmountAfterFee,
-                    _releases
+                    order.sellToken.token,
+                    sellTokenAmountAfterFee,
+                    releases
                 );
             } else {
                 // Take Fee.
                 TransferHelper.safeTransfer(
-                    _order.sellToken.token,
+                    order.sellToken.token,
                     address(treasury),
-                    _sellTokenFee
+                    sellTokenFee
                 );
-                IERC20(_order.sellToken.token).approve(
+                IERC20(order.sellToken.token).approve(
                     address(vestingManager),
-                    _sellTokenAmountAfterFee
+                    sellTokenAmountAfterFee
                 );
                 vestingManager.startVesting(
-                    _order.id,
+                    order.id,
                     buyer,
-                    _order.sellToken.token,
-                    _sellTokenAmountAfterFee,
-                    _releases
+                    order.sellToken.token,
+                    sellTokenAmountAfterFee,
+                    releases
                 );
             }
         }

@@ -51,7 +51,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         IAtomicSwapBase.Release[] memory releases
     ) external payable nonReentrant onlyAdmin {
 
-        uint vestingId = _issueVestingID(buyer, orderId);
+        uint vestingId = _issueVestingId(buyer, orderId);
         if (vesting[vestingId].from != address(0)) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
@@ -152,11 +152,11 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// This function can only be called by an administrator of the contract.
     /// @param to The address to which the vesting ID and corresponding tokens will be issued.
     /// @param orderId The order ID based on which the vesting ID is generated.
-    /// @return vestingID The generated vesting ID as a uint.
+    /// @return vestingId The generated vesting ID as a uint.
 
-    function _issueVestingID(address to, bytes32 orderId) internal onlyAdmin returns(uint vestingID) {
-        vestingID = uint(orderId);
-        _mint(to, vestingID);                                                                                                                                                                                                                                                                  
+    function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint vestingId) {
+        vestingId = uint(orderId);
+        _mint(to, vestingId);                                                                                                                                                                                                                                                                  
     }
 
     function supportsInterface(bytes4 interfaceId)
