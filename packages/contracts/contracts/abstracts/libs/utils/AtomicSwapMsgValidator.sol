@@ -32,31 +32,26 @@ library AtomicSwapMsgValidator {
     /// @notice Validates parameters for taking an atomic swap.
     /// @param takeswap The take swap message details.
     /// @dev Checks if the order is not already accepted or completed, and if the taker is authorized.
-    function validateTakeSwap(IAtomicSwapBase.AtomicSwapOrder storage _order,IAtomicSwapBase.TakeSwapMsg memory takeswap) external view {
+    function validateTakeSwap(IAtomicSwapBase.AtomicSwapOrder storage order,IAtomicSwapBase.TakeSwapMsg memory takeswap) external view {
         if (takeswap.takerReceiver == address(0)) {
             revert IAtomicSwapBase.UnauthorizedSender();
         }
-        if (_order.taker != address(0) && _order.taker != msg.sender) {
+        if (order.taker != address(0) && order.taker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedTakeAction();
         }
 
-        if(_order.expiredAt < block.timestamp) {
-            revert IAtomicSwapBase.OrderAlreadyExpired(block.timestamp,_order.expiredAt);
+        if(order.expiredAt < block.timestamp) {
+            revert IAtomicSwapBase.OrderAlreadyExpired(block.timestamp,order.expiredAt);
         }
     }
 
     /// @notice Validates the cancellation of a swap.
-    /// @param _order The atomic swap order to validate for cancellation.
-    /// @dev Ensures that the _order is in the initial state and the sender is authorized to cancel.
-    function validateCancelSwap(IAtomicSwapBase.AtomicSwapOrder storage _order) external view {
-        if (_order.maker != msg.sender) {
+    /// @param order The atomic swap order to validate for cancellation.
+    /// @dev Ensures that the order is in the initial state and the sender is authorized to cancel.
+    function validateCancelSwap(IAtomicSwapBase.AtomicSwapOrder storage order) external view {
+        if (order.maker != msg.sender) {
             revert IAtomicSwapBase.UnauthorizedCancelAction();
         }
-
-        // change to onlyActive
-        // if (_order.status != IAtomicSwapBase.OrderStatus.INITIAL) {
-        //     revert IAtomicSwapBase.InactiveOrder();
-        // }
     }
 
     /// @notice Validates vesting parameters for an atomic swap.

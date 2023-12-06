@@ -23,7 +23,7 @@ library AtomicSwapStateLogic {
             revert IAtomicSwapBase.OrderAlreadyExists();
         }
 
-        IAtomicSwapBase.AtomicSwapOrder memory _order = IAtomicSwapBase.AtomicSwapOrder(
+        IAtomicSwapBase.AtomicSwapOrder memory order = IAtomicSwapBase.AtomicSwapOrder(
             id,
             IAtomicSwapBase.OrderStatus.INITIAL,
             sender,
@@ -38,7 +38,7 @@ library AtomicSwapStateLogic {
             makeswap.acceptBid
         );
 
-        swapOrder[id] = _order;
+        swapOrder[id] = order;
     }
     /// @notice Adds a new bid to a swap order.
     /// @param bids The mapping of bids for swap orders.
