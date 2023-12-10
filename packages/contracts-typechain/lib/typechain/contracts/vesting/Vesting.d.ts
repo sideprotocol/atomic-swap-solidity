@@ -53,7 +53,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VestingInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "approve" | "balanceOf" | "getApproved" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isApprovedForAll" | "isPauser" | "name" | "ownerOf" | "paginationSize" | "pause" | "paused" | "release" | "releaseInfo" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setPaginationSize" | "startVesting" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unpause" | "vesting"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "approve" | "balanceOf" | "getApproved" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isApprovedForAll" | "isPauser" | "name" | "ownerOf" | "paginationSize" | "pause" | "paused" | "release" | "releaseInfo" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "safeTransferFrom(address,address,uint256)" | "safeTransferFrom(address,address,uint256,bytes)" | "setApprovalForAll" | "setPaginationSize" | "startVesting" | "supportsInterface" | "symbol" | "tokenURI" | "transferFrom" | "unpause" | "vesting" | "vestingIds"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Approval" | "ApprovalForAll" | "Initialized" | "NewVesting" | "Paused" | "Received" | "Released" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Transfer" | "Unpaused"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "PAUSER_ROLE", values?: undefined): string;
@@ -97,6 +97,7 @@ export interface VestingInterface extends Interface {
     encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
     encodeFunctionData(functionFragment: "vesting", values: [BigNumberish]): string;
+    encodeFunctionData(functionFragment: "vestingIds", values: [BytesLike]): string;
     decodeFunctionResult(functionFragment: "DEFAULT_ADMIN_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "PAUSER_ROLE", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
@@ -133,6 +134,7 @@ export interface VestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "vesting", data: BytesLike): Result;
+    decodeFunctionResult(functionFragment: "vestingIds", data: BytesLike): Result;
 }
 export declare namespace ApprovalEvent {
     type InputTuple = [
@@ -472,6 +474,7 @@ export interface Vesting extends BaseContract {
             nextReleaseStep: bigint;
         }
     ], "view">;
+    vestingIds: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "PAUSER_ROLE"): TypedContractMethod<[], [string], "view">;
@@ -604,6 +607,7 @@ export interface Vesting extends BaseContract {
             nextReleaseStep: bigint;
         }
     ], "view">;
+    getFunction(nameOrSignature: "vestingIds"): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
     getEvent(key: "Approval"): TypedContractEvent<ApprovalEvent.InputTuple, ApprovalEvent.OutputTuple, ApprovalEvent.OutputObject>;
     getEvent(key: "ApprovalForAll"): TypedContractEvent<ApprovalForAllEvent.InputTuple, ApprovalForAllEvent.OutputTuple, ApprovalForAllEvent.OutputObject>;
     getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;

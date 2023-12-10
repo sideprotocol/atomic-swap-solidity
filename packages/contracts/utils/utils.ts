@@ -26,7 +26,7 @@ export const Utils = {
   prepareInChainAtomicTest: async function (
     sellTokenFeeRate?: number,
     buyTokenFeeRate?: number,
-    treasury?: string
+    treasury?: string,
   ) {
     //import users
     const accounts = await ethers.getSigners();
@@ -34,7 +34,7 @@ export const Utils = {
 
     // deploy libraries
     const atomicSwapStateLogicFactory = await ethers.getContractFactory(
-      "AtomicSwapStateLogic"
+      "AtomicSwapStateLogic",
     );
     const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
 
@@ -42,7 +42,7 @@ export const Utils = {
     const AnteHandler = await AnteHandlerFactory.deploy();
 
     const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-      "AtomicSwapMsgValidator"
+      "AtomicSwapMsgValidator",
     );
     const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
 
@@ -68,7 +68,7 @@ export const Utils = {
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,
-      }
+      },
     );
     const vestingManagerAddress = await vestingManager.getAddress();
 
@@ -81,7 +81,7 @@ export const Utils = {
           AnteHandler: await AnteHandler.getAddress(),
           AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
-      }
+      },
     );
 
     // deploy contract
@@ -97,7 +97,7 @@ export const Utils = {
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,
-      }
+      },
     );
 
     await vestingManager.addAdmin(await atomicSwap.getAddress());
@@ -119,7 +119,7 @@ export const Utils = {
         await mockUSDC.approve(await atomicSwap.getAddress(), MINT_AMOUNT);
         await mockUSDT.approve(await atomicSwap.getAddress(), MINT_AMOUNT);
         await mockDAI.approve(await atomicSwap.getAddress(), MINT_AMOUNT);
-      })
+      }),
     );
 
     return {
@@ -139,7 +139,7 @@ export const createDefaultAtomicOrder = async (
   withNativeSellToken?: boolean,
   withNativeBuyToken?: boolean,
   noTaker?: boolean,
-  acceptBid?: boolean
+  acceptBid?: boolean,
 ) => {
   const {
     atomicSwap,
@@ -174,26 +174,26 @@ export const createDefaultAtomicOrder = async (
   if (!withNativeSellToken) {
     const amount = await usdc.allowance(
       accounts[0].address,
-      await atomicSwap.getAddress()
+      await atomicSwap.getAddress(),
     );
     await expect(
       usdc.approve(
         await atomicSwap.getAddress(),
-        amount + payload.sellToken.amount
-      )
+        amount + payload.sellToken.amount,
+      ),
     ).not.to.reverted;
   }
 
   if (!withNativeBuyToken) {
     const amount = (await usdt.allowance(
       accounts[0].address,
-      await atomicSwap.getAddress()
+      await atomicSwap.getAddress(),
     )) as bigint;
     await expect(
       usdt.approve(
         await atomicSwap.getAddress(),
-        amount + payload.buyToken.amount
-      )
+        amount + payload.buyToken.amount,
+      ),
     ).not.to.reverted;
   }
 
@@ -205,7 +205,7 @@ export const createDefaultAtomicOrder = async (
     });
     await expect(tx).to.changeEtherBalance(
       await atomicSwap.getAddress(),
-      nativeTokenAmount
+      nativeTokenAmount,
     );
     await expect(tx).to.emit(atomicSwap, "AtomicSwapOrderCreated");
   } else {
@@ -213,7 +213,7 @@ export const createDefaultAtomicOrder = async (
     await expect(tx).to.changeTokenBalance(
       usdc,
       await atomicSwap.getAddress(),
-      payload.sellToken.amount
+      payload.sellToken.amount,
     );
     await expect(tx).emit(atomicSwap, "AtomicSwapOrderCreated");
   }
@@ -248,7 +248,7 @@ export const createDefaultVestingAtomicOrder = async (
   withNativeSellToken?: boolean,
   withNativeBuyToken?: boolean,
   noTaker?: boolean,
-  acceptBid?: boolean
+  acceptBid?: boolean,
 ) => {
   const {
     atomicSwap,
@@ -283,26 +283,26 @@ export const createDefaultVestingAtomicOrder = async (
   if (!withNativeSellToken) {
     const amount = await usdc.allowance(
       accounts[0].address,
-      await atomicSwap.getAddress()
+      await atomicSwap.getAddress(),
     );
     await expect(
       usdc.approve(
         await atomicSwap.getAddress(),
-        amount + payload.sellToken.amount
-      )
+        amount + payload.sellToken.amount,
+      ),
     ).not.to.reverted;
   }
 
   if (!withNativeBuyToken) {
     const amount = (await usdt.allowance(
       accounts[0].address,
-      await atomicSwap.getAddress()
+      await atomicSwap.getAddress(),
     )) as bigint;
     await expect(
       usdt.approve(
         await atomicSwap.getAddress(),
-        amount + payload.buyToken.amount
-      )
+        amount + payload.buyToken.amount,
+      ),
     ).not.to.reverted;
   }
 
@@ -314,7 +314,7 @@ export const createDefaultVestingAtomicOrder = async (
     });
     await expect(tx).to.changeEtherBalance(
       await atomicSwap.getAddress(),
-      nativeTokenAmount
+      nativeTokenAmount,
     );
     await expect(tx).to.emit(atomicSwap, "AtomicSwapOrderCreated");
   } else {
@@ -322,7 +322,7 @@ export const createDefaultVestingAtomicOrder = async (
     await expect(tx).to.changeTokenBalance(
       usdc,
       await atomicSwap.getAddress(),
-      payload.sellToken.amount
+      payload.sellToken.amount,
     );
     await expect(tx).emit(atomicSwap, "AtomicSwapOrderCreated");
   }
@@ -330,7 +330,6 @@ export const createDefaultVestingAtomicOrder = async (
   const id = newAtomicSwapOrderID(await atomicSwap.getAddress(), payload.uuid);
   const orderIDAtContractA = await atomicSwap.swapOrder(id);
   expect(orderIDAtContractA.id).to.equal(id);
-
   return {
     orderID: id,
     maker,
@@ -352,13 +351,13 @@ export const bidToDefaultAtomicOrder = async (
   withSellNativeToken?: boolean,
   withBuyNativeToken?: boolean,
   noTaker?: boolean,
-  acceptBid?: boolean
+  acceptBid?: boolean,
 ) => {
   const orderParams = await createDefaultAtomicOrder(
     withSellNativeToken,
     withBuyNativeToken,
     noTaker,
-    acceptBid
+    acceptBid,
   );
   const { atomicSwap, maker, taker, orderID, usdc, usdt } = orderParams;
 
@@ -377,18 +376,18 @@ export const bidToDefaultAtomicOrder = async (
     await expect(
       atomicSwap.connect(taker).placeBid(bidPayload, {
         value: buyToken.amount,
-      })
+      }),
     ).to.changeEtherBalance(await atomicSwap.getAddress(), buyToken.amount);
   } else {
     await usdt
       .connect(taker)
       .approve(await atomicSwap.getAddress(), buyToken.amount);
     await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload)
+      atomicSwap.connect(taker).placeBid(bidPayload),
     ).to.changeTokenBalance(
       usdt,
       await atomicSwap.getAddress(),
-      buyToken.amount
+      buyToken.amount,
     );
   }
 
@@ -398,7 +397,7 @@ export const bidToDefaultAtomicOrder = async (
 export const bidToDefaultVestingAtomicOrder = async (
   withSellNativeToken?: boolean,
   withBuyNativeToken?: boolean,
-  noTaker?: boolean
+  noTaker?: boolean,
 ) => {
   const vestingParams = [
     {
@@ -414,7 +413,7 @@ export const bidToDefaultVestingAtomicOrder = async (
     vestingParams,
     withSellNativeToken,
     withBuyNativeToken,
-    noTaker
+    noTaker,
   );
   const { atomicSwap, maker, taker, orderID, usdc, usdt } = orderParams;
 
@@ -433,27 +432,26 @@ export const bidToDefaultVestingAtomicOrder = async (
     await expect(
       atomicSwap.connect(taker).placeBid(bidPayload, {
         value: buyToken.amount,
-      })
+      }),
     ).to.changeEtherBalance(await atomicSwap.getAddress(), buyToken.amount);
   } else {
     await usdt
       .connect(taker)
       .approve(await atomicSwap.getAddress(), buyToken.amount);
     await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload)
+      atomicSwap.connect(taker).placeBid(bidPayload),
     ).to.changeTokenBalance(
       usdt,
       await atomicSwap.getAddress(),
-      buyToken.amount
+      buyToken.amount,
     );
   }
-
   return { ...orderParams, ...bidPayload };
 };
 
 export const testTakeSwap = async (
   isNativeSellToken?: boolean,
-  isNativeBuyToken?: boolean
+  isNativeBuyToken?: boolean,
 ) => {
   const [, , , takerReceiver] = await ethers.getSigners();
   const {
@@ -470,7 +468,7 @@ export const testTakeSwap = async (
     isNativeSellToken,
     isNativeBuyToken,
     false,
-    false
+    false,
   );
 
   const order = await atomicSwap.swapOrder(orderID);
@@ -487,21 +485,21 @@ export const testTakeSwap = async (
 
     const { amountAfterFee, feeAmount } = calcSwapAmount(
       order.buyToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
 
     await expect(tx).to.changeEtherBalances(
       [takerReceiver, treasury],
-      [amountAfterFee, feeAmount]
+      [amountAfterFee, feeAmount],
     );
     const amountAfterSwap = calcSwapAmount(
       order.sellToken.amount,
-      sellTokenFeeRate
+      sellTokenFeeRate,
     );
     await expect(tx).changeTokenBalances(
       usdt,
       [maker.address, treasury],
-      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
+      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount],
     );
   } else {
     const tx = atomicSwap.connect(taker).takeSwap(
@@ -509,26 +507,26 @@ export const testTakeSwap = async (
         orderID,
         takerReceiver: takerReceiver.address,
       },
-      { value: order.buyToken.amount }
+      { value: order.buyToken.amount },
     );
 
     const { amountAfterFee, feeAmount } = calcSwapAmount(
       order.buyToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
 
     await expect(tx).to.changeTokenBalances(
       usdc,
       [takerReceiver.address, treasury],
-      [amountAfterFee, feeAmount]
+      [amountAfterFee, feeAmount],
     );
     const amountAfterSwap = calcSwapAmount(
       order.sellToken.amount,
-      sellTokenFeeRate
+      sellTokenFeeRate,
     );
     await expect(tx).changeEtherBalances(
       [maker.address, treasury],
-      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount]
+      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount],
     );
   }
 
@@ -543,7 +541,7 @@ export const testTakeSwap = async (
 
 export const testVestingTakeSwap = async (
   withSellNativeToken: boolean,
-  withBuyNativeToken: boolean
+  withBuyNativeToken: boolean,
 ) => {
   const [, , takerReceiver] = await ethers.getSigners();
   const vestingParams = [
@@ -571,7 +569,7 @@ export const testVestingTakeSwap = async (
     withSellNativeToken,
     withBuyNativeToken,
     false,
-    false
+    false,
   );
 
   const order = await atomicSwap.swapOrder(orderID);
@@ -587,7 +585,7 @@ export const testVestingTakeSwap = async (
         orderID,
         takerReceiver: takerReceiver.address,
       },
-      { value: order.buyToken.amount }
+      { value: order.buyToken.amount },
     );
     expect(await tx).not.to.reverted;
   } else {
@@ -603,42 +601,44 @@ export const testVestingTakeSwap = async (
   await time.increase(3600 * 1);
   const totalReleaseAmount = calcSwapAmount(
     order.sellToken.amount,
-    buyTokenFeeRate
+    buyTokenFeeRate,
   );
 
   const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
-  const vestingId = BigInt(orderID);
+  const vestingId = await vestingManager.vestingIds(orderID);
   if (order.sellToken.token == ethers.ZeroAddress) {
     expect(
-      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
+      await vestingManager.connect(takerReceiver).release(vestingId),
     ).to.changeEtherBalance(takerReceiver, releaseAmount);
   } else {
     expect(
-      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
+      await vestingManager.connect(takerReceiver).release(vestingId),
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
   }
   // after 1 hours, release again
   await time.increase(3600 * 1);
   if (order.sellToken.token == ethers.ZeroAddress) {
     expect(
-      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
+      await vestingManager.connect(takerReceiver).release(vestingId),
     ).to.changeEtherBalance(takerReceiver, releaseAmount);
   } else {
     expect(
-      await vestingManager.connect(takerReceiver).release(BigInt(orderID))
+      await vestingManager.connect(takerReceiver).release(vestingId),
     ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
   }
 
   // // after 1 hours, release again
   await time.increase(3600 * 1);
   if (order.sellToken.token == ethers.ZeroAddress) {
-    await expect(
-      vestingManager.release(BigInt(orderID))
-    ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
+    await expect(vestingManager.release(vestingId)).to.revertedWithCustomError(
+      vestingManager,
+      "ERC721NonexistentToken",
+    );
   } else {
-    await expect(
-      vestingManager.release(BigInt(orderID))
-    ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
+    await expect(vestingManager.release(vestingId)).to.revertedWithCustomError(
+      vestingManager,
+      "ERC721NonexistentToken",
+    );
   }
   expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
   return {
@@ -647,6 +647,7 @@ export const testVestingTakeSwap = async (
     taker,
     takerReceiver,
     vestingManager,
+    vestingId,
   };
 };
 
@@ -658,7 +659,7 @@ export const encodePayload = (types: string[], values: any[]): string => {
 export function newAtomicSwapOrderID(contract: string, uuid: string): string {
   const encoder = new ethers.AbiCoder();
   const id = keccak256(
-    encoder.encode(["address", "bytes32"], [contract, uuid])
+    encoder.encode(["address", "bytes32"], [contract, uuid]),
   );
   return id;
 }
@@ -673,7 +674,7 @@ export function generateOrderID(): string {
 export const saveDeployedAddress = async (
   atomicswap: string,
   usdc?: string,
-  usdt?: string
+  usdt?: string,
 ) => {
   const settingInfo: {
     atomicswap: string;
@@ -731,7 +732,7 @@ export function safeFactor(amount: bigint, factor: number): bigint {
 
 export const getCustomSigner = async (
   customAddress: string,
-  initialFund?: bigint
+  initialFund?: bigint,
 ) => {
   await ethers.provider.send("hardhat_impersonateAccount", [customAddress]);
   const signer = await ethers.provider.getSigner(customAddress);

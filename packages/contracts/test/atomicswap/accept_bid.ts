@@ -24,7 +24,7 @@ describe("AtomicSwap: AcceptBid", () => {
 
     const sellTokenAmount = calcSwapAmount(
       payload.sellToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
 
     const buyTokenAmount = calcSwapAmount(bidAmount, sellTokenFeeRate);
@@ -32,18 +32,18 @@ describe("AtomicSwap: AcceptBid", () => {
     const tx = atomicSwap.connect(maker).acceptBid({ orderID, bidder });
     await expect(tx).to.changeEtherBalance(
       bidder,
-      sellTokenAmount.amountAfterFee
+      sellTokenAmount.amountAfterFee,
     );
     await expect(tx).to.changeTokenBalance(
       usdt,
       maker.address,
-      buyTokenAmount.amountAfterFee
+      buyTokenAmount.amountAfterFee,
     );
     await expect(tx).to.changeEtherBalance(treasury, sellTokenAmount.feeAmount);
     await expect(tx).to.changeTokenBalance(
       usdt,
       treasury,
-      buyTokenAmount.feeAmount
+      buyTokenAmount.feeAmount,
     );
   });
 
@@ -63,7 +63,7 @@ describe("AtomicSwap: AcceptBid", () => {
     } = await bidToDefaultAtomicOrder(false, false);
     const sellTokenAmount = calcSwapAmount(
       payload.sellToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
 
     const buyTokenAmount = calcSwapAmount(bidAmount, sellTokenFeeRate);
@@ -72,23 +72,23 @@ describe("AtomicSwap: AcceptBid", () => {
     await expect(tx).to.changeTokenBalance(
       usdt,
       maker.address,
-      buyTokenAmount.amountAfterFee
+      buyTokenAmount.amountAfterFee,
     );
     await expect(tx).to.changeTokenBalance(
       usdc,
       bidder,
-      sellTokenAmount.amountAfterFee
+      sellTokenAmount.amountAfterFee,
     );
 
     await expect(tx).to.changeTokenBalance(
       usdc,
       treasury,
-      sellTokenAmount.feeAmount
+      sellTokenAmount.feeAmount,
     );
     await expect(tx).to.changeTokenBalance(
       usdt,
       treasury,
-      buyTokenAmount.feeAmount
+      buyTokenAmount.feeAmount,
     );
   });
   it("should accept bid with zero address msg sender", async () => {
@@ -96,13 +96,13 @@ describe("AtomicSwap: AcceptBid", () => {
       await bidToDefaultAtomicOrder(false, false, true, true);
     const sellTokenAmount = calcSwapAmount(
       payload.sellToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
     const signer = await getCustomSigner(ZeroAddress);
     const tx = atomicSwap.connect(signer).acceptBid({ orderID, bidder });
     await expect(tx).to.revertedWithCustomError(
       atomicSwap,
-      "UnauthorizedSender"
+      "UnauthorizedSender",
     );
   });
 
@@ -111,14 +111,14 @@ describe("AtomicSwap: AcceptBid", () => {
       await bidToDefaultAtomicOrder(true, false);
 
     await expect(
-      atomicSwap.connect(taker).acceptBid({ orderID, bidder })
+      atomicSwap.connect(taker).acceptBid({ orderID, bidder }),
     ).to.revertedWithCustomError(atomicSwap, "UnauthorizedAcceptAction");
   });
   it("should revert to accept bid with already took bid", async () => {
     const { atomicSwap, maker, orderID, bidAmount, bidder, payload } =
       await bidToDefaultAtomicOrder(true, false);
     await expect(
-      atomicSwap.connect(maker).acceptBid({ orderID, bidder: ZeroAddress })
+      atomicSwap.connect(maker).acceptBid({ orderID, bidder: ZeroAddress }),
     ).to.revertedWithCustomError(atomicSwap, "BidNotInPlacedStatus");
   });
 
@@ -127,7 +127,7 @@ describe("AtomicSwap: AcceptBid", () => {
       await bidToDefaultAtomicOrder(true, false);
     await time.increase(50);
     await expect(
-      atomicSwap.connect(maker).acceptBid({ orderID, bidder })
+      atomicSwap.connect(maker).acceptBid({ orderID, bidder }),
     ).to.revertedWithCustomError(atomicSwap, "BidAlreadyExpired");
   });
 });

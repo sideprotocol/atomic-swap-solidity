@@ -19,15 +19,15 @@ describe("AtomicSwap: Vesting", () => {
     const { orderID, taker, vestingManager, takerReceiver, atomicSwap } =
       await testVestingTakeSwap(true, false);
     await expect(
-      vestingManager.connect(taker).addAdmin(taker.address)
+      vestingManager.connect(taker).addAdmin(taker.address),
     ).to.revertedWithCustomError(
       vestingManager,
-      "AccessControlUnauthorizedAccount"
+      "AccessControlUnauthorizedAccount",
     );
   });
   it("should revert to start vesting with invalid fund", async () => {
     const { atomicSwap, treasury, vestingManager } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const orderId = randomBytes(32);
     const customSigner = await getCustomSigner(await atomicSwap.getAddress());
@@ -39,12 +39,12 @@ describe("AtomicSwap: Vesting", () => {
             durationInHours: BigInt(1),
             percentage: 10000,
           },
-        ])
+        ]),
     ).to.revertedWithCustomError(vestingManager, "NotEnoughFund");
   });
   it("should revert to start vesting with non-inchainAtomicSwap contract", async () => {
     const { treasury, vestingManager } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const orderId = randomBytes(32);
     const [, , taker] = await ethers.getSigners();
@@ -56,14 +56,14 @@ describe("AtomicSwap: Vesting", () => {
             durationInHours: BigInt(1),
             percentage: 10000,
           },
-        ])
+        ]),
     ).to.revertedWith("OwnablePausable: access denied");
   });
   it("should revert to release fund after release all", async () => {
-    const { orderID, taker, vestingManager, takerReceiver, atomicSwap } =
+    const { vestingId, taker, vestingManager, takerReceiver, atomicSwap } =
       await testVestingTakeSwap(true, false);
     await expect(
-      vestingManager.connect(takerReceiver).release(BigInt(orderID))
+      vestingManager.connect(takerReceiver).release(vestingId),
     ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
   });
 });

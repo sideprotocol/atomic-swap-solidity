@@ -26,7 +26,7 @@ describe("AtomicSwap: MakeVestingSwap", () => {
           percentage: BigInt(9000),
         },
       ],
-      true
+      true,
     ));
   it("create in-chain swap with ERC20 token", async () =>
     createDefaultVestingAtomicOrder([
@@ -42,7 +42,7 @@ describe("AtomicSwap: MakeVestingSwap", () => {
 
   it("should revert to create in-chain vesting swap with same token address", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -78,13 +78,13 @@ describe("AtomicSwap: MakeVestingSwap", () => {
           durationInHours: BigInt(1),
           percentage: BigInt(10),
         },
-      ])
+      ]),
     ).to.revertedWithCustomError(atomicSwap, "InvalidTotalPercentage");
   });
 
   it("should revert to create in-chain vesting swap with zero release schedule", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -110,13 +110,13 @@ describe("AtomicSwap: MakeVestingSwap", () => {
       acceptBid: true,
     };
     await expect(
-      atomicSwap.makeSwapWithVesting(payload, [])
+      atomicSwap.makeSwapWithVesting(payload, []),
     ).to.revertedWithCustomError(atomicSwap, "ZeroReleaseSchedule");
   });
 
   it("should revert to create in-chain vesting swap with invalid release plans", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -153,15 +153,16 @@ describe("AtomicSwap: MakeVestingSwap", () => {
       });
     }
     await expect(
-      atomicSwap.makeSwapWithVesting(payload, releases)
+      atomicSwap.makeSwapWithVesting(payload, releases),
     ).to.revertedWithCustomError(atomicSwap, "OverMaximumReleaseStep");
   });
   it("should revert to create in-chain vesting swap with already existing order", async () => {
     const { vestingManager, orderID, takerReceiver, atomicSwap } =
       await testVestingTakeSwap(false, true);
+    const vestingId = await vestingManager.vestingIds(orderID);
     const contractSigner = await getCustomSigner(
       await atomicSwap.getAddress(),
-      ethers.parseEther("50")
+      ethers.parseEther("50"),
     );
     await expect(
       vestingManager.connect(contractSigner).startVesting(
@@ -179,14 +180,14 @@ describe("AtomicSwap: MakeVestingSwap", () => {
             percentage: BigInt(1000),
           },
         ],
-        { value: BigInt(20) }
-      )
+        { value: BigInt(20) },
+      ),
     ).to.revertedWithCustomError(vestingManager, "DuplicateReleaseSchedule");
   });
 
   it("should revert to create in-chain vesting swap with zero vesting percentage", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -226,7 +227,7 @@ describe("AtomicSwap: MakeVestingSwap", () => {
           durationInHours: BigInt(1),
           percentage: BigInt(0),
         },
-      ])
+      ]),
     ).to.revertedWithCustomError(atomicSwap, "InvalidReleasePercentage");
   });
 });

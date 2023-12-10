@@ -45,14 +45,14 @@ describe("TakeSwap With Vesting", () => {
       true,
       false,
       false,
-      false
+      false,
     );
 
     const order = await atomicSwap.swapOrder(orderID);
     const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
     const atomicSwapAddress = await atomicSwap.getAddress();
     await expect(
-      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount)
+      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount),
     ).not.to.reverted;
 
     // Run takeSwap message
@@ -62,7 +62,7 @@ describe("TakeSwap With Vesting", () => {
           orderID,
           takerReceiver: takerReceiver.address,
         },
-        { value: order.buyToken.amount }
+        { value: order.buyToken.amount },
       );
       expect(await tx).not.to.reverted;
     } else {
@@ -72,21 +72,16 @@ describe("TakeSwap With Vesting", () => {
       });
       await expect(tx).not.to.reverted;
     }
-
-    const vestingId = BigInt(orderID);
+    const vestingId = await vestingManager.vestingIds(orderID);
     const [, , , , vestingBuyer] = await ethers.getSigners();
     await vestingManager
       .connect(takerReceiver)
       .approve(vestingBuyer.address, vestingId);
     await vestingManager
       .connect(takerReceiver)
-      .transferFrom(
-        takerReceiver.address,
-        vestingBuyer.address,
-        BigInt(orderID)
-      );
+      .transferFrom(takerReceiver.address, vestingBuyer.address, vestingId);
     expect(await vestingManager.balanceOf(vestingBuyer.address)).to.equal(
-      BigInt(1)
+      BigInt(1),
     );
 
     // Release from vesting contract
@@ -94,28 +89,28 @@ describe("TakeSwap With Vesting", () => {
     await time.increase(3600 * 1);
     const totalReleaseAmount = calcSwapAmount(
       order.sellToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
 
     const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.connect(vestingBuyer).release(BigInt(orderID))
+        await vestingManager.connect(vestingBuyer).release(vestingId),
       ).to.changeEtherBalance(vestingBuyer, releaseAmount);
     } else {
       expect(
-        await vestingManager.connect(vestingBuyer).release(BigInt(orderID))
+        await vestingManager.connect(vestingBuyer).release(vestingId),
       ).to.changeTokenBalance(usdc, vestingBuyer, releaseAmount);
     }
     // after 1 hours, release again
     await time.increase(3600 * 1);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.connect(vestingBuyer).release(BigInt(orderID))
+        await vestingManager.connect(vestingBuyer).release(vestingId),
       ).to.changeEtherBalance(vestingBuyer, releaseAmount);
     } else {
       expect(
-        await vestingManager.connect(vestingBuyer).release(BigInt(orderID))
+        await vestingManager.connect(vestingBuyer).release(vestingId),
       ).to.changeTokenBalance(usdc, vestingBuyer, releaseAmount);
     }
 
@@ -123,11 +118,11 @@ describe("TakeSwap With Vesting", () => {
     await time.increase(3600 * 1);
     if (order.sellToken.token == ethers.ZeroAddress) {
       await expect(
-        vestingManager.connect(vestingBuyer).release(BigInt(orderID))
+        vestingManager.connect(vestingBuyer).release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
     } else {
       await expect(
-        vestingManager.connect(vestingBuyer).release(BigInt(orderID))
+        vestingManager.connect(vestingBuyer).release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
     }
     expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
@@ -151,14 +146,14 @@ describe("TakeSwap With Vesting", () => {
         true,
         false,
         false,
-        false
+        false,
       );
 
     const order = await atomicSwap.swapOrder(orderID);
     const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
     const atomicSwapAddress = await atomicSwap.getAddress();
     await expect(
-      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount)
+      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount),
     ).not.to.reverted;
 
     // Run takeSwap message
@@ -168,7 +163,7 @@ describe("TakeSwap With Vesting", () => {
           orderID,
           takerReceiver: takerReceiver.address,
         },
-        { value: order.buyToken.amount }
+        { value: order.buyToken.amount },
       );
       expect(await tx).not.to.reverted;
     } else {
@@ -178,21 +173,16 @@ describe("TakeSwap With Vesting", () => {
       });
       await expect(tx).not.to.reverted;
     }
-
-    const vestingId = BigInt(orderID);
+    const vestingId = await vestingManager.vestingIds(orderID);
     const [, , , , vestingBuyer] = await ethers.getSigners();
     await vestingManager
       .connect(takerReceiver)
       .approve(vestingBuyer.address, vestingId);
     await vestingManager
       .connect(takerReceiver)
-      .transferFrom(
-        takerReceiver.address,
-        vestingBuyer.address,
-        BigInt(orderID)
-      );
+      .transferFrom(takerReceiver.address, vestingBuyer.address, vestingId);
     expect(await vestingManager.balanceOf(vestingBuyer.address)).to.equal(
-      BigInt(1)
+      BigInt(1),
     );
 
     // Release from vesting contract
@@ -200,11 +190,11 @@ describe("TakeSwap With Vesting", () => {
     await time.increase(3600 * 1);
     if (order.sellToken.token == ethers.ZeroAddress) {
       await expect(
-        vestingManager.connect(takerReceiver).release(BigInt(orderID))
+        vestingManager.connect(takerReceiver).release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "NoPermissionToRelease");
     } else {
       await expect(
-        vestingManager.connect(takerReceiver).release(BigInt(orderID))
+        vestingManager.connect(takerReceiver).release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "NoPermissionToRelease");
     }
   });
@@ -236,14 +226,14 @@ describe("TakeSwap With Vesting", () => {
       true,
       false,
       false,
-      false
+      false,
     );
 
     const order = await atomicSwap.swapOrder(orderID);
     const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
     const atomicSwapAddress = await atomicSwap.getAddress();
     await expect(
-      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount)
+      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount),
     ).not.to.reverted;
 
     // Run takeSwap message
@@ -267,33 +257,33 @@ describe("TakeSwap With Vesting", () => {
     //await time.increase(3600 * 1);
     const totalReleaseAmount = calcSwapAmount(
       order.sellToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
-    const vestingId = BigInt(orderID);
+    const vestingId = await vestingManager.vestingIds(orderID);
     if (order.sellToken.token == ethers.ZeroAddress) {
       await expect(
-        vestingManager.connect(takerReceiver).release(BigInt(orderID))
+        vestingManager.connect(takerReceiver).release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "NoVestedTokensForRelease");
     } else {
       await expect(
-        vestingManager.connect(takerReceiver).release(BigInt(orderID))
+        vestingManager.connect(takerReceiver).release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "NoVestedTokensForRelease");
     }
   });
 
   it("should revert to release from vesting with completed releases", async () => {
-    const { orderID, atomicSwap, vestingManager, taker } =
+    const { orderID, atomicSwap, vestingManager, taker, vestingId } =
       await testVestingTakeSwap(true, false);
     const order = await atomicSwap.swapOrder(orderID);
     // Release from vesting contract
-    const vestingId = BigInt(orderID);
+
     if (order.sellToken.token == ethers.ZeroAddress) {
       await expect(
-        vestingManager.release(BigInt(orderID))
+        vestingManager.release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
     } else {
       await expect(
-        vestingManager.release(BigInt(orderID))
+        vestingManager.release(vestingId),
       ).to.revertedWithCustomError(vestingManager, "ERC721NonexistentToken");
     }
   });
@@ -325,14 +315,14 @@ describe("TakeSwap With Vesting", () => {
       false,
       true,
       false,
-      false
+      false,
     );
 
     const order = await atomicSwap.swapOrder(orderID);
     const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
     const atomicSwapAddress = await atomicSwap.getAddress();
     await expect(
-      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount)
+      usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount),
     ).not.to.reverted;
 
     // Run takeSwap message

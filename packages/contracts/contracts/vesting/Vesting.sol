@@ -8,6 +8,7 @@ import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.so
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {console} from "hardhat/console.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
@@ -20,7 +21,15 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// @notice Stores vesting schedules for each vestingId.
     mapping(uint => VestingSchedule)
         public vesting;
+    
+    /// @dev Counter for generating unique token IDs for new vestings.
+    /// The counter starts from 1 and is incremented each time a new token is minted.
+    uint256 private _nextTokenId;
 
+    /// @dev Mapping to associate each orderId (bytes32) with a unique vestingId (uint).
+    /// This mapping helps in tracking the relationship between orderIds and their respective vestingIds.
+    mapping (bytes32 => uint) public vestingIds;
+    
     /// @notice Stores release information for each vestingId.
     // slither-disable-next-line uninitialized-state
     mapping(uint => IAtomicSwapBase.Release[])
@@ -35,6 +44,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         __OwnablePausableUpgradeable_init(admin);
         __ERC721_init(name, symbol);
         _baseURL = baseURL;
+        _nextTokenId = 0;
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
@@ -50,9 +60,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases
     ) external payable nonReentrant onlyAdmin {
-
-        uint vestingId = _issueVestingId(buyer, orderId);
-        if (vesting[vestingId].from != address(0)) { 
+   
+        if (vestingIds[orderId] != 0) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
@@ -68,6 +77,11 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             );
         }
         uint256 vestingStartTime = block.timestamp;
+        uint vestingId= _issueVestingId(buyer, orderId);
+            
+        console.log("order started");
+        console.logBytes32(orderId);
+        console.log(vestingId);
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
             start: vestingStartTime,
@@ -154,9 +168,11 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// @param orderId The order ID based on which the vesting ID is generated.
     /// @return vestingId The generated vesting ID as a uint.
 
-    function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint vestingId) {
-        vestingId = uint(orderId);
-        _mint(to, vestingId);                                                                                                                                                                                                                                                                  
+    function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
+        _nextTokenId++;
+        vestingIds[orderId] = _nextTokenId;
+        _mint(to, _nextTokenId);    
+        return _nextTokenId;                                                                                                                                                                                                                                                              
     }
 
     function supportsInterface(bytes4 interfaceId)

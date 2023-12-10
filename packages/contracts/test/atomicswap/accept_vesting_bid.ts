@@ -31,37 +31,38 @@ describe("AtomicSwap: AcceptBid with Vesting", () => {
     await expect(tx).to.changeTokenBalance(
       usdt,
       maker.address,
-      buyTokenAmount.amountAfterFee
+      buyTokenAmount.amountAfterFee,
     );
 
     const order = await atomicSwap.swapOrder(orderID);
+    const vestingId = await vestingManager.vestingIds(orderID);
     // Release from vesting contract
     // After cliff time, it's possible to get started releasing
     await time.increase(3600 * 1);
     const totalReleaseAmount = calcSwapAmount(
       order.sellToken.amount,
-      buyTokenFeeRate
+      buyTokenFeeRate,
     );
 
     const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.connect(taker).release(BigInt(orderID))
+        await vestingManager.connect(taker).release(vestingId),
       ).to.changeEtherBalance(bidder, releaseAmount);
     } else {
       expect(
-        await vestingManager.connect(taker).release(BigInt(orderID))
+        await vestingManager.connect(taker).release(vestingId),
       ).to.changeTokenBalance(usdc, bidder, releaseAmount);
     }
     // after 1 hours, release again
     await time.increase(3600 * 1);
     if (order.sellToken.token == ethers.ZeroAddress) {
       expect(
-        await vestingManager.connect(taker).release(BigInt(orderID))
+        await vestingManager.connect(taker).release(vestingId),
       ).to.changeEtherBalance(bidder, releaseAmount);
     } else {
       expect(
-        await vestingManager.connect(taker).release(BigInt(orderID))
+        await vestingManager.connect(taker).release(vestingId),
       ).to.changeTokenBalance(usdc, bidder, releaseAmount);
     }
   };

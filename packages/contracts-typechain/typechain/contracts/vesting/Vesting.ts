@@ -117,6 +117,7 @@ export interface VestingInterface extends Interface {
       | "transferFrom"
       | "unpause"
       | "vesting"
+      | "vestingIds"
   ): FunctionFragment;
 
   getEvent(
@@ -270,6 +271,10 @@ export interface VestingInterface extends Interface {
     functionFragment: "vesting",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "vestingIds",
+    values: [BytesLike]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
@@ -358,6 +363,7 @@ export interface VestingInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vesting", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "vestingIds", data: BytesLike): Result;
 }
 
 export namespace ApprovalEvent {
@@ -757,6 +763,8 @@ export interface Vesting extends BaseContract {
     "view"
   >;
 
+  vestingIds: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -945,6 +953,9 @@ export interface Vesting extends BaseContract {
     ],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "vestingIds"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
 
   getEvent(
     key: "Approval"
