@@ -23,49 +23,6 @@ import type {
   TypedContractMethod,
 } from "../../../common";
 
-export declare namespace IVesting {
-  export type VestingScheduleStruct = {
-    from: AddressLike;
-    start: BigNumberish;
-    token: AddressLike;
-    totalAmount: BigNumberish;
-    amountReleased: BigNumberish;
-    nextReleaseStep: BigNumberish;
-  };
-
-  export type VestingScheduleStructOutput = [
-    from: string,
-    start: bigint,
-    token: string,
-    totalAmount: bigint,
-    amountReleased: bigint,
-    nextReleaseStep: bigint
-  ] & {
-    from: string;
-    start: bigint;
-    token: string;
-    totalAmount: bigint;
-    amountReleased: bigint;
-    nextReleaseStep: bigint;
-  };
-
-  export type VestingInfoStruct = {
-    schedule: IVesting.VestingScheduleStruct;
-    release: IAtomicSwapBase.ReleaseStruct[];
-    orderId: BytesLike;
-  };
-
-  export type VestingInfoStructOutput = [
-    schedule: IVesting.VestingScheduleStructOutput,
-    release: IAtomicSwapBase.ReleaseStructOutput[],
-    orderId: string
-  ] & {
-    schedule: IVesting.VestingScheduleStructOutput;
-    release: IAtomicSwapBase.ReleaseStructOutput[];
-    orderId: string;
-  };
-}
-
 export declare namespace IAtomicSwapBase {
   export type ReleaseStruct = {
     durationInHours: BigNumberish;
@@ -103,10 +60,11 @@ export interface IVestingInterface extends Interface {
 }
 
 export namespace NewVestingEvent {
-  export type InputTuple = [vesting: IVesting.VestingInfoStruct];
-  export type OutputTuple = [vesting: IVesting.VestingInfoStructOutput];
+  export type InputTuple = [orderId: BytesLike, tokenId: BigNumberish];
+  export type OutputTuple = [orderId: string, tokenId: bigint];
   export interface OutputObject {
-    vesting: IVesting.VestingInfoStructOutput;
+    orderId: string;
+    tokenId: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -236,7 +194,7 @@ export interface IVesting extends BaseContract {
   >;
 
   filters: {
-    "NewVesting(tuple)": TypedContractEvent<
+    "NewVesting(bytes32,uint256)": TypedContractEvent<
       NewVestingEvent.InputTuple,
       NewVestingEvent.OutputTuple,
       NewVestingEvent.OutputObject

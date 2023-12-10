@@ -29,7 +29,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// @dev Mapping to associate each orderId (bytes32) with a unique vestingId (uint).
     /// This mapping helps in tracking the relationship between orderIds and their respective vestingIds.
     mapping (bytes32 => uint) public vestingIds;
-    
+
     /// @notice Stores release information for each vestingId.
     // slither-disable-next-line uninitialized-state
     mapping(uint => IAtomicSwapBase.Release[])
@@ -98,9 +98,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             _releases.push(releases[i]);
         }
 
-        emit NewVesting(
-            VestingInfo(newVesting, releases, orderId)
-        );
+        emit NewVesting(orderId, vestingId);
     }
 
     /// @notice Releases vested tokens to the beneficiary.

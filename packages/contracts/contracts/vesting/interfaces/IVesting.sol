@@ -44,7 +44,7 @@ interface IVesting {
 
     
 
-    event NewVesting(VestingInfo indexed vesting);
+    event NewVesting(bytes32 indexed orderId, uint256 tokenId);
     /// @notice Event emitted when tokens are released to a beneficiary.
     /// @param beneficiary The address of the beneficiary.
     /// @param amount The amount of tokens released.

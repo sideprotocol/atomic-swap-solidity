@@ -53,71 +53,16 @@
       "anonymous": false,
       "inputs": [
         {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "address",
-                  "name": "from",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "start",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "totalAmount",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "amountReleased",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "nextReleaseStep",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct IVesting.VestingSchedule",
-              "name": "schedule",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint256",
-                  "name": "durationInHours",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "percentage",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct IAtomicSwapBase.Release[]",
-              "name": "release",
-              "type": "tuple[]"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "orderId",
-              "type": "bytes32"
-            }
-          ],
           "indexed": true,
-          "internalType": "struct IVesting.VestingInfo",
-          "name": "vesting",
-          "type": "tuple"
+          "internalType": "bytes32",
+          "name": "orderId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
         }
       ],
       "name": "NewVesting",

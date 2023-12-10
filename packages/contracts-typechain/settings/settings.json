@@ -15,7 +15,7 @@
   "interchainAtomicSwapLogic_bnb": "0x194Bd45e1a2045d34FfAdfF323aA57A5473E73Fc",
   "sideBridgeAddress_bnb": "0x669BA9D3E56A48b42f3178720d733DBAf04a847d",
   "interChainAtomicSwap_bnb": "0xF4DEFbAd78558C44F7b4dAc09B1Dd51d5F7222E7",
-  "vesting_sepolia": "0x706Be9A17C3080841b2301aC44A8F6f15a219761",
+  "vesting_sepolia": "0xEd736d94bfc0b4629ADA0Dc3117d020896A108a9",
   "atomicSwapStateLogic_sepolia": "0x4497fa72758cC0DD220a1AE160aF328DfD362a7d",
   "AnteHandler_sepolia": "0x6Ba5c34C8F66220A99801Cf7eC0C7e1180d043E1",
   "atomicSwapStateLogic_bnb": "0xfB2ADA0a6826Ba709E7dDD1E534ebFD96F3E0A66",

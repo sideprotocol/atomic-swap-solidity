@@ -1,44 +1,5 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, EventFragment, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../../common";
-export declare namespace IVesting {
-    type VestingScheduleStruct = {
-        from: AddressLike;
-        start: BigNumberish;
-        token: AddressLike;
-        totalAmount: BigNumberish;
-        amountReleased: BigNumberish;
-        nextReleaseStep: BigNumberish;
-    };
-    type VestingScheduleStructOutput = [
-        from: string,
-        start: bigint,
-        token: string,
-        totalAmount: bigint,
-        amountReleased: bigint,
-        nextReleaseStep: bigint
-    ] & {
-        from: string;
-        start: bigint;
-        token: string;
-        totalAmount: bigint;
-        amountReleased: bigint;
-        nextReleaseStep: bigint;
-    };
-    type VestingInfoStruct = {
-        schedule: IVesting.VestingScheduleStruct;
-        release: IAtomicSwapBase.ReleaseStruct[];
-        orderId: BytesLike;
-    };
-    type VestingInfoStructOutput = [
-        schedule: IVesting.VestingScheduleStructOutput,
-        release: IAtomicSwapBase.ReleaseStructOutput[],
-        orderId: string
-    ] & {
-        schedule: IVesting.VestingScheduleStructOutput;
-        release: IAtomicSwapBase.ReleaseStructOutput[];
-        orderId: string;
-    };
-}
 export declare namespace IAtomicSwapBase {
     type ReleaseStruct = {
         durationInHours: BigNumberish;
@@ -65,10 +26,11 @@ export interface IVestingInterface extends Interface {
     decodeFunctionResult(functionFragment: "startVesting", data: BytesLike): Result;
 }
 export declare namespace NewVestingEvent {
-    type InputTuple = [vesting: IVesting.VestingInfoStruct];
-    type OutputTuple = [vesting: IVesting.VestingInfoStructOutput];
+    type InputTuple = [orderId: BytesLike, tokenId: BigNumberish];
+    type OutputTuple = [orderId: string, tokenId: bigint];
     interface OutputObject {
-        vesting: IVesting.VestingInfoStructOutput;
+        orderId: string;
+        tokenId: bigint;
     }
     type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
     type Filter = TypedDeferredTopicFilter<Event>;
@@ -135,7 +97,7 @@ export interface IVesting extends BaseContract {
     getEvent(key: "Received"): TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
     getEvent(key: "Released"): TypedContractEvent<ReleasedEvent.InputTuple, ReleasedEvent.OutputTuple, ReleasedEvent.OutputObject>;
     filters: {
-        "NewVesting(tuple)": TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
+        "NewVesting(bytes32,uint256)": TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
         NewVesting: TypedContractEvent<NewVestingEvent.InputTuple, NewVestingEvent.OutputTuple, NewVestingEvent.OutputObject>;
         "Received(address,uint256)": TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
         Received: TypedContractEvent<ReceivedEvent.InputTuple, ReceivedEvent.OutputTuple, ReceivedEvent.OutputObject>;
