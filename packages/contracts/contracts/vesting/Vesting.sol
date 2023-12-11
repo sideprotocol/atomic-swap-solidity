@@ -24,7 +24,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     
     /// @dev Counter for generating unique token IDs for new vestings.
     /// The counter starts from 1 and is incremented each time a new token is minted.
-    uint256 private _nextTokenId;
+    uint256 private _lastTokenId;
 
     /// @dev Mapping to associate each orderId (bytes32) with a unique vestingId (uint).
     /// This mapping helps in tracking the relationship between orderIds and their respective vestingIds.
@@ -44,7 +44,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         __OwnablePausableUpgradeable_init(admin);
         __ERC721_init(name, symbol);
         _baseURL = baseURL;
-        _nextTokenId = 0;
+        _lastTokenId = 0;
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
@@ -77,11 +77,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             );
         }
         uint256 vestingStartTime = block.timestamp;
-        uint vestingId= _issueVestingId(buyer, orderId);
+        uint vestingId = _issueVestingId(buyer, orderId);
             
-        console.log("order started");
-        console.logBytes32(orderId);
-        console.log(vestingId);
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
             start: vestingStartTime,
@@ -167,10 +164,10 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// @return vestingId The generated vesting ID as a uint.
 
     function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
-        _nextTokenId++;
-        vestingIds[orderId] = _nextTokenId;
-        _mint(to, _nextTokenId);    
-        return _nextTokenId;                                                                                                                                                                                                                                                              
+        _lastTokenId++;
+        vestingIds[orderId] = _lastTokenId;
+        _mint(to, _lastTokenId);    
+        return _lastTokenId;                                                                                                                                                                                                                                                              
     }
 
     function supportsInterface(bytes4 interfaceId)
