@@ -8,12 +8,13 @@ import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.so
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {console} from "hardhat/console.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting,ERC721Upgradeable {
     using AtomicSwapMsgValidator for *;
+    using Strings for *;
     string private _baseURL;
     /// @dev Maximum scale for release percent calculations.
     uint256 constant internal RELEASE_PERCENT_SCALE_FACTOR = 1e4;
@@ -185,5 +186,23 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
      */
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseURL;
+    }
+
+      /**
+     * @dev See {IERC721Metadata-tokenURI}.
+     */
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        _requireOwned(tokenId);
+        string memory baseURI = _baseURI();
+        return bytes(baseURI).length > 0
+            ? string(abi.encodePacked(
+                baseURI,
+                block.chainid.toString(),
+                "/",
+                address(this).toHexString(), // convert address to string with 20 bytes
+                "/",
+                tokenId.toString()
+            ))
+            : "";
     }
 }

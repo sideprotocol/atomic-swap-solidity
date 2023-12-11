@@ -89,9 +89,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     function makeSwapWithVesting(
         MakeSwapMsg calldata makeswap,
         Release[] calldata releases
-    ) external payable {
+    ) external payable returns(bytes32 orderId) {
         releases.validateVestingParams();
-        bytes32 orderId = makeSwap(makeswap);
+        orderId = makeSwap(makeswap);
         for (uint256 i = 0; i < releases.length; i++) {
             swapOrderVestingParams[orderId].push(releases[i]);
         }

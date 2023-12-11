@@ -29,7 +29,7 @@
     "hh:node": "cd packages/contracts && npx hardhat node",
     "hh:build": "cd packages/contracts && npx hardhat clean && npx hardhat compile --force && cd .. && yarn typechain:build",
     "hh:test": "yarn hh:build && cd packages/contracts && npx hardhat test",
-    "forge:test": "cd packages/contracts && forge test",
+    "forge:test": "cd packages/contracts && forge test -vvvv",
     "hh:coverage": "cd packages/contracts && npx hardhat coverage",
     "hh:deploy:local": "cd packages/contracts && npx hardhat run --network localhost scripts/deploy.ts && cd .. && yarn typechain:build",
     "hh:deploy:sepolia": "cd packages/contracts && npx hardhat run --network sepolia scripts/deploy.ts && cd .. && yarn typechain:build",

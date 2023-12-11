@@ -258,7 +258,7 @@ export interface IInchainAtomicSwap extends BaseContract {
         makeswap: IAtomicSwapBase.MakeSwapMsgStruct,
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
-        void
+        string
     ], "payable">;
     placeBid: TypedContractMethod<[
         placeBidMsg: IAtomicSwapBase.PlaceBidMsgStruct
@@ -295,7 +295,7 @@ export interface IInchainAtomicSwap extends BaseContract {
         makeswap: IAtomicSwapBase.MakeSwapMsgStruct,
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
-        void
+        string
     ], "payable">;
     getFunction(nameOrSignature: "placeBid"): TypedContractMethod<[
         placeBidMsg: IAtomicSwapBase.PlaceBidMsgStruct

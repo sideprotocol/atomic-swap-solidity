@@ -8,15 +8,13 @@ task("deploy:vesting", "deploy in chain ").setAction(
   async ({}, { ethers, upgrades, network }) => {
     //deploy contracts
     const admin = process.env.ADMIN;
-    const treasury = process.env.TREASURY;
-    const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
     let AtomicSwapMsgValidatorAddress =
       Settings[
         `AtomicSwapMsgValidator_${network.name}` as keyof typeof Settings
       ];
     if (!ethers.isAddress(AtomicSwapMsgValidatorAddress)) {
       const AtomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-        `AtomicSwapMsgValidator`
+        `AtomicSwapMsgValidator`,
       );
       const AtomicSwapMsgValidator =
         await AtomicSwapMsgValidatorFactory.deploy();
@@ -30,10 +28,14 @@ task("deploy:vesting", "deploy in chain ").setAction(
       },
     });
     // deploy contract
-    const vesting = await upgrades.deployProxy(vestingFactory, [admin, "vSide", "vSide", "https://nft.side.market/metadata/"], {
-      initializer: "initialize",
-      unsafeAllowLinkedLibraries: true,
-    });
+    const vesting = await upgrades.deployProxy(
+      vestingFactory,
+      [admin, "vSide", "vSide", "https://nft.side.market/metadata"],
+      {
+        initializer: "initialize",
+        unsafeAllowLinkedLibraries: true,
+      },
+    );
     const vestingContractAddress = await vesting.getAddress();
 
     await saveItemsToSetting([
@@ -43,5 +45,5 @@ task("deploy:vesting", "deploy in chain ").setAction(
       },
     ]);
     console.log("Deployed vesting address:", vestingContractAddress);
-  }
+  },
 );

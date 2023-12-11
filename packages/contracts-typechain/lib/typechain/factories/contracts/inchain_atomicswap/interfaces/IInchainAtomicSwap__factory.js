@@ -696,7 +696,13 @@ const _abi = [
             },
         ],
         name: "makeSwapWithVesting",
-        outputs: [],
+        outputs: [
+            {
+                internalType: "bytes32",
+                name: "",
+                type: "bytes32",
+            },
+        ],
         stateMutability: "payable",
         type: "function",
     },

@@ -534,7 +534,11 @@ export declare class IInchainAtomicSwap__factory {
             readonly type: "tuple[]";
         }];
         readonly name: "makeSwapWithVesting";
-        readonly outputs: readonly [];
+        readonly outputs: readonly [{
+            readonly internalType: "bytes32";
+            readonly name: "";
+            readonly type: "bytes32";
+        }];
         readonly stateMutability: "payable";
         readonly type: "function";
     }, {

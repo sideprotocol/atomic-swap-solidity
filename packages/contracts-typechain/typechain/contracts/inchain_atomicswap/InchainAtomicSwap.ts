@@ -721,7 +721,7 @@ export interface InchainAtomicSwap extends BaseContract {
       makeswap: IAtomicSwapBase.MakeSwapMsgStruct,
       releases: IAtomicSwapBase.ReleaseStruct[]
     ],
-    [void],
+    [string],
     "payable"
   >;
 
@@ -938,7 +938,7 @@ export interface InchainAtomicSwap extends BaseContract {
       makeswap: IAtomicSwapBase.MakeSwapMsgStruct,
       releases: IAtomicSwapBase.ReleaseStruct[]
     ],
-    [void],
+    [string],
     "payable"
   >;
   getFunction(

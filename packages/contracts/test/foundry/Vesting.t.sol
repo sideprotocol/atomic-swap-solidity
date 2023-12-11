@@ -71,47 +71,53 @@ contract VestingTest is Test {
         usdc.mint(user2, 1000 ether); // Provide user1 with some
         usdt.mint(user3, 1000 ether); // Provide user1 with some
     }
+
     // Fuzz test for startVesting
     function testFuzz_startVesting(bytes32 orderId, address buyer, address token, uint256 totalAmount) public {
         IAtomicSwapBase.Release[] memory releases = new IAtomicSwapBase.Release[](1);
         releases[0] = IAtomicSwapBase.Release(1, 1000); // Example release
         vm.expectRevert("OwnablePausable: access denied");
         vesting.startVesting(orderId, buyer, token, totalAmount, releases);
+       
     }
 
     // // // Fuzz test for release
-    // function testFuzz_release(
-    //     bytes32 uuid
-    // ) public {
-    //     IAtomicSwapBase.MakeSwapMsg memory makeswap = IAtomicSwapBase.MakeSwapMsg(
-    //         uuid,
-    //         IAtomicSwapBase.Coin(address(0), 10 ether), 
-    //         IAtomicSwapBase.Coin(address(usdt), 10 ether),
-    //         address(user1),
-    //         address (user2),
-    //         8 ether,
-    //         block.timestamp + 1000,
-    //         true
-    //     );
+    function testFuzz_release(
+        bytes32 uuid
+    ) public {
+        IAtomicSwapBase.MakeSwapMsg memory makeswap = IAtomicSwapBase.MakeSwapMsg(
+            uuid,
+            IAtomicSwapBase.Coin(address(0), 10 ether), 
+            IAtomicSwapBase.Coin(address(usdt), 10 ether),
+            address(user1),
+            address (user2),
+            8 ether,
+            block.timestamp + 1000,
+            true
+        );
 
-    //     IAtomicSwapBase.Release[] memory releases = new IAtomicSwapBase.Release[](2);
-    //     releases[0] = IAtomicSwapBase.Release(
-    //         1 hours,
-    //         5000
-    //     );
-    //     releases[1] = IAtomicSwapBase.Release(
-    //         1 hours,
-    //         5000
-    //     );
+        IAtomicSwapBase.Release[] memory releases = new IAtomicSwapBase.Release[](2);
+        releases[0] = IAtomicSwapBase.Release(
+            1 hours,
+            5000
+        );
+        releases[1] = IAtomicSwapBase.Release(
+            1 hours,
+            5000
+        );
 
-    //     // Create Order
-    //     vm.startPrank(user1);
-    //     atomicswap.makeSwapWithVesting(
-    //        makeswap,
-    //        releases
-    //     );
-    //     // This will need additional setup to ensure there are vesting schedules to release
-    //     // vesting.release(vestingId);
-    //     //Add assertions or conditions here
-    // }
+        // Create Order
+        vm.startPrank(user1);
+        bytes32 orderId = atomicswap.makeSwapWithVesting{value: makeswap.sellToken.amount }(
+           makeswap,
+           releases
+        );
+
+        uint tokenId = vesting.vestingIds(orderId);
+        //string memory tokenUrl = vesting.tokenURI(tokenId);
+        console2.log("value: %s", tokenId);
+        console.log("tokenId=======>:", tokenId);
+        //console.log("tokenUrl:", tokenUrl);
+        
+    }
 }

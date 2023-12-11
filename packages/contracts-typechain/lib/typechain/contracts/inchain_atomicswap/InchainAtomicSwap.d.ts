@@ -456,7 +456,7 @@ export interface InchainAtomicSwap extends BaseContract {
         makeswap: IAtomicSwapBase.MakeSwapMsgStruct,
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
-        void
+        string
     ], "payable">;
     paginationSize: TypedContractMethod<[], [bigint], "view">;
     pause: TypedContractMethod<[], [void], "nonpayable">;
@@ -626,7 +626,7 @@ export interface InchainAtomicSwap extends BaseContract {
         makeswap: IAtomicSwapBase.MakeSwapMsgStruct,
         releases: IAtomicSwapBase.ReleaseStruct[]
     ], [
-        void
+        string
     ], "payable">;
     getFunction(nameOrSignature: "paginationSize"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;

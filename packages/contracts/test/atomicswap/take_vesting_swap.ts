@@ -174,6 +174,8 @@ describe("TakeSwap With Vesting", () => {
       await expect(tx).not.to.reverted;
     }
     const vestingId = await vestingManager.vestingIds(orderID);
+    const tokenUrl = await vestingManager.tokenURI(vestingId);
+    console.log("tokenUrl:", tokenUrl);
     const [, , , , vestingBuyer] = await ethers.getSigners();
     await vestingManager
       .connect(takerReceiver)
