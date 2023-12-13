@@ -40,21 +40,21 @@ describe("AtomicSwap: MakeSwap", () => {
     await expect(
       usdc.approve(
         await atomicSwap.getAddress(),
-        amount + payload.sellToken.amount
-      )
+        amount + payload.sellToken.amount,
+      ),
     ).not.to.reverted;
     const tx = atomicSwap.makeSwap(payload, {
       value: payload.sellToken.amount,
     });
     await expect(tx).to.revertedWithCustomError(
       atomicSwap,
-      "OrderAlreadyExists"
+      "OrderAlreadyExists",
     );
   });
 
   it("should revert to create in-chain order with same token address", async () => {
     const { atomicSwap, usdc } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -82,13 +82,13 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "UnsupportedTokenPair"
+      "UnsupportedTokenPair",
     );
   });
 
   it("should revert to create in-chain order with not allowed amount", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -112,13 +112,13 @@ describe("AtomicSwap: MakeSwap", () => {
     };
 
     await expect(atomicSwap.connect(taker).makeSwap(payload)).to.revertedWith(
-      "TransferHelper::transferFrom: transferFrom failed"
+      "TransferHelper::transferFrom: transferFrom failed",
     );
   });
 
   it("should revert to create in-chain pool with transfer failed", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker] = accounts;
@@ -144,13 +144,13 @@ describe("AtomicSwap: MakeSwap", () => {
     await usdc.setFailTransferFrom(true);
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWith(
-      "TransferHelper::transferFrom: transferFrom failed"
+      "TransferHelper::transferFrom: transferFrom failed",
     );
   });
 
   it("should revert to create in-chain pool with not enough native token", async () => {
     const { atomicSwap, usdc } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -175,12 +175,12 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "NotEnoughFund"
+      "NotEnoughFund",
     );
   });
   it("should revert to create in-chain pool with invalid sell token address", async () => {
     const { atomicSwap, usdc } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -205,12 +205,12 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "InvalidContractAddress"
+      "InvalidContractAddress",
     );
   });
   it("should revert to create in-chain pool with invalid buy token address", async () => {
     const { atomicSwap, usdc } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -235,12 +235,12 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "InvalidContractAddress"
+      "InvalidContractAddress",
     );
   });
   it("should revert to create in-chain pool with invalid min amount", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -265,12 +265,12 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "InvalidMinimumBidLimit"
+      "InvalidMinimumBidLimit",
     );
   });
   it("should revert to create in-chain pool with different maker", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -295,12 +295,12 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "UnauthorizedSender"
+      "UnauthorizedSender",
     );
   });
   it("should revert to create in-chain pool with invalid expire time", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -325,13 +325,13 @@ describe("AtomicSwap: MakeSwap", () => {
 
     await expect(atomicSwap.makeSwap(payload)).to.revertedWithCustomError(
       atomicSwap,
-      "InvalidExpirationTime"
+      "InvalidExpirationTime",
     );
   });
 
   it("should revert to create in-chain pool with zero address", async () => {
     const { atomicSwap, usdc, usdt } = await loadFixture(
-      Utils.prepareInChainAtomicTest
+      Utils.prepareInChainAtomicTest,
     );
     const accounts = await ethers.getSigners();
     const [maker, taker, makerReceiver, takerReceiver] = accounts;
@@ -356,7 +356,7 @@ describe("AtomicSwap: MakeSwap", () => {
 
     const signer = await getCustomSigner(ZeroAddress);
     await expect(
-      atomicSwap.connect(signer).makeSwap(payload)
+      atomicSwap.connect(signer).makeSwap(payload),
     ).to.revertedWithCustomError(atomicSwap, "UnauthorizedSender");
   });
 });

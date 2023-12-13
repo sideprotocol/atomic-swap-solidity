@@ -119,11 +119,30 @@ interface IAtomicSwapBase {
         uint256 amount; // Counteroffer amount.
     }
 
+    // Signature 
+    struct PermitSignature {
+        uint256 deadline; 
+        uint8 v;
+        bytes32 r; 
+        bytes32 s; 
+        address sender;
+    }
+
+    struct FeeParams {
+        uint     sellerFeeRate;
+        uint    buyerFeeRate;
+        uint    MAX_FEE_RATE_SCALE;
+        address treasury;
+    }
+
     // Swap with permit
     struct SwapWithPermitMsg {
         bytes32 uuid; // UUID from frontend.
         Coin sellToken; // Token/coin to sell.
         Coin buyToken; // Token/coin to buy.
+        address desiredTaker; // Desired taker address.
+        uint256 minBidAmount; // Minimum bid.
+        bool   acceptBid;
         bytes makerPermitSignature;
         bytes takerPermitSignature;
     }

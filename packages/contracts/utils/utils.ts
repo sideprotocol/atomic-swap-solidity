@@ -85,7 +85,6 @@ export const Utils = {
       {
         libraries: {
           AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
-          AnteHandler: await anteHandler.getAddress(),
           AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },

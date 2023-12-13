@@ -83,6 +83,7 @@ library AtomicSwapStateLogic {
         // will fail when we send some uuid from frontend
         bytes32 id = generateNewAtomicSwapID(makeswap.uuid,address(this));
         addNewSwapOrder(swapOrder,makeswap, id, msg.sender);
+        
         if (makeswap.sellToken.token == address(0)) {
             // If selling Ether, ensure sufficient Ether was sent with the transaction.
             if (msg.value < makeswap.sellToken.amount) {
@@ -401,55 +402,104 @@ library AtomicSwapStateLogic {
     }
 
     function executeSwapWithPermit(
-        IAtomicSwapBase.SwapWithPermitMsg calldata swap 
-    ) external {
-        if(swap.sellToken.token == address(0)) {
-            revert();
+        mapping( bytes32 => IAtomicSwapBase.AtomicSwapOrder
+    ) storage swapOrder,
+        IAtomicSwapBase.SwapWithPermitMsg calldata swap,
+        IAtomicSwapBase.Release[] calldata releases,  
+        IVesting vestingManager, 
+        IAtomicSwapBase.FeeParams memory feeParams
+        // uint    sellerFeeRate,
+        // uint    buyerFeeRate,
+        // uint    MAX_FEE_RATE_SCALE,
+        // address treasury
+    ) external returns (bytes32 id, address, address) {
+        id = generateNewAtomicSwapID(swap.uuid, address(this));
+        if(swapOrder[id].maker != address(0)) {
+            revert IAtomicSwapBase.OrderAlreadyExists();
         }
-        if(swap.buyToken.token == address(0)) {
-            revert();
+        if(swap.sellToken.token == address(0) || swap.buyToken.token == address(0)) {
+            revert IAtomicSwapBase.UnsupportedTokenPair();
         }
         
-        (uint256 makerDeadline, uint8 makerV, bytes32 makerR, bytes32 makerS,address maker) = abi.decode(swap.makerPermitSignature, (uint256, uint8, bytes32, bytes32, address));
-        if(makerDeadline > block.timestamp) {
-            revert();
+        IAtomicSwapBase.PermitSignature memory makerSignature = parseSignature(
+            swap.makerPermitSignature
+        );
+        if(makerSignature.deadline > block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(makerSignature.deadline, block.timestamp);
         }
-        (uint256 takerDeadline, uint8 takerV, bytes32 takerR, bytes32 takerS, address taker) = abi.decode(swap.takerPermitSignature, (uint256, uint8, bytes32, bytes32, address));
-        if(takerDeadline > block.timestamp) {
-            revert();
+
+        IAtomicSwapBase.PermitSignature memory takerSignature = parseSignature(
+            swap.takerPermitSignature
+        );
+        if(takerSignature.deadline > block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(takerSignature.deadline, block.timestamp);
         }
 
         // Call permit to approve token transfer
         IERC20Permit(swap.sellToken.token).permit(
-            maker,
+            makerSignature.sender,
             address(this),
             swap.sellToken.amount,
-            makerDeadline,
-            makerV, makerR, makerS
+            makerSignature.deadline,
+            makerSignature.v, makerSignature.r, makerSignature.s
         );
 
-        // (release)
+        // // (release)
         IERC20Permit(swap.buyToken.token).permit(
-            taker,
+            takerSignature.sender,
             address(this),
-            swap.buyToken.amount,
-            takerDeadline,
-            takerV, takerR,takerS
-        );
-        TransferHelper.safeTransferFrom(
-            swap.sellToken.token,
-            maker,
-            taker,
-            swap.sellToken.amount
+            swap.sellToken.amount,
+            takerSignature.deadline,
+            takerSignature.v, takerSignature.r, takerSignature.s
         );
 
-        TransferHelper.safeTransferFrom(
+        AnteHandler.transferFromWithFee(
             swap.buyToken.token,
-            taker,
-            maker,
-            swap.buyToken.amount
+            makerSignature.sender,
+            swap.buyToken.amount,
+            feeParams.sellerFeeRate,
+            feeParams.MAX_FEE_RATE_SCALE,
+            feeParams.treasury
         );
+
+        IAtomicSwapBase.AtomicSwapOrder memory order = IAtomicSwapBase.AtomicSwapOrder(
+            id,
+            IAtomicSwapBase.OrderStatus.INITIAL,
+            makerSignature.sender,
+            swap.sellToken,
+            swap.desiredTaker,
+            swap.buyToken,
+            swap.minBidAmount,
+            block.timestamp,
+            0,
+            0,
+            makerSignature.deadline,
+            swap.acceptBid
+        );
+        swapOrder[id] = order;
+
+        AnteHandler.transferSellTokenToBuyer(
+            swapOrder[id],
+            releases,
+            vestingManager,
+            takerSignature.sender,
+            feeParams.buyerFeeRate,
+            feeParams.MAX_FEE_RATE_SCALE,
+            feeParams.treasury
+        );
+        return (id, makerSignature.sender, takerSignature.sender);
     }
     
 
+
+    function parseSignature(bytes memory signature) private pure returns (IAtomicSwapBase.PermitSignature memory permitSignature) {
+        (uint256 deadline, uint8 v, bytes32 r, bytes32 s, address sender) = abi.decode(signature, (uint256, uint8, bytes32, bytes32, address));
+        permitSignature = IAtomicSwapBase.PermitSignature(
+            deadline,
+            v,
+            r,
+            s,
+            sender
+        );
+    }
 }

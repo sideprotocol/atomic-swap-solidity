@@ -4,7 +4,6 @@ pragma solidity ^0.8.19;
 import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
-import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
 /// @title Inchain Atomic Swap
@@ -13,7 +12,7 @@ import {IVesting} from "../vesting/interfaces/IVesting.sol";
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     using AtomicSwapMsgValidator for *;
     using AtomicSwapStateLogic for *;
-    using AnteHandler for *;
+
     /// @notice Initializes the contract with necessary parameters.
     /// @param _admin The admin address for the contract.
     /// @param _vestingManager The address of the vesting manager contract.
@@ -49,6 +48,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     function makeSwap(
         MakeSwapMsg calldata makeswap
     ) public payable nonReentrant whenNotPaused returns (bytes32 id) {
+        AtomicSwapMsgValidator.validateMakeSwapParams(makeswap);
         id = swapOrder.makeSwap(makeswap);
         emit AtomicSwapOrderCreated(id);
     }
@@ -68,9 +68,31 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     }
 
     function executeSwapWithPermit(
-        SwapWithPermitMsg calldata swap 
-    ) external  {
-        
+        SwapWithPermitMsg calldata swap,
+        Release[] calldata releases 
+    ) external  nonReentrant whenNotPaused {
+        FeeParams memory params = FeeParams(
+            sellerFeeRate,
+            buyerFeeRate,
+            MAX_FEE_RATE_SCALE,
+            treasury
+        );
+        (bytes32 orderId, address maker, address taker) = swapOrder.executeSwapWithPermit(
+            swap,
+            releases,
+            vestingManager,
+            params
+        );
+        emit AtomicSwapOrderCreated(orderId);
+        if(swap.acceptBid) {
+            emit AcceptedBid(orderId,maker,swap.buyToken.amount);
+        }else{
+            emit AtomicSwapOrderTook(
+                maker,
+                taker,
+                orderId
+            );
+        }
     }
 
     /// @notice Allows a user to complete a swap order.
