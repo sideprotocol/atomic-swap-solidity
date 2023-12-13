@@ -44,6 +44,38 @@ export declare namespace IAtomicSwapBase {
     amount: bigint;
   };
 
+  export type SwapWithPermitMsgStruct = {
+    uuid: BytesLike;
+    sellToken: IAtomicSwapBase.CoinStruct;
+    buyToken: IAtomicSwapBase.CoinStruct;
+    makerPermitSignature: BytesLike;
+    takerPermitSignature: BytesLike;
+  };
+
+  export type SwapWithPermitMsgStructOutput = [
+    uuid: string,
+    sellToken: IAtomicSwapBase.CoinStructOutput,
+    buyToken: IAtomicSwapBase.CoinStructOutput,
+    makerPermitSignature: string,
+    takerPermitSignature: string
+  ] & {
+    uuid: string;
+    sellToken: IAtomicSwapBase.CoinStructOutput;
+    buyToken: IAtomicSwapBase.CoinStructOutput;
+    makerPermitSignature: string;
+    takerPermitSignature: string;
+  };
+
+  export type ReleaseStruct = {
+    durationInHours: BigNumberish;
+    percentage: BigNumberish;
+  };
+
+  export type ReleaseStructOutput = [
+    durationInHours: bigint,
+    percentage: bigint
+  ] & { durationInHours: bigint; percentage: bigint };
+
   export type MakeSwapMsgStruct = {
     uuid: BytesLike;
     sellToken: IAtomicSwapBase.CoinStruct;
@@ -74,16 +106,6 @@ export declare namespace IAtomicSwapBase {
     expireAt: bigint;
     acceptBid: boolean;
   };
-
-  export type ReleaseStruct = {
-    durationInHours: BigNumberish;
-    percentage: BigNumberish;
-  };
-
-  export type ReleaseStructOutput = [
-    durationInHours: bigint,
-    percentage: bigint
-  ] & { durationInHours: bigint; percentage: bigint };
 
   export type PlaceBidMsgStruct = {
     bidAmount: BigNumberish;
@@ -140,6 +162,7 @@ export interface InchainAtomicSwapInterface extends Interface {
       | "cancelBid"
       | "cancelSwap"
       | "counteroffers"
+      | "executeSwapWithPermit"
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
@@ -222,6 +245,13 @@ export interface InchainAtomicSwapInterface extends Interface {
   encodeFunctionData(
     functionFragment: "counteroffers",
     values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeSwapWithPermit",
+    values: [
+      IAtomicSwapBase.SwapWithPermitMsgStruct,
+      IAtomicSwapBase.ReleaseStruct[]
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -331,6 +361,10 @@ export interface InchainAtomicSwapInterface extends Interface {
   decodeFunctionResult(functionFragment: "cancelSwap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "counteroffers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeSwapWithPermit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -680,6 +714,15 @@ export interface InchainAtomicSwap extends BaseContract {
     "view"
   >;
 
+  executeSwapWithPermit: TypedContractMethod<
+    [
+      swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
+      releases: IAtomicSwapBase.ReleaseStruct[]
+    ],
+    [string],
+    "payable"
+  >;
+
   getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
 
   grantRole: TypedContractMethod<
@@ -887,6 +930,16 @@ export interface InchainAtomicSwap extends BaseContract {
     [arg0: BytesLike, arg1: AddressLike],
     [bigint],
     "view"
+  >;
+  getFunction(
+    nameOrSignature: "executeSwapWithPermit"
+  ): TypedContractMethod<
+    [
+      swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
+      releases: IAtomicSwapBase.ReleaseStruct[]
+    ],
+    [string],
+    "payable"
   >;
   getFunction(
     nameOrSignature: "getRoleAdmin"

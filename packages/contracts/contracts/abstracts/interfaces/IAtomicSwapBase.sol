@@ -119,6 +119,15 @@ interface IAtomicSwapBase {
         uint256 amount; // Counteroffer amount.
     }
 
+    // Swap with permit
+    struct SwapWithPermitMsg {
+        bytes32 uuid; // UUID from frontend.
+        Coin sellToken; // Token/coin to sell.
+        Coin buyToken; // Token/coin to buy.
+        bytes makerPermitSignature;
+        bytes takerPermitSignature;
+    }
+
     // Custom errors
     error BidNotInPlacedStatus(BidStatus status);
     error OrderAlreadyExists();

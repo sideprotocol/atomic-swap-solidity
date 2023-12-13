@@ -10,6 +10,9 @@ library AtomicSwapMsgValidator {
     /// @param makeswap The structure containing swap details.
     /// @dev Checks for valid contract address, positive minimum bid, authorized sender, and future expiration time.
     function validateMakeSwapParams(IAtomicSwapBase.MakeSwapMsg memory makeswap) external view {
+         if (makeswap.sellToken.token == makeswap.buyToken.token) {
+            revert IAtomicSwapBase.UnsupportedTokenPair();
+        }
         if (makeswap.sellToken.token != address(0) && !isContract(makeswap.sellToken.token)) {
             revert IAtomicSwapBase.InvalidContractAddress(makeswap.sellToken.token);
         }

@@ -10,6 +10,8 @@ import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic
 import {AnteHandler} from "../abstracts/libs/utils/AnteHandler.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
+import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
+
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
 /// @dev Extends the AtomicSwapBase and implements the IInchainAtomicSwap interface.
@@ -48,39 +50,13 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     /// @notice Creates a new swap order.
     /// @param makeswap Struct containing details of the swap order.
-    /// @return Returns the unique identifier of the created swap order.
+    /// @return id Returns the unique identifier of the created swap order.
     function makeSwap(
         MakeSwapMsg calldata makeswap
-    ) public payable nonReentrant whenNotPaused returns (bytes32) {
-        // Ensure the sell token and buy token are not the same non-zero address.
-        if (makeswap.sellToken.token == makeswap.buyToken.token) {
-            revert UnsupportedTokenPair();
-        }
-        // Validate makeswap message
+    ) public payable nonReentrant whenNotPaused returns (bytes32 id) {
         makeswap.validateMakeSwapParams();
-        // Generate a unique ID and add the new swap order to the contract's state.
-    
-        // UUID should be unique, In current logic anyone can spam orders with uuid and code
-        // will fail when we send some uuid from frontend
-        bytes32 id = makeswap.uuid.generateNewAtomicSwapID(address(this));
-        swapOrder.addNewSwapOrder(makeswap, id, msg.sender);
-        if (makeswap.sellToken.token == address(0)) {
-            // If selling Ether, ensure sufficient Ether was sent with the transaction.
-            if (msg.value < makeswap.sellToken.amount) {
-                revert NotEnoughFund(msg.value, makeswap.sellToken.amount);
-            }
-        } else {
-            // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
-            TransferHelper.safeTransferFrom(
-                makeswap.sellToken.token,
-                msg.sender,
-                address(this),
-                makeswap.sellToken.amount
-            );
-        }
-        // Emit an event signaling the creation of a new swap order.
+        id = swapOrder.makeSwap(makeswap);
         emit AtomicSwapOrderCreated(id);
-        return id;
     }
 
     /// @notice Creates a new swap order with vesting parameters.
@@ -95,6 +71,10 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         for (uint256 i = 0; i < releases.length; i++) {
             swapOrderVestingParams[orderId].push(releases[i]);
         }
+    }
+
+    function executeSwapWithPermit(SwapWithPermitMsg calldata swap,Release[] calldata releases) external payable nonReentrant whenNotPaused returns (bytes32) {
+        swap.executeSwapWithPermit();
     }
 
     /// @notice Allows a user to complete a swap order.

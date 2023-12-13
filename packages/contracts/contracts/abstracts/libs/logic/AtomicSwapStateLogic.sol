@@ -2,7 +2,9 @@
 pragma solidity ^0.8.19;
 
 import {IAtomicSwapBase} from "../../interfaces/IAtomicSwapBase.sol";
-
+//import {AtomicSwapMsgValidator} from "../utils/AtomicSwapMsgValidator.sol";
+import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
+import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 /// @title Atomic Swap State Logic
 /// @notice Library providing state management functions for atomic swap orders and bids.
 /// @dev Used by atomic swap contracts to manipulate order and bid states.
@@ -18,7 +20,7 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.MakeSwapMsg memory makeswap,
         bytes32 id,
         address sender
-    ) external {
+    ) public {
         if (swapOrder[id].id != bytes32(0x0)) {
             revert IAtomicSwapBase.OrderAlreadyExists();
         }
@@ -64,7 +66,90 @@ library AtomicSwapStateLogic {
     /// @param contractAddress The address of the contract using the ID.
     /// @return id The generated unique identifier.
     /// @dev Uses keccak256 hashing to generate a unique ID.
-    function generateNewAtomicSwapID(bytes32 uuid, address contractAddress) external pure returns (bytes32 id) {
+    function generateNewAtomicSwapID(bytes32 uuid, address contractAddress) public pure returns (bytes32 id) {
         id = keccak256(abi.encode(contractAddress, uuid));
     }
+
+
+    function makeSwap(
+        mapping (bytes32 => IAtomicSwapBase.AtomicSwapOrder) storage swapOrder,
+        IAtomicSwapBase.MakeSwapMsg calldata makeswap
+    ) public returns (bytes32) {
+        //AtomicSwapMsgValidator.validateMakeSwapParams(makeswap);
+        // Generate a unique ID and add the new swap order to the contract's state.   
+        // UUID should be unique, In current logic anyone can spam orders with uuid and code
+        // will fail when we send some uuid from frontend
+        bytes32 id = generateNewAtomicSwapID(makeswap.uuid,address(this));
+        addNewSwapOrder(swapOrder,makeswap, id, msg.sender);
+        if (makeswap.sellToken.token == address(0)) {
+            // If selling Ether, ensure sufficient Ether was sent with the transaction.
+            if (msg.value < makeswap.sellToken.amount) {
+                revert IAtomicSwapBase.NotEnoughFund(msg.value, makeswap.sellToken.amount);
+            }
+        } else {
+            // If selling an ERC20 token, ensure approved and transfer tokens to the contract.
+            TransferHelper.safeTransferFrom(
+                makeswap.sellToken.token,
+                msg.sender,
+                address(this),
+                makeswap.sellToken.amount
+            );
+        }
+        return id;
+    }
+
+    function executeSwapWithPermit(
+        IAtomicSwapBase.SwapWithPermitMsg calldata swap 
+    ) external {
+        if(swap.sellToken.token == address(0)) {
+            revert();
+        }
+        if(swap.buyToken.token == address(0)) {
+            revert();
+        }
+        
+        (uint256 makerDeadline, uint8 makerV, bytes32 makerR, bytes32 makerS,address maker) = abi.decode(swap.makerPermitSignature, (uint256, uint8, bytes32, bytes32, address));
+        if(makerDeadline > block.timestamp) {
+            revert();
+        }
+        (uint256 takerDeadline, uint8 takerV, bytes32 takerR, bytes32 takerS, address taker) = abi.decode(swap.takerPermitSignature, (uint256, uint8, bytes32, bytes32, address));
+        if(takerDeadline > block.timestamp) {
+            revert();
+        }
+
+        // Call permit to approve token transfer
+        IERC20Permit(swap.sellToken.token).permit(
+            maker,
+            address(this),
+            swap.sellToken.amount,
+            makerDeadline,
+            makerV, makerR, makerS
+        );
+
+        // (release)
+
+        IERC20Permit(swap.buyToken.token).permit(
+            taker,
+            address(this),
+            swap.buyToken.amount,
+            takerDeadline,
+            takerV, takerR,takerS
+        );
+        
+
+        TransferHelper.safeTransferFrom(
+            swap.sellToken.token,
+            maker,
+            taker,
+            swap.sellToken.amount
+        );
+
+        TransferHelper.safeTransferFrom(
+            swap.buyToken.token,
+            taker,
+            maker,
+            swap.buyToken.amount
+        );
+    }
+    
 }
