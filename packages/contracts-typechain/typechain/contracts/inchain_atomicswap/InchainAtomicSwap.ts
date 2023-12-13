@@ -66,16 +66,6 @@ export declare namespace IAtomicSwapBase {
     takerPermitSignature: string;
   };
 
-  export type ReleaseStruct = {
-    durationInHours: BigNumberish;
-    percentage: BigNumberish;
-  };
-
-  export type ReleaseStructOutput = [
-    durationInHours: bigint,
-    percentage: bigint
-  ] & { durationInHours: bigint; percentage: bigint };
-
   export type MakeSwapMsgStruct = {
     uuid: BytesLike;
     sellToken: IAtomicSwapBase.CoinStruct;
@@ -106,6 +96,16 @@ export declare namespace IAtomicSwapBase {
     expireAt: bigint;
     acceptBid: boolean;
   };
+
+  export type ReleaseStruct = {
+    durationInHours: BigNumberish;
+    percentage: BigNumberish;
+  };
+
+  export type ReleaseStructOutput = [
+    durationInHours: bigint,
+    percentage: bigint
+  ] & { durationInHours: bigint; percentage: bigint };
 
   export type PlaceBidMsgStruct = {
     bidAmount: BigNumberish;
@@ -248,10 +248,7 @@ export interface InchainAtomicSwapInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeSwapWithPermit",
-    values: [
-      IAtomicSwapBase.SwapWithPermitMsgStruct,
-      IAtomicSwapBase.ReleaseStruct[]
-    ]
+    values: [IAtomicSwapBase.SwapWithPermitMsgStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -715,12 +712,9 @@ export interface InchainAtomicSwap extends BaseContract {
   >;
 
   executeSwapWithPermit: TypedContractMethod<
-    [
-      swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
-      releases: IAtomicSwapBase.ReleaseStruct[]
-    ],
-    [string],
-    "payable"
+    [swap: IAtomicSwapBase.SwapWithPermitMsgStruct],
+    [void],
+    "nonpayable"
   >;
 
   getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
@@ -934,12 +928,9 @@ export interface InchainAtomicSwap extends BaseContract {
   getFunction(
     nameOrSignature: "executeSwapWithPermit"
   ): TypedContractMethod<
-    [
-      swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
-      releases: IAtomicSwapBase.ReleaseStruct[]
-    ],
-    [string],
-    "payable"
+    [swap: IAtomicSwapBase.SwapWithPermitMsgStruct],
+    [void],
+    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "getRoleAdmin"

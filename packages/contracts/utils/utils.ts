@@ -33,18 +33,25 @@ export const Utils = {
     const [owner] = accounts;
 
     // deploy libraries
-    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
-      "AtomicSwapStateLogic",
-    );
-    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
 
     const AnteHandlerFactory = await ethers.getContractFactory("AnteHandler");
-    const AnteHandler = await AnteHandlerFactory.deploy();
+    const anteHandler = await AnteHandlerFactory.deploy();
 
     const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
       "AtomicSwapMsgValidator",
     );
     const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
+
+    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+      "AtomicSwapStateLogic",
+      {
+        libraries: {
+          AnteHandler: await anteHandler.getAddress(),
+          AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
+        },
+      },
+    );
+    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
 
     if (!sellTokenFeeRate) {
       sellTokenFeeRate = 100;
@@ -78,7 +85,7 @@ export const Utils = {
       {
         libraries: {
           AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
-          AnteHandler: await AnteHandler.getAddress(),
+          AnteHandler: await anteHandler.getAddress(),
           AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },

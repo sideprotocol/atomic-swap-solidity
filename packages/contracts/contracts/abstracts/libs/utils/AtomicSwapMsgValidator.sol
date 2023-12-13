@@ -57,6 +57,8 @@ library AtomicSwapMsgValidator {
         }
     }
 
+
+
     /// @notice Validates vesting parameters for an atomic swap.
     /// @param releases Array of release schedules for the vesting.
     /// @dev Ensures the total percentage of releases equals 100% and the number of releases is within limits.
