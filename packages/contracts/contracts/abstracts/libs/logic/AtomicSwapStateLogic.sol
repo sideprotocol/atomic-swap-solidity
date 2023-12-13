@@ -408,10 +408,6 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.Release[] calldata releases,  
         IVesting vestingManager, 
         IAtomicSwapBase.FeeParams memory feeParams
-        // uint    sellerFeeRate,
-        // uint    buyerFeeRate,
-        // uint    MAX_FEE_RATE_SCALE,
-        // address treasury
     ) external returns (bytes32 id, address, address) {
         id = generateNewAtomicSwapID(swap.uuid, address(this));
         if(swapOrder[id].maker != address(0)) {
