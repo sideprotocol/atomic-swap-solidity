@@ -46,18 +46,19 @@ library AnteHandler {
     /// @dev Deducts a fee from the amount and transfers the net amount to the recipient and fee to the treasury.
     function transferFromWithFee(
         address token,
+        address from,
         address recipient,
         uint256 amount,
         uint256 feeRate,
         uint256 maxFeeRateScale,
         address treasury
-    ) external {
+    ) public {
         uint256 fee = (amount * feeRate) / maxFeeRateScale;
         uint256 amountAfterFee = amount - fee;
 
         if (token != address(0)) {
-            TransferHelper.safeTransferFrom(token, msg.sender, recipient, amountAfterFee);
-            TransferHelper.safeTransferFrom(token, msg.sender, treasury, fee);
+            TransferHelper.safeTransferFrom(token, from, recipient, amountAfterFee);
+            TransferHelper.safeTransferFrom(token, from, treasury, fee);
         } else {
             if(msg.value != amount) {
                 revert IAtomicSwapBase.NotEnoughFund(msg.value, amount);
@@ -120,6 +121,78 @@ library AnteHandler {
                     order.sellToken.token,
                     address(treasury),
                     sellTokenFee
+                );
+                IERC20(order.sellToken.token).approve(
+                    address(vestingManager),
+                    sellTokenAmountAfterFee
+                );
+                vestingManager.startVesting(
+                    order.id,
+                    buyer,
+                    order.sellToken.token,
+                    sellTokenAmountAfterFee,
+                    releases
+                );
+            }
+        }
+    }
+
+    function transferFromSellTokenToBuyer(
+        IAtomicSwapBase.AtomicSwapOrder storage order,
+        IAtomicSwapBase.Release[] memory releases,
+        IVesting vestingManager,
+        address seller,
+        address buyer,
+        uint    buyerFeeRate,
+        uint    MAX_FEE_RATE_SCALE,
+        address treasury
+    ) internal {
+        
+        if (releases.length == 0) {
+            // Exchange the tokens
+            // If buying with ERC20 tokens
+            transferFromWithFee(
+                order.sellToken.token,
+                seller,
+                buyer,
+                order.sellToken.amount,
+                buyerFeeRate,
+                MAX_FEE_RATE_SCALE,
+                treasury
+            );
+        } else {
+            // Transfer sell token to vesting contract
+            uint256 sellTokenFee = (order.sellToken.amount * buyerFeeRate) /
+                MAX_FEE_RATE_SCALE;
+            uint256 sellTokenAmountAfterFee = order.sellToken.amount -
+                sellTokenFee;
+            if (order.sellToken.token == address(0)) {
+                TransferHelper.safeTransferETH(
+                    treasury,
+                    sellTokenFee
+                );
+                // Take Fee.
+                // slither-disable-next-line arbitrary-send-eth
+                vestingManager.startVesting{value: sellTokenAmountAfterFee}(
+                    order.id,
+                    buyer,
+                    order.sellToken.token,
+                    sellTokenAmountAfterFee,
+                    releases
+                );
+            } else {
+                // Take Fee.
+                TransferHelper.safeTransferFrom(
+                    order.sellToken.token,
+                    seller,
+                    address(treasury),
+                    sellTokenFee
+                );
+                TransferHelper.safeTransferFrom(
+                    order.sellToken.token,
+                    seller,
+                    address(this),
+                    sellTokenAmountAfterFee
                 );
                 IERC20(order.sellToken.token).approve(
                     address(vestingManager),

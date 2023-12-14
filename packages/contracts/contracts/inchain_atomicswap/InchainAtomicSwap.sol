@@ -71,6 +71,9 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         SwapWithPermitMsg calldata swap,
         Release[] calldata releases 
     ) external  nonReentrant whenNotPaused {
+        if(swap.sellToken.token == swap.buyToken.token) {
+            revert UnsupportedTokenPair();
+        }
         FeeParams memory params = FeeParams(
             sellerFeeRate,
             buyerFeeRate,

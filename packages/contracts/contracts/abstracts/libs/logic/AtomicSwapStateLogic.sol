@@ -135,6 +135,7 @@ library AtomicSwapStateLogic {
 
         AnteHandler.transferFromWithFee(
             order.buyToken.token,
+            msg.sender,
             order.maker,
             order.buyToken.amount,
             sellerFeeRate,
@@ -227,7 +228,7 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.UpdateBidMsg calldata updateBidMsg
     )
         external returns (address, uint) {
-// Extracting details from the updateBidMsg for easy reference
+        // Extracting details from the updateBidMsg for easy reference
         bytes32 orderID = updateBidMsg.orderID;
         uint256 addition = updateBidMsg.addition;
         // Retrieving the current bid for this order and sender
@@ -413,45 +414,40 @@ library AtomicSwapStateLogic {
         if(swapOrder[id].maker != address(0)) {
             revert IAtomicSwapBase.OrderAlreadyExists();
         }
+
         if(swap.sellToken.token == address(0) || swap.buyToken.token == address(0)) {
             revert IAtomicSwapBase.UnsupportedTokenPair();
         }
-        
-        IAtomicSwapBase.PermitSignature memory makerSignature = parseSignature(
-            swap.makerPermitSignature
-        );
-        if(makerSignature.deadline > block.timestamp) {
-            revert IAtomicSwapBase.InvalidExpirationTime(makerSignature.deadline, block.timestamp);
+        if(swap.makerSignature.deadline < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(swap.makerSignature.deadline, block.timestamp);
         }
 
-        IAtomicSwapBase.PermitSignature memory takerSignature = parseSignature(
-            swap.takerPermitSignature
-        );
-        if(takerSignature.deadline > block.timestamp) {
-            revert IAtomicSwapBase.InvalidExpirationTime(takerSignature.deadline, block.timestamp);
+        if(swap.takerSignature.deadline < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(swap.takerSignature.deadline, block.timestamp);
         }
 
         // Call permit to approve token transfer
         IERC20Permit(swap.sellToken.token).permit(
-            makerSignature.sender,
+            swap.makerSignature.sender,
             address(this),
             swap.sellToken.amount,
-            makerSignature.deadline,
-            makerSignature.v, makerSignature.r, makerSignature.s
+            swap.makerSignature.deadline,
+            swap.makerSignature.v, swap.makerSignature.r, swap.makerSignature.s
         );
 
         // // (release)
         IERC20Permit(swap.buyToken.token).permit(
-            takerSignature.sender,
+            swap.takerSignature.sender,
             address(this),
             swap.sellToken.amount,
-            takerSignature.deadline,
-            takerSignature.v, takerSignature.r, takerSignature.s
+            swap.takerSignature.deadline,
+            swap.takerSignature.v, swap.takerSignature.r, swap.takerSignature.s
         );
 
         AnteHandler.transferFromWithFee(
             swap.buyToken.token,
-            makerSignature.sender,
+            swap.takerSignature.sender,
+            swap.makerSignature.sender,
             swap.buyToken.amount,
             feeParams.sellerFeeRate,
             feeParams.MAX_FEE_RATE_SCALE,
@@ -461,7 +457,7 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.AtomicSwapOrder memory order = IAtomicSwapBase.AtomicSwapOrder(
             id,
             IAtomicSwapBase.OrderStatus.INITIAL,
-            makerSignature.sender,
+            swap.makerSignature.sender,
             swap.sellToken,
             swap.desiredTaker,
             swap.buyToken,
@@ -469,33 +465,21 @@ library AtomicSwapStateLogic {
             block.timestamp,
             0,
             0,
-            makerSignature.deadline,
+            swap.makerSignature.deadline,
             swap.acceptBid
         );
         swapOrder[id] = order;
 
-        AnteHandler.transferSellTokenToBuyer(
+        AnteHandler.transferFromSellTokenToBuyer(
             swapOrder[id],
             releases,
             vestingManager,
-            takerSignature.sender,
+            swap.makerSignature.sender,
+            swap.takerSignature.sender,
             feeParams.buyerFeeRate,
             feeParams.MAX_FEE_RATE_SCALE,
             feeParams.treasury
         );
-        return (id, makerSignature.sender, takerSignature.sender);
-    }
-    
-
-
-    function parseSignature(bytes memory signature) private pure returns (IAtomicSwapBase.PermitSignature memory permitSignature) {
-        (uint256 deadline, uint8 v, bytes32 r, bytes32 s, address sender) = abi.decode(signature, (uint256, uint8, bytes32, bytes32, address));
-        permitSignature = IAtomicSwapBase.PermitSignature(
-            deadline,
-            v,
-            r,
-            s,
-            sender
-        );
+        return (id, swap.makerSignature.sender, swap.takerSignature.sender);
     }
 }

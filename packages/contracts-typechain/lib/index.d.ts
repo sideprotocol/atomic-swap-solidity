@@ -1,5 +1,6 @@
 export * from "./typechain";
 import * as constants from "./constants/constants";
+export * as ecdsa from "./util/ecdsa";
 export declare const Settings: {
     atomicSwapHelper_sepolia: string;
     inChainAtomicSwap_mumbai: string;

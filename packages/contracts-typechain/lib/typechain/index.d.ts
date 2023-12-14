@@ -75,6 +75,8 @@ export type { InchainAtomicSwap } from "./contracts/inchain_atomicswap/InchainAt
 export { InchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/InchainAtomicSwap__factory";
 export type { IInchainAtomicSwap } from "./contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap";
 export { IInchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap__factory";
+export type { MockERC20Token } from "./contracts/mocks/MockERC20.sol/MockERC20Token";
+export { MockERC20Token__factory } from "./factories/contracts/mocks/MockERC20.sol/MockERC20Token__factory";
 export type { MockToken } from "./contracts/mocks/MockToken";
 export { MockToken__factory } from "./factories/contracts/mocks/MockToken__factory";
 export type { IVesting } from "./contracts/vesting/interfaces/IVesting";

@@ -23,6 +23,26 @@ export declare namespace IAtomicSwapBase {
         token: string;
         amount: bigint;
     };
+    type PermitSignatureStruct = {
+        deadline: BigNumberish;
+        v: BigNumberish;
+        r: BytesLike;
+        s: BytesLike;
+        sender: AddressLike;
+    };
+    type PermitSignatureStructOutput = [
+        deadline: bigint,
+        v: bigint,
+        r: string,
+        s: string,
+        sender: string
+    ] & {
+        deadline: bigint;
+        v: bigint;
+        r: string;
+        s: string;
+        sender: string;
+    };
     type SwapWithPermitMsgStruct = {
         uuid: BytesLike;
         sellToken: IAtomicSwapBase.CoinStruct;
@@ -30,8 +50,8 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: AddressLike;
         minBidAmount: BigNumberish;
         acceptBid: boolean;
-        makerPermitSignature: BytesLike;
-        takerPermitSignature: BytesLike;
+        makerSignature: IAtomicSwapBase.PermitSignatureStruct;
+        takerSignature: IAtomicSwapBase.PermitSignatureStruct;
     };
     type SwapWithPermitMsgStructOutput = [
         uuid: string,
@@ -40,8 +60,8 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: string,
         minBidAmount: bigint,
         acceptBid: boolean,
-        makerPermitSignature: string,
-        takerPermitSignature: string
+        makerSignature: IAtomicSwapBase.PermitSignatureStructOutput,
+        takerSignature: IAtomicSwapBase.PermitSignatureStructOutput
     ] & {
         uuid: string;
         sellToken: IAtomicSwapBase.CoinStructOutput;
@@ -49,8 +69,8 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: string;
         minBidAmount: bigint;
         acceptBid: boolean;
-        makerPermitSignature: string;
-        takerPermitSignature: string;
+        makerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
+        takerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
     };
     type ReleaseStruct = {
         durationInHours: BigNumberish;
