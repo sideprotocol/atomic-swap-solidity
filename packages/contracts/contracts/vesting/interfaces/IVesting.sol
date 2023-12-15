@@ -21,6 +21,7 @@ interface IVesting {
         uint256 totalAmount;
         uint256 amountReleased;
         uint256 nextReleaseStep;
+        bool toVault;
     }
 
     struct VestingInfo {
@@ -39,7 +40,8 @@ interface IVesting {
         address buyer,
         address token,
         uint256 totalAmount,
-        IAtomicSwapBase.Release[] memory releases
+        IAtomicSwapBase.Release[] memory releases,
+        bool withVault
     ) external payable;
 
     

@@ -7,22 +7,30 @@ task("deploy:in-chain:lib", "deploy libraries")
   .addOptionalParam("f", "force write")
   .setAction(async ({ f }, { ethers, upgrades, network }) => {
     // deploy libraries
-    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
-      "AtomicSwapStateLogic"
-    );
-    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
-    const atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
 
     const AnteHandlerFactory = await ethers.getContractFactory(`AnteHandler`);
     const AnteHandler = await AnteHandlerFactory.deploy();
     const AnteHandlerAddress = await AnteHandler.getAddress();
 
     const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-      "AtomicSwapMsgValidator"
+      "AtomicSwapMsgValidator",
     );
     const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
     const atomicSwapMsgValidatorAddress =
       await atomicSwapMsgValidator.getAddress();
+
+    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+      "AtomicSwapStateLogic",
+      {
+        libraries: {
+          AnteHandler: AnteHandlerAddress,
+          AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
+        },
+      },
+    );
+    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+    const atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
+
     await saveItemsToSetting(
       [
         {
@@ -38,17 +46,17 @@ task("deploy:in-chain:lib", "deploy libraries")
           value: atomicSwapMsgValidatorAddress,
         },
       ],
-      f
+      f,
     );
     console.log(
       `atomicSwapStateLogic_${network.name}`,
-      atomicSwapStateLogicAddress
+      atomicSwapStateLogicAddress,
     );
 
     console.log(`AnteHandler_${network.name}`, AnteHandlerAddress);
     console.log(
       `atomicSwapMsgValidator_${network.name}`,
-      atomicSwapMsgValidatorAddress
+      atomicSwapMsgValidatorAddress,
     );
   });
 
@@ -61,22 +69,6 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
     const sellTokenFeeRate = process.env.SELL_TOKEN_FEE_RATE;
     const buyTokenFeeRate = process.env.BUY_TOKEN_FEE_RATE;
     const deployer = new ethers.Wallet(privatekey!, ethers.provider);
-
-    let atomicSwapStateLogicAddress =
-      Settings[`atomicSwapStateLogic_${network.name}` as keyof typeof Settings];
-    if (!ethers.isAddress(atomicSwapStateLogicAddress)) {
-      const atomicSwapStateLogicFactory = await ethers.getContractFactory(
-        `AtomicSwapStateLogic`
-      );
-      const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
-      atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
-      saveItemsToSetting([
-        {
-          title: `atomicSwapStateLogic_${network.name}`,
-          value: atomicSwapStateLogicAddress,
-        },
-      ]);
-    }
 
     let AnteHandlerAddress =
       Settings[`AnteHandler_${network.name}` as keyof typeof Settings];
@@ -100,7 +92,7 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
 
     if (!ethers.isAddress(AnteHandlerAddress)) {
       const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-        "AtomicSwapMsgValidator"
+        "AtomicSwapMsgValidator",
       );
       const atomicSwapMsgValidator =
         await atomicSwapMsgValidatorFactory.deploy();
@@ -111,6 +103,37 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
           value: atomicSwapMsgValidatorAddress,
         },
       ]);
+    }
+
+    let atomicSwapStateLogicAddress =
+      Settings[`atomicSwapStateLogic_${network.name}` as keyof typeof Settings];
+    if (!ethers.isAddress(atomicSwapStateLogicAddress)) {
+      const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+        `AtomicSwapStateLogic`,
+        {
+          libraries: {
+            AnteHandler: AnteHandlerAddress,
+            AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
+          },
+        },
+      );
+
+      const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+      atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
+      saveItemsToSetting([
+        {
+          title: `atomicSwapStateLogic_${network.name}`,
+          value: atomicSwapStateLogicAddress,
+        },
+      ]);
+    }
+
+    let vaultAddress =
+      Settings[`vault_${network.name}` as keyof typeof Settings];
+
+    if (!ethers.isAddress(vaultAddress)) {
+      console.error("Please deploy vesting contract first of all");
+      return;
     }
 
     let vestingAddress =
@@ -127,25 +150,31 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
       {
         libraries: {
           AtomicSwapStateLogic: atomicSwapStateLogicAddress,
-          AnteHandler: AnteHandlerAddress,
           AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
         },
-      }
+      },
     );
 
     // deploy contract
     const atomicSwap = await upgrades.deployProxy(
       atomicSwapFactory,
-      [admin, vestingAddress, treasury, sellTokenFeeRate, buyTokenFeeRate],
+      [
+        admin,
+        vaultAddress,
+        vestingAddress,
+        treasury,
+        sellTokenFeeRate,
+        buyTokenFeeRate,
+      ],
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,
-      }
+      },
     );
 
     // atomicsSwap contract ad admin of vesting contract.
     await Vesting__factory.connect(vestingAddress, deployer).addAdmin(
-      await atomicSwap.getAddress()
+      await atomicSwap.getAddress(),
     );
     // Deploy mock token contracts. This will be used for testing purposes.
     const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");
@@ -177,5 +206,5 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
     console.log("Deployed in-chain address:", contractAddress);
     console.log("Deployed mock usdc address:", mockUSDCAddress);
     console.log("Deployed mock usdt address:", mockUSDTAddress);
-  }
+  },
 );

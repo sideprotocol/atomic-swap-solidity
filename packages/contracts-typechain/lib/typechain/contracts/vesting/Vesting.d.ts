@@ -26,7 +26,7 @@ export interface VestingInterface extends Interface {
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, string, string, string]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, string, string, string]): string;
     encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isApprovedForAll", values: [AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "isPauser", values: [AddressLike]): string;
@@ -50,7 +50,8 @@ export interface VestingInterface extends Interface {
         AddressLike,
         AddressLike,
         BigNumberish,
-        IAtomicSwapBase.ReleaseStruct[]
+        IAtomicSwapBase.ReleaseStruct[],
+        boolean
     ]): string;
     encodeFunctionData(functionFragment: "supportsInterface", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
@@ -316,6 +317,7 @@ export interface Vesting extends BaseContract {
     ], "view">;
     initialize: TypedContractMethod<[
         admin: AddressLike,
+        vault: AddressLike,
         name: string,
         symbol: string,
         baseURL: string
@@ -398,7 +400,8 @@ export interface Vesting extends BaseContract {
         buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
-        releases: IAtomicSwapBase.ReleaseStruct[]
+        releases: IAtomicSwapBase.ReleaseStruct[],
+        toVault: boolean
     ], [
         void
     ], "payable">;
@@ -426,7 +429,8 @@ export interface Vesting extends BaseContract {
             string,
             bigint,
             bigint,
-            bigint
+            bigint,
+            boolean
         ] & {
             from: string;
             start: bigint;
@@ -434,6 +438,7 @@ export interface Vesting extends BaseContract {
             totalAmount: bigint;
             amountReleased: bigint;
             nextReleaseStep: bigint;
+            toVault: boolean;
         }
     ], "view">;
     vestingIds: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
@@ -465,6 +470,7 @@ export interface Vesting extends BaseContract {
     ], "view">;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
         admin: AddressLike,
+        vault: AddressLike,
         name: string,
         symbol: string,
         baseURL: string
@@ -535,7 +541,8 @@ export interface Vesting extends BaseContract {
         buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
-        releases: IAtomicSwapBase.ReleaseStruct[]
+        releases: IAtomicSwapBase.ReleaseStruct[],
+        toVault: boolean
     ], [
         void
     ], "payable">;
@@ -559,7 +566,8 @@ export interface Vesting extends BaseContract {
             string,
             bigint,
             bigint,
-            bigint
+            bigint,
+            boolean
         ] & {
             from: string;
             start: bigint;
@@ -567,6 +575,7 @@ export interface Vesting extends BaseContract {
             totalAmount: bigint;
             amountReleased: bigint;
             nextReleaseStep: bigint;
+            toVault: boolean;
         }
     ], "view">;
     getFunction(nameOrSignature: "vestingIds"): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;

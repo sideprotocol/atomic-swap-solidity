@@ -5,10 +5,12 @@ import {OwnablePausableUpgradeable} from "../abstracts/OwnablePausableUpgradeabl
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
+import {TransferHelperWithVault} from "../abstracts/libs/utils/TransferHelperWithVault.sol";
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
 import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {IVault} from "../vault/IVault.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
@@ -35,17 +37,19 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     // slither-disable-next-line uninitialized-state
     mapping(uint => IAtomicSwapBase.Release[])
         public releaseInfo;
+    address private _vault;
 
     /// @notice Initializes the vesting contract with necessary parameters.
     /// @param admin The address of the admin.
     /// @param name The address of the vesting NFT.
     /// @param symbol The address of the vesting NFT.
     /// @param baseURL The address of the vesting NFT.
-    function initialize(address admin, string memory name, string memory symbol, string memory baseURL) external initializer {
+    function initialize(address admin,address vault, string memory name, string memory symbol, string memory baseURL) external initializer {
         __OwnablePausableUpgradeable_init(admin);
         __ERC721_init(name, symbol);
         _baseURL = baseURL;
         _lastTokenId = 0;
+        _vault = vault;
     }
 
     /// @notice Starts the vesting schedule for a beneficiary.
@@ -59,24 +63,16 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         address buyer,
         address token,
         uint256 totalAmount,
-        IAtomicSwapBase.Release[] memory releases
+        IAtomicSwapBase.Release[] memory releases,
+        bool toVault
     ) external payable nonReentrant onlyAdmin {
    
         if (vestingIds[orderId] != 0) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
+        _transferFrom(token, totalAmount, toVault);
 
-        if (token == address(0)) {
-            if (msg.value != totalAmount) {
-                revert IAtomicSwapBase.NotEnoughFund(totalAmount, msg.value);
-            }
-        } else {
-            TransferHelper.safeTransferFrom(
-                token,
-                msg.sender, address(this), totalAmount
-            );
-        }
         uint256 vestingStartTime = block.timestamp;
         uint vestingId = _issueVestingId(buyer, orderId);
             
@@ -86,7 +82,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             token: token,
             totalAmount: totalAmount,
             amountReleased: 0,
-            nextReleaseStep: 0
+            nextReleaseStep: 0,
+            toVault: toVault
         });
 
         vesting[vestingId] = newVesting;
@@ -97,6 +94,33 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         }
 
         emit NewVesting(orderId, vestingId);
+    }
+
+    function _transferFrom(
+        address token, 
+        uint amount,
+        bool withVault
+    ) private {
+        if(withVault) {
+            TransferHelperWithVault.safeTransferFrom(
+                _vault,
+                token,
+                msg.sender, 
+                address(this), 
+                amount
+            );
+        }else{
+            if (token == address(0)) {
+                if (msg.value != amount) {
+                    revert IAtomicSwapBase.NotEnoughFund(amount, msg.value);
+                }
+            } else {
+                TransferHelper.safeTransferFrom(
+                    token,
+                    msg.sender, address(this), amount
+                );
+            }
+        }
     }
 
     /// @notice Releases vested tokens to the beneficiary.
@@ -136,23 +160,32 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         }
         
         schedule.amountReleased += amountForRelease;
-        if (schedule.token != address(0)) {
-            TransferHelper.safeTransfer(
-                schedule.token,
-                msg.sender, amountForRelease
-            );
-        } else {
-            TransferHelper.safeTransferETH(msg.sender, amountForRelease);
-        }
 
-        // burn NFT at last release time. frontend need to approve this. 
-        if(schedule.amountReleased == schedule.totalAmount) {
-            transferFrom(msg.sender,address(this), vestingId);
-            _burn(vestingId);
+        if(schedule.toVault) {
+            TransferHelperWithVault.safeTransfer(
+                _vault,
+                schedule.token,
+                msg.sender,  
+                amountForRelease
+            );
+        }else{
+            if (schedule.token != address(0)) {
+                TransferHelper.safeTransfer(
+                    schedule.token,
+                    msg.sender, amountForRelease
+                );
+            } else {
+                TransferHelper.safeTransferETH(msg.sender, amountForRelease);
+            }
+
+            // burn NFT at last release time. frontend need to approve this. 
+            if(schedule.amountReleased == schedule.totalAmount) {
+                transferFrom(msg.sender,address(this), vestingId);
+                _burn(vestingId);
+            }
         }
         emit Released(msg.sender, amountForRelease);
     }
-
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }
@@ -163,7 +196,6 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// @param to The address to which the vesting ID and corresponding tokens will be issued.
     /// @param orderId The order ID based on which the vesting ID is generated.
     /// @return vestingId The generated vesting ID as a uint.
-
     function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
         _lastTokenId++;
         vestingIds[orderId] = _lastTokenId;

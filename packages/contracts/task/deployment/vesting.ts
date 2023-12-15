@@ -4,7 +4,7 @@ import { task } from "hardhat/config";
 import { Settings } from "@sideprotocol/contracts-typechain";
 dotenv.config();
 
-task("deploy:vesting", "deploy in chain ").setAction(
+task("deploy:vesting", "deploy vesting contract").setAction(
   async ({}, { ethers, upgrades, network }) => {
     //deploy contracts
     const admin = process.env.ADMIN;
@@ -21,6 +21,13 @@ task("deploy:vesting", "deploy in chain ").setAction(
       AtomicSwapMsgValidatorAddress = await AtomicSwapMsgValidator.getAddress();
     }
 
+    let vaultAddress =
+      Settings[`vault_${network.name}` as keyof typeof Settings];
+    if (!ethers.isAddress(vaultAddress)) {
+      console.error("Invalid vault address!");
+      return;
+    }
+
     // AtomicSwap contract deploy
     const vestingFactory = await ethers.getContractFactory(`Vesting`, {
       libraries: {
@@ -30,7 +37,13 @@ task("deploy:vesting", "deploy in chain ").setAction(
     // deploy contract
     const vesting = await upgrades.deployProxy(
       vestingFactory,
-      [admin, "vSide", "vSide", "https://nft.side.market/metadata"],
+      [
+        admin,
+        vaultAddress,
+        "vSide",
+        "vSide",
+        "https://nft.side.market/metadata",
+      ],
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,

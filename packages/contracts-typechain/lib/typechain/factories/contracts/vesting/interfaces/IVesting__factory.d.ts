@@ -112,6 +112,10 @@ export declare class IVesting__factory {
             readonly internalType: "struct IAtomicSwapBase.Release[]";
             readonly name: "releases";
             readonly type: "tuple[]";
+        }, {
+            readonly internalType: "bool";
+            readonly name: "withVault";
+            readonly type: "bool";
         }];
         readonly name: "startVesting";
         readonly outputs: readonly [];

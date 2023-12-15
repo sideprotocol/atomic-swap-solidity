@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {IAtomicSwapBase} from "../../interfaces/IAtomicSwapBase.sol";
 import {AtomicSwapMsgValidator} from "../utils/AtomicSwapMsgValidator.sol";
-import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
+import {IVault} from "../../../vault/IVault.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVesting} from "../../../vesting/interfaces/IVesting.sol";
 import {AnteHandler} from "../utils/AnteHandler.sol";
@@ -407,9 +407,11 @@ library AtomicSwapStateLogic {
     ) storage swapOrder,
         IAtomicSwapBase.SwapWithPermitMsg calldata swap,
         IAtomicSwapBase.Release[] calldata releases,  
+        address vault,
         IVesting vestingManager, 
         IAtomicSwapBase.FeeParams memory feeParams
     ) external returns (bytes32 id, address, address) {
+
         id = generateNewAtomicSwapID(swap.uuid, address(this));
         if(swapOrder[id].maker != address(0)) {
             revert IAtomicSwapBase.OrderAlreadyExists();
@@ -427,24 +429,25 @@ library AtomicSwapStateLogic {
         }
 
         // Call permit to approve token transfer
-        IERC20Permit(swap.sellToken.token).permit(
+        IVault(vault).permit(
+            swap.sellToken.token,
             swap.makerSignature.sender,
             address(this),
             swap.sellToken.amount,
-            swap.makerSignature.deadline,
-            swap.makerSignature.v, swap.makerSignature.r, swap.makerSignature.s
+            swap.makerSignature
         );
 
-        // // (release)
-        IERC20Permit(swap.buyToken.token).permit(
+        // (release)
+        IVault(vault).permit(
+            swap.buyToken.token,
             swap.takerSignature.sender,
             address(this),
             swap.sellToken.amount,
-            swap.takerSignature.deadline,
-            swap.takerSignature.v, swap.takerSignature.r, swap.takerSignature.s
+            swap.takerSignature
         );
 
-        AnteHandler.transferFromWithFee(
+        AnteHandler.transferFromWithFeeAtVault(
+            address(vault),
             swap.buyToken.token,
             swap.takerSignature.sender,
             swap.makerSignature.sender,
@@ -470,15 +473,15 @@ library AtomicSwapStateLogic {
         );
         swapOrder[id] = order;
 
-        AnteHandler.transferFromSellTokenToBuyer(
+        AnteHandler.transferFromSellTokenToBuyerAtVault(
             swapOrder[id],
             releases,
+            address(vault),
             vestingManager,
             swap.makerSignature.sender,
             swap.takerSignature.sender,
-            feeParams.buyerFeeRate,
-            feeParams.MAX_FEE_RATE_SCALE,
-            feeParams.treasury
+            feeParams,
+            true
         );
         return (id, swap.makerSignature.sender, swap.takerSignature.sender);
     }

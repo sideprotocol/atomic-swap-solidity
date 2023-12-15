@@ -6,6 +6,7 @@ import {
   IAtomicSwapBase,
   InchainAtomicSwap as ICAtomicSwap,
   IVesting,
+  Vault,
   MockToken,
 } from "@sideprotocol/contracts-typechain";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
@@ -63,6 +64,12 @@ export const Utils = {
       treasury = accounts[10].address;
     }
 
+    // Deploy Vault contract
+    const vaultName = "Side_Vault";
+    const vaultFactory = await ethers.getContractFactory("Vault");
+    const vault = await vaultFactory.deploy(vaultName);
+    const vaultAddress = await vault.getAddress();
+
     // Deploy vesting contract.
     const vestingManagerFactory = await ethers.getContractFactory("Vesting", {
       libraries: {
@@ -71,12 +78,19 @@ export const Utils = {
     });
     const vestingManager = await upgrades.deployProxy(
       vestingManagerFactory,
-      [owner.address, "vSide", "vSide", "https://nft.side.market/metadata/"],
+      [
+        owner.address,
+        vaultAddress,
+        "vSide",
+        "vSide",
+        "https://nft.side.market/metadata/",
+      ],
       {
         initializer: "initialize",
         unsafeAllowLinkedLibraries: true,
       },
     );
+
     const vestingManagerAddress = await vestingManager.getAddress();
 
     // AtomicSwap contract deploy
@@ -95,6 +109,7 @@ export const Utils = {
       atomicSwapFactory,
       [
         owner.address,
+        vaultAddress,
         vestingManagerAddress,
         treasury,
         sellTokenFeeRate,
@@ -137,6 +152,8 @@ export const Utils = {
       sellTokenFeeRate,
       buyTokenFeeRate,
       treasury,
+      vault: vault as unknown as Vault,
+      vaultName,
     };
   },
 };

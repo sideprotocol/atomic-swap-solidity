@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vesting__factory = exports.IVesting__factory = exports.MockToken__factory = exports.MockERC20Token__factory = exports.IInchainAtomicSwap__factory = exports.InchainAtomicSwap__factory = exports.OwnablePausableUpgradeable__factory = exports.AtomicSwapMsgValidator__factory = exports.AnteHandler__factory = exports.AtomicSwapStateLogic__factory = exports.IOwnablePausable__factory = exports.IAtomicSwapBase__factory = exports.AtomicSwapBase__factory = exports.Strings__factory = exports.ShortStrings__factory = exports.Nonces__factory = exports.Math__factory = exports.IERC165__factory = exports.EIP712__factory = exports.ECDSA__factory = exports.IERC721Receiver__factory = exports.IERC721__factory = exports.IERC721Metadata__factory = exports.IERC20__factory = exports.IERC20Permit__factory = exports.IERC20Metadata__factory = exports.ERC20Permit__factory = exports.ERC20__factory = exports.IERC5267__factory = exports.IERC721Errors__factory = exports.IERC20Errors__factory = exports.IERC1155Errors__factory = exports.IAccessControl__factory = exports.ReentrancyGuardUpgradeable__factory = exports.PausableUpgradeable__factory = exports.ERC165Upgradeable__factory = exports.ContextUpgradeable__factory = exports.ERC721Upgradeable__factory = exports.Initializable__factory = exports.AccessControlUpgradeable__factory = exports.factories = void 0;
+exports.Vesting__factory = exports.IVesting__factory = exports.Vault__factory = exports.IVault__factory = exports.MockToken__factory = exports.MockERC20Token__factory = exports.IInchainAtomicSwap__factory = exports.InchainAtomicSwap__factory = exports.OwnablePausableUpgradeable__factory = exports.AtomicSwapMsgValidator__factory = exports.AnteHandler__factory = exports.AtomicSwapStateLogic__factory = exports.IOwnablePausable__factory = exports.IAtomicSwapBase__factory = exports.AtomicSwapBase__factory = exports.Strings__factory = exports.ShortStrings__factory = exports.Nonces__factory = exports.Math__factory = exports.IERC165__factory = exports.EIP712__factory = exports.ECDSA__factory = exports.IERC721Receiver__factory = exports.IERC721__factory = exports.IERC721Metadata__factory = exports.IERC20__factory = exports.IERC20Metadata__factory = exports.ERC20__factory = exports.IERC5267__factory = exports.IERC721Errors__factory = exports.IERC20Errors__factory = exports.IERC1155Errors__factory = exports.IAccessControl__factory = exports.ReentrancyGuardUpgradeable__factory = exports.PausableUpgradeable__factory = exports.ERC165Upgradeable__factory = exports.ContextUpgradeable__factory = exports.ERC721Upgradeable__factory = exports.Initializable__factory = exports.AccessControlUpgradeable__factory = exports.factories = void 0;
 exports.factories = __importStar(require("./factories"));
 var AccessControlUpgradeable__factory_1 = require("./factories/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable__factory");
 Object.defineProperty(exports, "AccessControlUpgradeable__factory", { enumerable: true, get: function () { return AccessControlUpgradeable__factory_1.AccessControlUpgradeable__factory; } });
@@ -51,12 +51,8 @@ var IERC5267__factory_1 = require("./factories/@openzeppelin/contracts/interface
 Object.defineProperty(exports, "IERC5267__factory", { enumerable: true, get: function () { return IERC5267__factory_1.IERC5267__factory; } });
 var ERC20__factory_1 = require("./factories/@openzeppelin/contracts/token/ERC20/ERC20__factory");
 Object.defineProperty(exports, "ERC20__factory", { enumerable: true, get: function () { return ERC20__factory_1.ERC20__factory; } });
-var ERC20Permit__factory_1 = require("./factories/@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit__factory");
-Object.defineProperty(exports, "ERC20Permit__factory", { enumerable: true, get: function () { return ERC20Permit__factory_1.ERC20Permit__factory; } });
 var IERC20Metadata__factory_1 = require("./factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata__factory");
 Object.defineProperty(exports, "IERC20Metadata__factory", { enumerable: true, get: function () { return IERC20Metadata__factory_1.IERC20Metadata__factory; } });
-var IERC20Permit__factory_1 = require("./factories/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit__factory");
-Object.defineProperty(exports, "IERC20Permit__factory", { enumerable: true, get: function () { return IERC20Permit__factory_1.IERC20Permit__factory; } });
 var IERC20__factory_1 = require("./factories/@openzeppelin/contracts/token/ERC20/IERC20__factory");
 Object.defineProperty(exports, "IERC20__factory", { enumerable: true, get: function () { return IERC20__factory_1.IERC20__factory; } });
 var IERC721Metadata__factory_1 = require("./factories/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata__factory");
@@ -101,6 +97,10 @@ var MockERC20Token__factory_1 = require("./factories/contracts/mocks/MockERC20.s
 Object.defineProperty(exports, "MockERC20Token__factory", { enumerable: true, get: function () { return MockERC20Token__factory_1.MockERC20Token__factory; } });
 var MockToken__factory_1 = require("./factories/contracts/mocks/MockToken__factory");
 Object.defineProperty(exports, "MockToken__factory", { enumerable: true, get: function () { return MockToken__factory_1.MockToken__factory; } });
+var IVault__factory_1 = require("./factories/contracts/vault/IVault__factory");
+Object.defineProperty(exports, "IVault__factory", { enumerable: true, get: function () { return IVault__factory_1.IVault__factory; } });
+var Vault__factory_1 = require("./factories/contracts/vault/Vault__factory");
+Object.defineProperty(exports, "Vault__factory", { enumerable: true, get: function () { return Vault__factory_1.Vault__factory; } });
 var IVesting__factory_1 = require("./factories/contracts/vesting/interfaces/IVesting__factory");
 Object.defineProperty(exports, "IVesting__factory", { enumerable: true, get: function () { return IVesting__factory_1.IVesting__factory; } });
 var Vesting__factory_1 = require("./factories/contracts/vesting/Vesting__factory");

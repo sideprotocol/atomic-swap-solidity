@@ -135,7 +135,7 @@ export interface VestingInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [AddressLike, string, string, string]
+    values: [AddressLike, AddressLike, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "isAdmin",
@@ -207,7 +207,8 @@ export interface VestingInterface extends Interface {
       AddressLike,
       AddressLike,
       BigNumberish,
-      IAtomicSwapBase.ReleaseStruct[]
+      IAtomicSwapBase.ReleaseStruct[],
+      boolean
     ]
   ): string;
   encodeFunctionData(
@@ -590,7 +591,13 @@ export interface Vesting extends BaseContract {
   >;
 
   initialize: TypedContractMethod<
-    [admin: AddressLike, name: string, symbol: string, baseURL: string],
+    [
+      admin: AddressLike,
+      vault: AddressLike,
+      name: string,
+      symbol: string,
+      baseURL: string
+    ],
     [void],
     "nonpayable"
   >;
@@ -682,7 +689,8 @@ export interface Vesting extends BaseContract {
       buyer: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
-      releases: IAtomicSwapBase.ReleaseStruct[]
+      releases: IAtomicSwapBase.ReleaseStruct[],
+      toVault: boolean
     ],
     [void],
     "payable"
@@ -709,13 +717,14 @@ export interface Vesting extends BaseContract {
   vesting: TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [string, bigint, string, bigint, bigint, bigint] & {
+      [string, bigint, string, bigint, bigint, bigint, boolean] & {
         from: string;
         start: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;
         nextReleaseStep: bigint;
+        toVault: boolean;
       }
     ],
     "view"
@@ -772,7 +781,13 @@ export interface Vesting extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [admin: AddressLike, name: string, symbol: string, baseURL: string],
+    [
+      admin: AddressLike,
+      vault: AddressLike,
+      name: string,
+      symbol: string,
+      baseURL: string
+    ],
     [void],
     "nonpayable"
   >;
@@ -871,7 +886,8 @@ export interface Vesting extends BaseContract {
       buyer: AddressLike,
       token: AddressLike,
       totalAmount: BigNumberish,
-      releases: IAtomicSwapBase.ReleaseStruct[]
+      releases: IAtomicSwapBase.ReleaseStruct[],
+      toVault: boolean
     ],
     [void],
     "payable"
@@ -900,13 +916,14 @@ export interface Vesting extends BaseContract {
   ): TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [string, bigint, string, bigint, bigint, bigint] & {
+      [string, bigint, string, bigint, bigint, bigint, boolean] & {
         from: string;
         start: bigint;
         token: string;
         totalAmount: bigint;
         amountReleased: bigint;
         nextReleaseStep: bigint;
+        toVault: boolean;
       }
     ],
     "view"

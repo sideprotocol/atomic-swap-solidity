@@ -27,5 +27,6 @@ export declare const Settings: {
     inChainAtomicSwap_bnb: string;
     mockUSDC_bnb: string;
     mockUSDT_bnb: string;
+    vault_sepolia: string;
 };
 export declare const CONSTANTS: typeof constants;

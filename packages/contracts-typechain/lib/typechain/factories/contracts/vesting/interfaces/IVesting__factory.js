@@ -148,6 +148,11 @@ const _abi = [
                 name: "releases",
                 type: "tuple[]",
             },
+            {
+                internalType: "bool",
+                name: "withVault",
+                type: "bool",
+            },
         ],
         name: "startVesting",
         outputs: [],

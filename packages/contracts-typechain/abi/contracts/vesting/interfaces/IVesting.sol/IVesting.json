@@ -144,6 +144,11 @@
           "internalType": "struct IAtomicSwapBase.Release[]",
           "name": "releases",
           "type": "tuple[]"
+        },
+        {
+          "internalType": "bool",
+          "name": "withVault",
+          "type": "bool"
         }
       ],
       "name": "startVesting",

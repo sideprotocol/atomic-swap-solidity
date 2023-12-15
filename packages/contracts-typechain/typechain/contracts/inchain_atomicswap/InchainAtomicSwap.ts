@@ -292,7 +292,14 @@ export interface InchainAtomicSwapInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [AddressLike, AddressLike, AddressLike, BigNumberish, BigNumberish]
+    values: [
+      AddressLike,
+      AddressLike,
+      AddressLike,
+      AddressLike,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "isAdmin",
@@ -765,6 +772,7 @@ export interface InchainAtomicSwap extends BaseContract {
   initialize: TypedContractMethod<
     [
       _admin: AddressLike,
+      _vault: AddressLike,
       _vestingManager: AddressLike,
       _treasury: AddressLike,
       _sellerFee: BigNumberish,
@@ -988,6 +996,7 @@ export interface InchainAtomicSwap extends BaseContract {
   ): TypedContractMethod<
     [
       _admin: AddressLike,
+      _vault: AddressLike,
       _vestingManager: AddressLike,
       _treasury: AddressLike,
       _sellerFee: BigNumberish,

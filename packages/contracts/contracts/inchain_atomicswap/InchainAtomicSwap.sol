@@ -21,6 +21,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @param _buyerFee The fee rate for the buyer in the swap.
     function initialize(
         address _admin,
+        address _vault,
         address _vestingManager,
         address _treasury,
         uint256 _sellerFee,
@@ -39,6 +40,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         sellerFeeRate = _sellerFee;
         buyerFeeRate = _buyerFee;
         treasury = _treasury;
+        vault = _vault;
         vestingManager = IVesting(_vestingManager);
     }
 
@@ -83,6 +85,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         (bytes32 orderId, address maker, address taker) = swapOrder.executeSwapWithPermit(
             swap,
             releases,
+            vault,
             vestingManager,
             params
         );

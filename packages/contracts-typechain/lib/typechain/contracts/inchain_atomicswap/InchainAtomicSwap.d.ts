@@ -175,7 +175,14 @@ export interface InchainAtomicSwapInterface extends Interface {
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "initialize", values: [AddressLike, AddressLike, AddressLike, BigNumberish, BigNumberish]): string;
+    encodeFunctionData(functionFragment: "initialize", values: [
+        AddressLike,
+        AddressLike,
+        AddressLike,
+        AddressLike,
+        BigNumberish,
+        BigNumberish
+    ]): string;
     encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isPauser", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "makeSwap", values: [IAtomicSwapBase.MakeSwapMsgStruct]): string;
@@ -498,6 +505,7 @@ export interface InchainAtomicSwap extends BaseContract {
     ], "view">;
     initialize: TypedContractMethod<[
         _admin: AddressLike,
+        _vault: AddressLike,
         _vestingManager: AddressLike,
         _treasury: AddressLike,
         _sellerFee: BigNumberish,
@@ -674,6 +682,7 @@ export interface InchainAtomicSwap extends BaseContract {
     ], "view">;
     getFunction(nameOrSignature: "initialize"): TypedContractMethod<[
         _admin: AddressLike,
+        _vault: AddressLike,
         _vestingManager: AddressLike,
         _treasury: AddressLike,
         _sellerFee: BigNumberish,

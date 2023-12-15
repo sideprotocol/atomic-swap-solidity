@@ -21,7 +21,8 @@ export interface IVestingInterface extends Interface {
         AddressLike,
         AddressLike,
         BigNumberish,
-        IAtomicSwapBase.ReleaseStruct[]
+        IAtomicSwapBase.ReleaseStruct[],
+        boolean
     ]): string;
     decodeFunctionResult(functionFragment: "startVesting", data: BytesLike): Result;
 }
@@ -79,7 +80,8 @@ export interface IVesting extends BaseContract {
         buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
-        releases: IAtomicSwapBase.ReleaseStruct[]
+        releases: IAtomicSwapBase.ReleaseStruct[],
+        withVault: boolean
     ], [
         void
     ], "payable">;
@@ -89,7 +91,8 @@ export interface IVesting extends BaseContract {
         buyer: AddressLike,
         token: AddressLike,
         totalAmount: BigNumberish,
-        releases: IAtomicSwapBase.ReleaseStruct[]
+        releases: IAtomicSwapBase.ReleaseStruct[],
+        withVault: boolean
     ], [
         void
     ], "payable">;

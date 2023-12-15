@@ -8,7 +8,7 @@ contract MockERC20Token is ERC20 {
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }
-
+    
     function setFailTransferFrom(bool _value) external {
         failTransferFrom = _value;
     }
