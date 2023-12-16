@@ -119,11 +119,11 @@ export declare class IVault__factory {
             readonly name: "value";
             readonly type: "uint256";
         }, {
+            readonly internalType: "bytes32";
+            readonly name: "agreement";
+            readonly type: "bytes32";
+        }, {
             readonly components: readonly [{
-                readonly internalType: "uint256";
-                readonly name: "deadline";
-                readonly type: "uint256";
-            }, {
                 readonly internalType: "uint8";
                 readonly name: "v";
                 readonly type: "uint8";
@@ -137,8 +137,12 @@ export declare class IVault__factory {
                 readonly type: "bytes32";
             }, {
                 readonly internalType: "address";
-                readonly name: "sender";
+                readonly name: "owner";
                 readonly type: "address";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "deadline";
+                readonly type: "uint256";
             }];
             readonly internalType: "struct IAtomicSwapBase.PermitSignature";
             readonly name: "signature";

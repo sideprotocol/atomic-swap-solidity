@@ -6,6 +6,7 @@ export declare const createPermitSignature: (params: {
     author: Signer;
     spender: string;
     value: BigNumberish;
+    agreement: string;
     nonce: BigNumberish;
     deadline: BigNumberish;
 }) => Promise<{

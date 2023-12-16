@@ -82,6 +82,7 @@ interface IVault {
         address owner,
         address spender,
         uint256 value,
+        bytes32 agreement,
         IAtomicSwapBase.PermitSignature calldata signature
     ) external;
 

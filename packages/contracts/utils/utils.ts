@@ -13,7 +13,7 @@ import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { keccak256 } from "ethers";
 import { BlockTime } from "./time";
-import { boolean } from "hardhat/internal/core/params/argumentTypes";
+
 export const ERC20_MINT_AMOUNT = 100000000;
 // stable coins
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
@@ -48,7 +48,7 @@ export const Utils = {
       {
         libraries: {
           AnteHandler: await anteHandler.getAddress(),
-          AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
+          //AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },
     );
@@ -99,7 +99,7 @@ export const Utils = {
       {
         libraries: {
           AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
-          AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
+          //AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },
     );
@@ -156,522 +156,6 @@ export const Utils = {
       vaultName,
     };
   },
-};
-
-export const createDefaultAtomicOrder = async (
-  withNativeSellToken?: boolean,
-  withNativeBuyToken?: boolean,
-  noTaker?: boolean,
-  acceptBid?: boolean,
-) => {
-  const {
-    atomicSwap,
-    vestingManager,
-    usdc,
-    usdt,
-    sellTokenFeeRate,
-    buyTokenFeeRate,
-    treasury,
-  } = await loadFixture(Utils.prepareInChainAtomicTest);
-  const accounts = await ethers.getSigners();
-  const [maker, taker] = accounts;
-  const expireAt = await BlockTime.AfterSeconds(10000);
-  const uuid = generateOrderID();
-  const payload = {
-    uuid,
-    sellToken: {
-      token: withNativeSellToken ? ethers.ZeroAddress : await usdc.getAddress(),
-      amount: ethers.parseEther("20"),
-    },
-    buyToken: {
-      token: withNativeBuyToken ? ethers.ZeroAddress : await usdt.getAddress(),
-      amount: ethers.parseEther("20"),
-    },
-    maker: maker.address,
-    minBidAmount: ethers.parseEther("15"),
-    desiredTaker: noTaker ? ethers.ZeroAddress : taker.address,
-    expireAt: expireAt,
-    acceptBid: acceptBid ?? true,
-  };
-
-  if (!withNativeSellToken) {
-    const amount = await usdc.allowance(
-      accounts[0].address,
-      await atomicSwap.getAddress(),
-    );
-    await expect(
-      usdc.approve(
-        await atomicSwap.getAddress(),
-        amount + payload.sellToken.amount,
-      ),
-    ).not.to.reverted;
-  }
-
-  if (!withNativeBuyToken) {
-    const amount = (await usdt.allowance(
-      accounts[0].address,
-      await atomicSwap.getAddress(),
-    )) as bigint;
-    await expect(
-      usdt.approve(
-        await atomicSwap.getAddress(),
-        amount + payload.buyToken.amount,
-      ),
-    ).not.to.reverted;
-  }
-
-  let nativeTokenAmount = BigInt(0);
-  if (withNativeSellToken) {
-    nativeTokenAmount = nativeTokenAmount + payload.sellToken.amount;
-    const tx = atomicSwap.makeSwap(payload, {
-      value: nativeTokenAmount,
-    });
-    await expect(tx).to.changeEtherBalance(
-      await atomicSwap.getAddress(),
-      nativeTokenAmount,
-    );
-    await expect(tx).to.emit(atomicSwap, "AtomicSwapOrderCreated");
-  } else {
-    const tx = atomicSwap.makeSwap(payload);
-    await expect(tx).to.changeTokenBalance(
-      usdc,
-      await atomicSwap.getAddress(),
-      payload.sellToken.amount,
-    );
-    await expect(tx).emit(atomicSwap, "AtomicSwapOrderCreated");
-  }
-
-  const id = newAtomicSwapOrderID(await atomicSwap.getAddress(), payload.uuid);
-  const orderIDAtContractA = await atomicSwap.swapOrder(id);
-  expect(orderIDAtContractA.id).to.equal(id);
-
-  return {
-    orderID: id,
-    uuid,
-    maker,
-    taker,
-
-    atomicSwap,
-    vestingManager,
-    payload: payload,
-    usdt,
-    usdc,
-    sellTokenFeeRate,
-    buyTokenFeeRate,
-    treasury,
-  };
-};
-
-export const createDefaultVestingAtomicOrder = async (
-  vestingParams: {
-    durationInHours: bigint;
-    percentage: bigint;
-  }[],
-
-  withNativeSellToken?: boolean,
-  withNativeBuyToken?: boolean,
-  noTaker?: boolean,
-  acceptBid?: boolean,
-) => {
-  const {
-    atomicSwap,
-    usdc,
-    usdt,
-    sellTokenFeeRate,
-    buyTokenFeeRate,
-    treasury,
-    vestingManager,
-  } = await loadFixture(Utils.prepareInChainAtomicTest);
-  const accounts = await ethers.getSigners();
-  const [maker, taker] = accounts;
-  const expireAt = await BlockTime.AfterSeconds(10000);
-  const uuid = generateOrderID();
-  const payload = {
-    uuid,
-    sellToken: {
-      token: withNativeSellToken ? ethers.ZeroAddress : await usdc.getAddress(),
-      amount: ethers.parseEther("20"),
-    },
-    buyToken: {
-      token: withNativeBuyToken ? ethers.ZeroAddress : await usdt.getAddress(),
-      amount: ethers.parseEther("20"),
-    },
-    maker: maker.address,
-    minBidAmount: ethers.parseEther("15"),
-    desiredTaker: noTaker ? ethers.ZeroAddress : taker.address,
-    expireAt: expireAt,
-    acceptBid: acceptBid ?? true,
-  };
-
-  if (!withNativeSellToken) {
-    const amount = await usdc.allowance(
-      accounts[0].address,
-      await atomicSwap.getAddress(),
-    );
-    await expect(
-      usdc.approve(
-        await atomicSwap.getAddress(),
-        amount + payload.sellToken.amount,
-      ),
-    ).not.to.reverted;
-  }
-
-  if (!withNativeBuyToken) {
-    const amount = (await usdt.allowance(
-      accounts[0].address,
-      await atomicSwap.getAddress(),
-    )) as bigint;
-    await expect(
-      usdt.approve(
-        await atomicSwap.getAddress(),
-        amount + payload.buyToken.amount,
-      ),
-    ).not.to.reverted;
-  }
-
-  let nativeTokenAmount = BigInt(0);
-  if (withNativeSellToken) {
-    nativeTokenAmount = nativeTokenAmount + payload.sellToken.amount;
-    const tx = atomicSwap.makeSwapWithVesting(payload, vestingParams, {
-      value: nativeTokenAmount,
-    });
-    await expect(tx).to.changeEtherBalance(
-      await atomicSwap.getAddress(),
-      nativeTokenAmount,
-    );
-    await expect(tx).to.emit(atomicSwap, "AtomicSwapOrderCreated");
-  } else {
-    const tx = atomicSwap.makeSwapWithVesting(payload, vestingParams);
-    await expect(tx).to.changeTokenBalance(
-      usdc,
-      await atomicSwap.getAddress(),
-      payload.sellToken.amount,
-    );
-    await expect(tx).emit(atomicSwap, "AtomicSwapOrderCreated");
-  }
-
-  const id = newAtomicSwapOrderID(await atomicSwap.getAddress(), payload.uuid);
-  const orderIDAtContractA = await atomicSwap.swapOrder(id);
-  expect(orderIDAtContractA.id).to.equal(id);
-  return {
-    orderID: id,
-    maker,
-    taker,
-
-    atomicSwap,
-
-    payload: payload,
-    usdt,
-    usdc,
-    sellTokenFeeRate,
-    buyTokenFeeRate,
-    treasury,
-    vestingManager,
-  };
-};
-
-export const bidToDefaultAtomicOrder = async (
-  withSellNativeToken?: boolean,
-  withBuyNativeToken?: boolean,
-  noTaker?: boolean,
-  acceptBid?: boolean,
-) => {
-  const orderParams = await createDefaultAtomicOrder(
-    withSellNativeToken,
-    withBuyNativeToken,
-    noTaker,
-    acceptBid,
-  );
-  const { atomicSwap, maker, taker, orderID, usdc, usdt } = orderParams;
-
-  // try to take swap
-  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
-
-  const bidPayload = {
-    bidder: taker.address,
-    bidderReceiver: taker.address,
-    bidAmount: buyToken.amount,
-    orderID: orderID,
-    expireTimestamp: await BlockTime.AfterSeconds(30),
-  };
-
-  if (withBuyNativeToken) {
-    await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload, {
-        value: buyToken.amount,
-      }),
-    ).to.changeEtherBalance(await atomicSwap.getAddress(), buyToken.amount);
-  } else {
-    await usdt
-      .connect(taker)
-      .approve(await atomicSwap.getAddress(), buyToken.amount);
-    await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload),
-    ).to.changeTokenBalance(
-      usdt,
-      await atomicSwap.getAddress(),
-      buyToken.amount,
-    );
-  }
-
-  return { ...orderParams, ...bidPayload };
-};
-
-export const bidToDefaultVestingAtomicOrder = async (
-  withSellNativeToken?: boolean,
-  withBuyNativeToken?: boolean,
-  noTaker?: boolean,
-) => {
-  const vestingParams = [
-    {
-      durationInHours: BigInt(1),
-      percentage: BigInt(5000),
-    },
-    {
-      durationInHours: BigInt(1),
-      percentage: BigInt(5000),
-    },
-  ];
-  const orderParams = await createDefaultVestingAtomicOrder(
-    vestingParams,
-    withSellNativeToken,
-    withBuyNativeToken,
-    noTaker,
-  );
-  const { atomicSwap, maker, taker, orderID, usdc, usdt } = orderParams;
-
-  // try to take swap
-  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
-
-  const bidPayload = {
-    bidder: taker.address,
-    bidderReceiver: taker.address,
-    bidAmount: buyToken.amount,
-    orderID: orderID,
-    expireTimestamp: await BlockTime.AfterSeconds(30),
-  };
-
-  if (withBuyNativeToken) {
-    await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload, {
-        value: buyToken.amount,
-      }),
-    ).to.changeEtherBalance(await atomicSwap.getAddress(), buyToken.amount);
-  } else {
-    await usdt
-      .connect(taker)
-      .approve(await atomicSwap.getAddress(), buyToken.amount);
-    await expect(
-      atomicSwap.connect(taker).placeBid(bidPayload),
-    ).to.changeTokenBalance(
-      usdt,
-      await atomicSwap.getAddress(),
-      buyToken.amount,
-    );
-  }
-  return { ...orderParams, ...bidPayload };
-};
-
-export const testTakeSwap = async (
-  isNativeSellToken?: boolean,
-  isNativeBuyToken?: boolean,
-) => {
-  const [, , , takerReceiver] = await ethers.getSigners();
-  const {
-    orderID,
-    atomicSwap,
-    maker,
-    taker,
-    usdc,
-    usdt,
-    treasury,
-    sellTokenFeeRate,
-    buyTokenFeeRate,
-  } = await createDefaultAtomicOrder(
-    isNativeSellToken,
-    isNativeBuyToken,
-    false,
-    false,
-  );
-
-  const order = await atomicSwap.swapOrder(orderID);
-  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
-  const atomicSwapAddress = await atomicSwap.getAddress();
-  await expect(usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount))
-    .not.to.reverted;
-
-  if (order.sellToken.token == ethers.ZeroAddress) {
-    const tx = atomicSwap.connect(taker).takeSwap({
-      orderID,
-      takerReceiver: takerReceiver.address,
-    });
-
-    const { amountAfterFee, feeAmount } = calcSwapAmount(
-      order.buyToken.amount,
-      buyTokenFeeRate,
-    );
-
-    await expect(tx).to.changeEtherBalances(
-      [takerReceiver, treasury],
-      [amountAfterFee, feeAmount],
-    );
-    const amountAfterSwap = calcSwapAmount(
-      order.sellToken.amount,
-      sellTokenFeeRate,
-    );
-    await expect(tx).changeTokenBalances(
-      usdt,
-      [maker.address, treasury],
-      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount],
-    );
-  } else {
-    const tx = atomicSwap.connect(taker).takeSwap(
-      {
-        orderID,
-        takerReceiver: takerReceiver.address,
-      },
-      { value: order.buyToken.amount },
-    );
-
-    const { amountAfterFee, feeAmount } = calcSwapAmount(
-      order.buyToken.amount,
-      buyTokenFeeRate,
-    );
-
-    await expect(tx).to.changeTokenBalances(
-      usdc,
-      [takerReceiver.address, treasury],
-      [amountAfterFee, feeAmount],
-    );
-    const amountAfterSwap = calcSwapAmount(
-      order.sellToken.amount,
-      sellTokenFeeRate,
-    );
-    await expect(tx).changeEtherBalances(
-      [maker.address, treasury],
-      [amountAfterSwap.amountAfterFee, amountAfterSwap.feeAmount],
-    );
-  }
-
-  expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
-  return {
-    orderID,
-    atomicSwap,
-
-    taker,
-  };
-};
-
-export const testVestingTakeSwap = async (
-  withSellNativeToken: boolean,
-  withBuyNativeToken: boolean,
-) => {
-  const [, , takerReceiver] = await ethers.getSigners();
-  const vestingParams = [
-    {
-      durationInHours: BigInt(1),
-      percentage: BigInt(5000),
-    },
-    {
-      durationInHours: BigInt(1),
-      percentage: BigInt(5000),
-    },
-  ];
-  const {
-    orderID,
-    atomicSwap,
-    taker,
-    usdc,
-    usdt,
-    treasury,
-    sellTokenFeeRate,
-    buyTokenFeeRate,
-    vestingManager,
-  } = await createDefaultVestingAtomicOrder(
-    vestingParams,
-    withSellNativeToken,
-    withBuyNativeToken,
-    false,
-    false,
-  );
-
-  const order = await atomicSwap.swapOrder(orderID);
-  const buyToken = (await atomicSwap.swapOrder(orderID)).buyToken;
-  const atomicSwapAddress = await atomicSwap.getAddress();
-  await expect(usdt.connect(taker).approve(atomicSwapAddress, buyToken.amount))
-    .not.to.reverted;
-
-  // Run takeSwap message
-  if (order.buyToken.token == ethers.ZeroAddress) {
-    const tx = atomicSwap.connect(taker).takeSwap(
-      {
-        orderID,
-        takerReceiver: takerReceiver.address,
-      },
-      { value: order.buyToken.amount },
-    );
-    expect(await tx).not.to.reverted;
-  } else {
-    const tx = atomicSwap.connect(taker).takeSwap({
-      orderID,
-      takerReceiver: takerReceiver.address,
-    });
-    await expect(tx).not.to.reverted;
-  }
-
-  // Release from vesting contract
-  // After cliff time, it's possible to get started releasing
-  await time.increase(3600 * 1);
-  const totalReleaseAmount = calcSwapAmount(
-    order.sellToken.amount,
-    buyTokenFeeRate,
-  );
-
-  const releaseAmount = totalReleaseAmount.amountAfterFee / BigInt(2);
-  const vestingId = await vestingManager.vestingIds(orderID);
-  if (order.sellToken.token == ethers.ZeroAddress) {
-    expect(
-      await vestingManager.connect(takerReceiver).release(vestingId),
-    ).to.changeEtherBalance(takerReceiver, releaseAmount);
-  } else {
-    expect(
-      await vestingManager.connect(takerReceiver).release(vestingId),
-    ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
-  }
-  // after 1 hours, release again
-  await time.increase(3600 * 1);
-  if (order.sellToken.token == ethers.ZeroAddress) {
-    expect(
-      await vestingManager.connect(takerReceiver).release(vestingId),
-    ).to.changeEtherBalance(takerReceiver, releaseAmount);
-  } else {
-    expect(
-      await vestingManager.connect(takerReceiver).release(vestingId),
-    ).to.changeTokenBalance(usdc, takerReceiver, releaseAmount);
-  }
-
-  // // after 1 hours, release again
-  await time.increase(3600 * 1);
-  if (order.sellToken.token == ethers.ZeroAddress) {
-    await expect(vestingManager.release(vestingId)).to.revertedWithCustomError(
-      vestingManager,
-      "ERC721NonexistentToken",
-    );
-  } else {
-    await expect(vestingManager.release(vestingId)).to.revertedWithCustomError(
-      vestingManager,
-      "ERC721NonexistentToken",
-    );
-  }
-  expect((await atomicSwap.swapOrder(orderID)).status).to.equal(2);
-  return {
-    orderID,
-    atomicSwap,
-    taker,
-    takerReceiver,
-    vestingManager,
-    vestingId,
-  };
 };
 
 // Utility methods
@@ -767,3 +251,41 @@ export const getCustomSigner = async (
   ]);
   return signer;
 };
+
+export function generateAgreement(swap: {
+  uuid: string; // UUID from frontend.
+  sellToken: {
+    token: string;
+    amount: bigint;
+  }; // Token/coin to sell.
+  buyToken: {
+    token: string;
+    amount: bigint;
+  }; // Token/coin to buy.
+  desiredTaker: string; // Desired taker address.
+  minBidAmount: bigint; // Minimum bid.
+  acceptBid: boolean;
+}): string {
+  const abiCoder = new ethers.AbiCoder();
+
+  const encoded = abiCoder.encode(
+    [
+      "bytes32",
+      "tuple(address, uint256)",
+      "tuple(address, uint256)",
+      "address",
+      "uint256",
+      "bool",
+    ],
+    [
+      swap.uuid, // Convert string uuid to bytes32 array
+      [swap.sellToken.token, swap.sellToken.amount],
+      [swap.buyToken.token, swap.buyToken.amount],
+      swap.desiredTaker,
+      swap.minBidAmount,
+      swap.acceptBid,
+    ],
+  );
+
+  return ethers.keccak256(encoded);
+}

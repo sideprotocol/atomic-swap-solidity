@@ -161,12 +161,12 @@ const _abi = [
                 type: "uint256",
             },
             {
+                internalType: "bytes32",
+                name: "agreement",
+                type: "bytes32",
+            },
+            {
                 components: [
-                    {
-                        internalType: "uint256",
-                        name: "deadline",
-                        type: "uint256",
-                    },
                     {
                         internalType: "uint8",
                         name: "v",
@@ -184,8 +184,13 @@ const _abi = [
                     },
                     {
                         internalType: "address",
-                        name: "sender",
+                        name: "owner",
                         type: "address",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "deadline",
+                        type: "uint256",
                     },
                 ],
                 internalType: "struct IAtomicSwapBase.PermitSignature",

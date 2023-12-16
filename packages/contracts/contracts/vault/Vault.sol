@@ -9,7 +9,7 @@ import {IVault} from "./IVault.sol";
 import {IAtomicSwapBase} from "../abstracts/interfaces/IAtomicSwapBase.sol";
 import "hardhat/console.sol";
 contract Vault is Context, EIP712, Nonces, IVault  {
-    bytes32 private constant PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
+    bytes32 private constant PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,bytes32 agreement,uint256 nonce,uint256 deadline)");
     mapping(address account => mapping(address token => uint amount)) private _balances;
     mapping(address account => mapping(address  token => mapping(address spender => uint256))) private _allowances;
 
@@ -65,13 +65,14 @@ contract Vault is Context, EIP712, Nonces, IVault  {
         address owner,
         address spender,
         uint256 value,
+        bytes32 agreement, 
         IAtomicSwapBase.PermitSignature calldata signature
     ) public virtual {
         if (block.timestamp > signature.deadline) {
             revert VaultExpiredSignature(signature.deadline);
         }
 
-        bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, _useNonce(owner), signature.deadline));
+        bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value,agreement,_useNonce(owner), signature.deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
 

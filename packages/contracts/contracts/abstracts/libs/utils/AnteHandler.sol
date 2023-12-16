@@ -269,7 +269,8 @@ library AnteHandler {
     }
 
     function transferFromSellTokenToBuyerAtVault(
-        IAtomicSwapBase.AtomicSwapOrder storage order,
+        bytes32 orderId,
+        IAtomicSwapBase.Coin memory sellToken,
         IAtomicSwapBase.Release[] memory releases,
         address vault,
         IVesting vestingManager,
@@ -284,68 +285,68 @@ library AnteHandler {
             // If buying with ERC20 tokens
             transferFromWithFeeAtVault(
                 vault,
-                order.sellToken.token,
+                sellToken.token,
                 seller,
                 buyer,
-                order.sellToken.amount,
+                sellToken.amount,
                 feeParams.buyerFeeRate,
-                feeParams.MAX_FEE_RATE_SCALE,
+                feeParams.maxFeeRateScale,
                 feeParams.treasury
             );
         } else {
             // Transfer sell token to vesting contract
-            uint256 sellTokenFee = (order.sellToken.amount * feeParams.buyerFeeRate) /
-                feeParams.MAX_FEE_RATE_SCALE;
-            uint256 sellTokenAmountAfterFee = order.sellToken.amount -
+            uint256 sellTokenFee = (sellToken.amount * feeParams.buyerFeeRate) /
+                feeParams.maxFeeRateScale;
+            uint256 sellTokenAmountAfterFee = sellToken.amount -
                 sellTokenFee;
             // Take Fee.
             // Move fund from vault to contract address for vesting:
             TransferHelperWithVault.safeTransferFrom(
                     vault,
-                    order.sellToken.token,
+                    sellToken.token,
                     seller,
                     address(this),
-                    order.sellToken.amount
+                    sellToken.amount
             );
             
             // take fee:
             if(withVault) {
                 IVault(vault).approve(
-                    order.sellToken.token,
+                    sellToken.token,
                     address(vestingManager),
                     sellTokenAmountAfterFee
                 );
                 vestingManager.startVesting(
-                        order.id,
+                        orderId,
                         buyer,
-                        order.sellToken.token,
+                        sellToken.token,
                         sellTokenAmountAfterFee,
                         releases,
                         true
                 );
             }else{
-                IVault(vault).withdraw(order.sellToken.token,feeParams.treasury, sellTokenFee);
-                if (order.sellToken.token == address(0)) {
+                IVault(vault).withdraw(sellToken.token,feeParams.treasury, sellTokenFee);
+                if (sellToken.token == address(0)) {
                     // Take Fee.
                     // slither-disable-next-line arbitrary-send-eth
                     vestingManager.startVesting{value: sellTokenAmountAfterFee}(
-                        order.id,
+                        orderId,
                         buyer,
-                        order.sellToken.token,
+                        sellToken.token,
                         sellTokenAmountAfterFee,
                         releases,
                         false
                     );
                 } else {
-                    IVault(vault).withdraw(order.sellToken.token,address(this), sellTokenAmountAfterFee);
-                    IERC20(order.sellToken.token).approve(
+                    IVault(vault).withdraw(sellToken.token,address(this), sellTokenAmountAfterFee);
+                    IERC20(sellToken.token).approve(
                         address(vestingManager),
                         sellTokenAmountAfterFee
                     );
                     vestingManager.startVesting(
-                        order.id,
+                        orderId,
                         buyer,
-                        order.sellToken.token,
+                        sellToken.token,
                         sellTokenAmountAfterFee,
                         releases,
                         false

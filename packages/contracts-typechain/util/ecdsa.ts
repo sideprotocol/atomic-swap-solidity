@@ -11,6 +11,7 @@ interface Permit {
   owner: string;
   spender: string;
   value: BigNumberish;
+  agreement: string;
   nonce: BigNumberish;
   deadline: BigNumberish;
 }
@@ -28,6 +29,7 @@ const types = {
     { name: "owner", type: "address" },
     { name: "spender", type: "address" },
     { name: "value", type: "uint256" },
+    { name: "agreement", type: "bytes32" },
     { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
@@ -69,14 +71,16 @@ export const createPermitSignature = async (params: {
   author: Signer;
   spender: string;
   value: BigNumberish;
+  agreement: string;
   nonce: BigNumberish;
   deadline: BigNumberish;
 }): Promise<{ signature: string }> => {
-  const { chainId, tokenName, contractAddress, author, spender, value, nonce, deadline } = params;
+  const { chainId, tokenName, contractAddress, author, spender, value, agreement, nonce, deadline } = params;
   const permitMsg: Permit = {
     owner: await author.getAddress(),
     spender,
     value,
+    agreement,
     nonce: nonce,
     deadline,
   };
