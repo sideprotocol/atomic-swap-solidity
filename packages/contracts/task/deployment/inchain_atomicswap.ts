@@ -24,7 +24,7 @@ task("deploy:in-chain:lib", "deploy libraries")
       {
         libraries: {
           AnteHandler: AnteHandlerAddress,
-          AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
+          //AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
         },
       },
     );
@@ -150,7 +150,6 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
       {
         libraries: {
           AtomicSwapStateLogic: atomicSwapStateLogicAddress,
-          AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
         },
       },
     );

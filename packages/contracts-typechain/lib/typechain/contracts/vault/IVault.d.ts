@@ -2,24 +2,24 @@ import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, I
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../common";
 export declare namespace IAtomicSwapBase {
     type PermitSignatureStruct = {
-        deadline: BigNumberish;
         v: BigNumberish;
         r: BytesLike;
         s: BytesLike;
-        sender: AddressLike;
+        owner: AddressLike;
+        deadline: BigNumberish;
     };
     type PermitSignatureStructOutput = [
-        deadline: bigint,
         v: bigint,
         r: string,
         s: string,
-        sender: string
+        owner: string,
+        deadline: bigint
     ] & {
-        deadline: bigint;
         v: bigint;
         r: string;
         s: string;
-        sender: string;
+        owner: string;
+        deadline: bigint;
     };
 }
 export interface IVaultInterface extends Interface {
@@ -35,6 +35,7 @@ export interface IVaultInterface extends Interface {
         AddressLike,
         AddressLike,
         BigNumberish,
+        BytesLike,
         IAtomicSwapBase.PermitSignatureStruct
     ]): string;
     encodeFunctionData(functionFragment: "transfer", values: [AddressLike, AddressLike, BigNumberish]): string;
@@ -99,6 +100,7 @@ export interface IVault extends BaseContract {
         owner: AddressLike,
         spender: AddressLike,
         value: BigNumberish,
+        agreement: BytesLike,
         signature: IAtomicSwapBase.PermitSignatureStruct
     ], [
         void
@@ -167,6 +169,7 @@ export interface IVault extends BaseContract {
         owner: AddressLike,
         spender: AddressLike,
         value: BigNumberish,
+        agreement: BytesLike,
         signature: IAtomicSwapBase.PermitSignatureStruct
     ], [
         void

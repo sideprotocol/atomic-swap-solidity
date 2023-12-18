@@ -121,17 +121,17 @@ interface IAtomicSwapBase {
 
     // Signature 
     struct PermitSignature {
-        uint256 deadline; 
         uint8 v;
         bytes32 r; 
         bytes32 s; 
-        address sender;
+        address owner;
+        uint256 deadline;
     }
 
     struct FeeParams {
-        uint     sellerFeeRate;
+        uint    sellerFeeRate;
         uint    buyerFeeRate;
-        uint    MAX_FEE_RATE_SCALE;
+        uint    maxFeeRateScale;
         address treasury;
     }
 
