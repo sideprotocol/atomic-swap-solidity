@@ -7,7 +7,5 @@ import type * as inchainAtomicswap from "./inchain_atomicswap";
 export type { inchainAtomicswap };
 import type * as mocks from "./mocks";
 export type { mocks };
-import type * as vault from "./vault";
-export type { vault };
 import type * as vesting from "./vesting";
 export type { vesting };

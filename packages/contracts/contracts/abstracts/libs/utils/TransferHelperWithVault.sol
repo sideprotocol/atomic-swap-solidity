@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.6.0;
 
-import {IVault} from '../../../vault/IVault.sol';
+import {IVault} from '../../interfaces/IVault.sol';
 
 library TransferHelperWithVault {
     /// @notice Transfers tokens from the targeted address to the given destination

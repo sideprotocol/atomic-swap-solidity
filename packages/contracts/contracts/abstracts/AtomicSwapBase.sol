@@ -6,7 +6,6 @@ import {ReentrancyGuardUpgradeable} from  "@openzeppelin/contracts-upgradeable/u
 
 import { IAtomicSwapBase } from "./interfaces/IAtomicSwapBase.sol";
 import {IVesting} from  "../vesting/interfaces/IVesting.sol";
-import {IVault} from "../vault/IVault.sol";
 
 /// @title AtomicSwapBase
 /// @notice Abstract contract for creating atomic swap orders with support for vesting parameters.

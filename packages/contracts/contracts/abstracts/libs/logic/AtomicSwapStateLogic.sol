@@ -3,10 +3,11 @@ pragma solidity ^0.8.19;
 
 import {IAtomicSwapBase} from "../../interfaces/IAtomicSwapBase.sol";
 import {AtomicSwapMsgValidator} from "../utils/AtomicSwapMsgValidator.sol";
-import {IVault} from "../../../vault/IVault.sol";
+import {IVaultPermit} from "../../interfaces/IVaultPermit.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVesting} from "../../../vesting/interfaces/IVesting.sol";
 import {AnteHandler} from "../utils/AnteHandler.sol";
+import {IVaultPermit} from "../../interfaces/IVaultPermit.sol";
 /// @title Atomic Swap State Logic
 /// @notice Library providing state management functions for atomic swap orders and bids.
 /// @dev Used by atomic swap contracts to manipulate order and bid states.
@@ -66,9 +67,8 @@ library AtomicSwapStateLogic {
         //
         bytes32 agreement = _generateAgreement(swap);
         // Call permit to approve token transfer
-        IVault(vault).permit(
+        IVaultPermit(vault).permit(
             swap.sellToken.token,
-            swap.makerSignature.owner,
             address(this),
             swap.sellToken.amount,
             agreement,
@@ -76,9 +76,8 @@ library AtomicSwapStateLogic {
         );
 
         // (release)
-        IVault(vault).permit(
+        IVaultPermit(vault).permit(
             swap.buyToken.token,
-            swap.takerSignature.owner,
             address(this),
             swap.buyToken.amount,
             agreement,

@@ -62,6 +62,10 @@ export type { IAtomicSwapBase } from "./contracts/abstracts/interfaces/IAtomicSw
 export { IAtomicSwapBase__factory } from "./factories/contracts/abstracts/interfaces/IAtomicSwapBase__factory";
 export type { IOwnablePausable } from "./contracts/abstracts/interfaces/IOwnablePausable";
 export { IOwnablePausable__factory } from "./factories/contracts/abstracts/interfaces/IOwnablePausable__factory";
+export type { IVault } from "./contracts/abstracts/interfaces/IVault";
+export { IVault__factory } from "./factories/contracts/abstracts/interfaces/IVault__factory";
+export type { IVaultPermit } from "./contracts/abstracts/interfaces/IVaultPermit";
+export { IVaultPermit__factory } from "./factories/contracts/abstracts/interfaces/IVaultPermit__factory";
 export type { AtomicSwapStateLogic } from "./contracts/abstracts/libs/logic/AtomicSwapStateLogic";
 export { AtomicSwapStateLogic__factory } from "./factories/contracts/abstracts/libs/logic/AtomicSwapStateLogic__factory";
 export type { AnteHandler } from "./contracts/abstracts/libs/utils/AnteHandler";
@@ -70,6 +74,10 @@ export type { AtomicSwapMsgValidator } from "./contracts/abstracts/libs/utils/At
 export { AtomicSwapMsgValidator__factory } from "./factories/contracts/abstracts/libs/utils/AtomicSwapMsgValidator__factory";
 export type { OwnablePausableUpgradeable } from "./contracts/abstracts/OwnablePausableUpgradeable";
 export { OwnablePausableUpgradeable__factory } from "./factories/contracts/abstracts/OwnablePausableUpgradeable__factory";
+export type { Vault } from "./contracts/abstracts/vault/Vault";
+export { Vault__factory } from "./factories/contracts/abstracts/vault/Vault__factory";
+export type { VaultPermit } from "./contracts/abstracts/vault/VaultPermit";
+export { VaultPermit__factory } from "./factories/contracts/abstracts/vault/VaultPermit__factory";
 export type { InchainAtomicSwap } from "./contracts/inchain_atomicswap/InchainAtomicSwap";
 export { InchainAtomicSwap__factory } from "./factories/contracts/inchain_atomicswap/InchainAtomicSwap__factory";
 export type { IInchainAtomicSwap } from "./contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap";
@@ -78,10 +86,6 @@ export type { MockERC20Token } from "./contracts/mocks/MockERC20.sol/MockERC20To
 export { MockERC20Token__factory } from "./factories/contracts/mocks/MockERC20.sol/MockERC20Token__factory";
 export type { MockToken } from "./contracts/mocks/MockToken";
 export { MockToken__factory } from "./factories/contracts/mocks/MockToken__factory";
-export type { IVault } from "./contracts/vault/IVault";
-export { IVault__factory } from "./factories/contracts/vault/IVault__factory";
-export type { Vault } from "./contracts/vault/Vault";
-export { Vault__factory } from "./factories/contracts/vault/Vault__factory";
 export type { IVesting } from "./contracts/vesting/interfaces/IVesting";
 export { IVesting__factory } from "./factories/contracts/vesting/interfaces/IVesting__factory";
 export type { Vesting } from "./contracts/vesting/Vesting";

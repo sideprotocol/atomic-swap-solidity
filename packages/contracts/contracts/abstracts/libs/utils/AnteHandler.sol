@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 import {TransferHelperWithVault} from "./TransferHelperWithVault.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IVault} from "../../../vault/IVault.sol";
+import {IVault} from "../../interfaces/IVault.sol";
 import {IVesting} from "../../../vesting/interfaces/IVesting.sol";
 import { IAtomicSwapBase } from "../../interfaces/IAtomicSwapBase.sol";
 import "hardhat/console.sol";

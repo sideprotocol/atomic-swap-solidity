@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vesting__factory = exports.IVesting__factory = exports.Vault__factory = exports.IVault__factory = exports.MockToken__factory = exports.MockERC20Token__factory = exports.IInchainAtomicSwap__factory = exports.InchainAtomicSwap__factory = exports.OwnablePausableUpgradeable__factory = exports.AtomicSwapMsgValidator__factory = exports.AnteHandler__factory = exports.AtomicSwapStateLogic__factory = exports.IOwnablePausable__factory = exports.IAtomicSwapBase__factory = exports.AtomicSwapBase__factory = exports.Strings__factory = exports.ShortStrings__factory = exports.Nonces__factory = exports.Math__factory = exports.IERC165__factory = exports.EIP712__factory = exports.ECDSA__factory = exports.IERC721Receiver__factory = exports.IERC721__factory = exports.IERC721Metadata__factory = exports.IERC20__factory = exports.IERC20Metadata__factory = exports.ERC20__factory = exports.IERC5267__factory = exports.IERC721Errors__factory = exports.IERC20Errors__factory = exports.IERC1155Errors__factory = exports.IAccessControl__factory = exports.ReentrancyGuardUpgradeable__factory = exports.PausableUpgradeable__factory = exports.ERC165Upgradeable__factory = exports.ContextUpgradeable__factory = exports.ERC721Upgradeable__factory = exports.Initializable__factory = exports.AccessControlUpgradeable__factory = exports.factories = void 0;
+exports.Vesting__factory = exports.IVesting__factory = exports.MockToken__factory = exports.MockERC20Token__factory = exports.IInchainAtomicSwap__factory = exports.InchainAtomicSwap__factory = exports.VaultPermit__factory = exports.Vault__factory = exports.OwnablePausableUpgradeable__factory = exports.AtomicSwapMsgValidator__factory = exports.AnteHandler__factory = exports.AtomicSwapStateLogic__factory = exports.IVaultPermit__factory = exports.IVault__factory = exports.IOwnablePausable__factory = exports.IAtomicSwapBase__factory = exports.AtomicSwapBase__factory = exports.Strings__factory = exports.ShortStrings__factory = exports.Nonces__factory = exports.Math__factory = exports.IERC165__factory = exports.EIP712__factory = exports.ECDSA__factory = exports.IERC721Receiver__factory = exports.IERC721__factory = exports.IERC721Metadata__factory = exports.IERC20__factory = exports.IERC20Metadata__factory = exports.ERC20__factory = exports.IERC5267__factory = exports.IERC721Errors__factory = exports.IERC20Errors__factory = exports.IERC1155Errors__factory = exports.IAccessControl__factory = exports.ReentrancyGuardUpgradeable__factory = exports.PausableUpgradeable__factory = exports.ERC165Upgradeable__factory = exports.ContextUpgradeable__factory = exports.ERC721Upgradeable__factory = exports.Initializable__factory = exports.AccessControlUpgradeable__factory = exports.factories = void 0;
 exports.factories = __importStar(require("./factories"));
 var AccessControlUpgradeable__factory_1 = require("./factories/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable__factory");
 Object.defineProperty(exports, "AccessControlUpgradeable__factory", { enumerable: true, get: function () { return AccessControlUpgradeable__factory_1.AccessControlUpgradeable__factory; } });
@@ -81,6 +81,10 @@ var IAtomicSwapBase__factory_1 = require("./factories/contracts/abstracts/interf
 Object.defineProperty(exports, "IAtomicSwapBase__factory", { enumerable: true, get: function () { return IAtomicSwapBase__factory_1.IAtomicSwapBase__factory; } });
 var IOwnablePausable__factory_1 = require("./factories/contracts/abstracts/interfaces/IOwnablePausable__factory");
 Object.defineProperty(exports, "IOwnablePausable__factory", { enumerable: true, get: function () { return IOwnablePausable__factory_1.IOwnablePausable__factory; } });
+var IVault__factory_1 = require("./factories/contracts/abstracts/interfaces/IVault__factory");
+Object.defineProperty(exports, "IVault__factory", { enumerable: true, get: function () { return IVault__factory_1.IVault__factory; } });
+var IVaultPermit__factory_1 = require("./factories/contracts/abstracts/interfaces/IVaultPermit__factory");
+Object.defineProperty(exports, "IVaultPermit__factory", { enumerable: true, get: function () { return IVaultPermit__factory_1.IVaultPermit__factory; } });
 var AtomicSwapStateLogic__factory_1 = require("./factories/contracts/abstracts/libs/logic/AtomicSwapStateLogic__factory");
 Object.defineProperty(exports, "AtomicSwapStateLogic__factory", { enumerable: true, get: function () { return AtomicSwapStateLogic__factory_1.AtomicSwapStateLogic__factory; } });
 var AnteHandler__factory_1 = require("./factories/contracts/abstracts/libs/utils/AnteHandler__factory");
@@ -89,6 +93,10 @@ var AtomicSwapMsgValidator__factory_1 = require("./factories/contracts/abstracts
 Object.defineProperty(exports, "AtomicSwapMsgValidator__factory", { enumerable: true, get: function () { return AtomicSwapMsgValidator__factory_1.AtomicSwapMsgValidator__factory; } });
 var OwnablePausableUpgradeable__factory_1 = require("./factories/contracts/abstracts/OwnablePausableUpgradeable__factory");
 Object.defineProperty(exports, "OwnablePausableUpgradeable__factory", { enumerable: true, get: function () { return OwnablePausableUpgradeable__factory_1.OwnablePausableUpgradeable__factory; } });
+var Vault__factory_1 = require("./factories/contracts/abstracts/vault/Vault__factory");
+Object.defineProperty(exports, "Vault__factory", { enumerable: true, get: function () { return Vault__factory_1.Vault__factory; } });
+var VaultPermit__factory_1 = require("./factories/contracts/abstracts/vault/VaultPermit__factory");
+Object.defineProperty(exports, "VaultPermit__factory", { enumerable: true, get: function () { return VaultPermit__factory_1.VaultPermit__factory; } });
 var InchainAtomicSwap__factory_1 = require("./factories/contracts/inchain_atomicswap/InchainAtomicSwap__factory");
 Object.defineProperty(exports, "InchainAtomicSwap__factory", { enumerable: true, get: function () { return InchainAtomicSwap__factory_1.InchainAtomicSwap__factory; } });
 var IInchainAtomicSwap__factory_1 = require("./factories/contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap__factory");
@@ -97,10 +105,6 @@ var MockERC20Token__factory_1 = require("./factories/contracts/mocks/MockERC20.s
 Object.defineProperty(exports, "MockERC20Token__factory", { enumerable: true, get: function () { return MockERC20Token__factory_1.MockERC20Token__factory; } });
 var MockToken__factory_1 = require("./factories/contracts/mocks/MockToken__factory");
 Object.defineProperty(exports, "MockToken__factory", { enumerable: true, get: function () { return MockToken__factory_1.MockToken__factory; } });
-var IVault__factory_1 = require("./factories/contracts/vault/IVault__factory");
-Object.defineProperty(exports, "IVault__factory", { enumerable: true, get: function () { return IVault__factory_1.IVault__factory; } });
-var Vault__factory_1 = require("./factories/contracts/vault/Vault__factory");
-Object.defineProperty(exports, "Vault__factory", { enumerable: true, get: function () { return Vault__factory_1.Vault__factory; } });
 var IVesting__factory_1 = require("./factories/contracts/vesting/interfaces/IVesting__factory");
 Object.defineProperty(exports, "IVesting__factory", { enumerable: true, get: function () { return IVesting__factory_1.IVesting__factory; } });
 var Vesting__factory_1 = require("./factories/contracts/vesting/Vesting__factory");
