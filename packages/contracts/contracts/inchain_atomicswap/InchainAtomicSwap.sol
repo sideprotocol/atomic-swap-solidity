@@ -2,8 +2,8 @@
 pragma solidity ^0.8.19;
 
 import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
-import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
-import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
+import {AtomicSwapMsgValidator} from "./logic/AtomicSwapMsgValidator.sol";
+import {AtomicSwapStateLogic} from "./logic/AtomicSwapStateLogic.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
 /// @title Inchain Atomic Swap

@@ -21,7 +21,7 @@ interface IVesting {
         uint256 totalAmount;
         uint256 amountReleased;
         uint256 nextReleaseStep;
-        bool toVault;
+        bool isWithdraw;
     }
 
     struct VestingInfo {

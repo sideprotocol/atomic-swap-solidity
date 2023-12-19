@@ -1,4 +1,5 @@
 export * as abstracts from "./abstracts";
 export * as inchainAtomicswap from "./inchain_atomicswap";
 export * as mocks from "./mocks";
+export * as vault from "./vault";
 export * as vesting from "./vesting";

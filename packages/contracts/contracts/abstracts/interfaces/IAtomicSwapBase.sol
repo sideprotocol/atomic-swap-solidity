@@ -143,6 +143,8 @@ interface IAtomicSwapBase {
         address desiredTaker; // Desired taker address.
         uint256 minBidAmount; // Minimum bid.
         bool   acceptBid;
+        bool isMakerWithdraw;
+        bool isTakerWithdraw;
         PermitSignature makerSignature;
         PermitSignature takerSignature;
     }

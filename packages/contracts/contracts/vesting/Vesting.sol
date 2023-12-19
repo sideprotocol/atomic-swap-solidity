@@ -5,19 +5,20 @@ import {OwnablePausableUpgradeable} from "../abstracts/OwnablePausableUpgradeabl
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
-import {TransferHelperWithVault} from "../abstracts/libs/utils/TransferHelperWithVault.sol";
+import {TransferHelperWithVault} from "../abstracts/libs/TransferHelperWithVault.sol";
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
-import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 //import {IVault} from "./abstracts/interfaces/IVault.sol";
 import {IVault} from "../abstracts/interfaces/IVault.sol";
+import {VestingHelper} from  "./logic/VestingHelper.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
 /// @dev Utilizes OpenZeppelin's Ownable and ReentrancyGuard contracts for security.
 contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVesting,ERC721Upgradeable {
-    using AtomicSwapMsgValidator for *;
+    
     using Strings for *;
+    using VestingHelper for *;
     string private _baseURL;
     /// @dev Maximum scale for release percent calculations.
     uint256 constant internal RELEASE_PERCENT_SCALE_FACTOR = 1e4;
@@ -65,15 +66,15 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         address token,
         uint256 totalAmount,
         IAtomicSwapBase.Release[] memory releases,
-        bool toVault
+        bool isWithdraw
     ) external payable nonReentrant onlyAdmin {
    
         if (vestingIds[orderId] != 0) { 
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
-        _transferFrom(token, totalAmount, toVault);
 
+        _vault.transferFrom(token, totalAmount, isWithdraw);
         uint256 vestingStartTime = block.timestamp;
         uint vestingId = _issueVestingId(buyer, orderId);
             
@@ -84,7 +85,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             totalAmount: totalAmount,
             amountReleased: 0,
             nextReleaseStep: 0,
-            toVault: toVault
+            isWithdraw: isWithdraw
         });
 
         vesting[vestingId] = newVesting;
@@ -97,33 +98,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         emit NewVesting(orderId, vestingId);
     }
 
-    function _transferFrom(
-        address token, 
-        uint amount,
-        bool withVault
-    ) private {
-        if(withVault) {
-            TransferHelperWithVault.safeTransferFrom(
-                _vault,
-                token,
-                msg.sender, 
-                address(this), 
-                amount
-            );
-        }else{
-            if (token == address(0)) {
-                if (msg.value != amount) {
-                    revert IAtomicSwapBase.NotEnoughFund(amount, msg.value);
-                }
-            } else {
-                TransferHelper.safeTransferFrom(
-                    token,
-                    msg.sender, address(this), amount
-                );
-            }
-        }
-    }
-
+  
     /// @notice Releases vested tokens to the beneficiary.
     /// @param vestingId The uint of the identity to release tokens to.
     /// @dev Calculates the amount of tokens to be released and transfers them to the beneficiary.
@@ -162,7 +137,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         
         schedule.amountReleased += amountForRelease;
 
-        if(schedule.toVault) {
+        if(!schedule.isWithdraw) {
             TransferHelperWithVault.safeTransfer(
                 _vault,
                 schedule.token,
@@ -178,7 +153,6 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             } else {
                 TransferHelper.safeTransferETH(msg.sender, amountForRelease);
             }
-
             // burn NFT at last release time. frontend need to approve this. 
             if(schedule.amountReleased == schedule.totalAmount) {
                 transferFrom(msg.sender,address(this), vestingId);

@@ -130,21 +130,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVault__factory>;
     getContractFactory(
-      name: "IVaultPermit",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IVaultPermit__factory>;
-    getContractFactory(
-      name: "AtomicSwapStateLogic",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AtomicSwapStateLogic__factory>;
-    getContractFactory(
       name: "AnteHandler",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AnteHandler__factory>;
-    getContractFactory(
-      name: "AtomicSwapMsgValidator",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
     getContractFactory(
       name: "OwnablePausableUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -154,10 +142,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Vault__factory>;
     getContractFactory(
-      name: "VaultPermit",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VaultPermit__factory>;
-    getContractFactory(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.InchainAtomicSwap__factory>;
@@ -165,6 +149,14 @@ declare module "hardhat/types/runtime" {
       name: "IInchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IInchainAtomicSwap__factory>;
+    getContractFactory(
+      name: "AtomicSwapMsgValidator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
+    getContractFactory(
+      name: "AtomicSwapStateLogic",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AtomicSwapStateLogic__factory>;
     getContractFactory(
       name: "MockERC20Token",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -174,9 +166,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
+      name: "IVaultPermit",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVaultPermit__factory>;
+    getContractFactory(
+      name: "VaultPermit",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VaultPermit__factory>;
+    getContractFactory(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVesting__factory>;
+    getContractFactory(
+      name: "VestingHelper",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VestingHelper__factory>;
     getContractFactory(
       name: "Vesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -328,25 +332,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IVault>;
     getContractAt(
-      name: "IVaultPermit",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IVaultPermit>;
-    getContractAt(
-      name: "AtomicSwapStateLogic",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AtomicSwapStateLogic>;
-    getContractAt(
       name: "AnteHandler",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.AnteHandler>;
-    getContractAt(
-      name: "AtomicSwapMsgValidator",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AtomicSwapMsgValidator>;
     getContractAt(
       name: "OwnablePausableUpgradeable",
       address: string | ethers.Addressable,
@@ -358,11 +347,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Vault>;
     getContractAt(
-      name: "VaultPermit",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VaultPermit>;
-    getContractAt(
       name: "InchainAtomicSwap",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -372,6 +356,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IInchainAtomicSwap>;
+    getContractAt(
+      name: "AtomicSwapMsgValidator",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    getContractAt(
+      name: "AtomicSwapStateLogic",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AtomicSwapStateLogic>;
     getContractAt(
       name: "MockERC20Token",
       address: string | ethers.Addressable,
@@ -383,10 +377,25 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
     getContractAt(
+      name: "IVaultPermit",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVaultPermit>;
+    getContractAt(
+      name: "VaultPermit",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VaultPermit>;
+    getContractAt(
       name: "IVesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IVesting>;
+    getContractAt(
+      name: "VestingHelper",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VestingHelper>;
     getContractAt(
       name: "Vesting",
       address: string | ethers.Addressable,
@@ -510,21 +519,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVault>;
     deployContract(
-      name: "IVaultPermit",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IVaultPermit>;
-    deployContract(
-      name: "AtomicSwapStateLogic",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapStateLogic>;
-    deployContract(
       name: "AnteHandler",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AnteHandler>;
-    deployContract(
-      name: "AtomicSwapMsgValidator",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapMsgValidator>;
     deployContract(
       name: "OwnablePausableUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -534,10 +531,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Vault>;
     deployContract(
-      name: "VaultPermit",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.VaultPermit>;
-    deployContract(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.InchainAtomicSwap>;
@@ -545,6 +538,14 @@ declare module "hardhat/types/runtime" {
       name: "IInchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IInchainAtomicSwap>;
+    deployContract(
+      name: "AtomicSwapMsgValidator",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
+      name: "AtomicSwapStateLogic",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapStateLogic>;
     deployContract(
       name: "MockERC20Token",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -554,9 +555,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
     deployContract(
+      name: "IVaultPermit",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVaultPermit>;
+    deployContract(
+      name: "VaultPermit",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VaultPermit>;
+    deployContract(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVesting>;
+    deployContract(
+      name: "VestingHelper",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VestingHelper>;
     deployContract(
       name: "Vesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -708,25 +721,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVault>;
     deployContract(
-      name: "IVaultPermit",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IVaultPermit>;
-    deployContract(
-      name: "AtomicSwapStateLogic",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapStateLogic>;
-    deployContract(
       name: "AnteHandler",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.AnteHandler>;
-    deployContract(
-      name: "AtomicSwapMsgValidator",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapMsgValidator>;
     deployContract(
       name: "OwnablePausableUpgradeable",
       args: any[],
@@ -738,11 +736,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Vault>;
     deployContract(
-      name: "VaultPermit",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.VaultPermit>;
-    deployContract(
       name: "InchainAtomicSwap",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -752,6 +745,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IInchainAtomicSwap>;
+    deployContract(
+      name: "AtomicSwapMsgValidator",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    deployContract(
+      name: "AtomicSwapStateLogic",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AtomicSwapStateLogic>;
     deployContract(
       name: "MockERC20Token",
       args: any[],
@@ -763,10 +766,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
     deployContract(
+      name: "IVaultPermit",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVaultPermit>;
+    deployContract(
+      name: "VaultPermit",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VaultPermit>;
+    deployContract(
       name: "IVesting",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVesting>;
+    deployContract(
+      name: "VestingHelper",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VestingHelper>;
     deployContract(
       name: "Vesting",
       args: any[],

@@ -690,7 +690,7 @@ export interface Vesting extends BaseContract {
       token: AddressLike,
       totalAmount: BigNumberish,
       releases: IAtomicSwapBase.ReleaseStruct[],
-      toVault: boolean
+      isWithdraw: boolean
     ],
     [void],
     "payable"
@@ -724,7 +724,7 @@ export interface Vesting extends BaseContract {
         totalAmount: bigint;
         amountReleased: bigint;
         nextReleaseStep: bigint;
-        toVault: boolean;
+        isWithdraw: boolean;
       }
     ],
     "view"
@@ -887,7 +887,7 @@ export interface Vesting extends BaseContract {
       token: AddressLike,
       totalAmount: BigNumberish,
       releases: IAtomicSwapBase.ReleaseStruct[],
-      toVault: boolean
+      isWithdraw: boolean
     ],
     [void],
     "payable"
@@ -923,7 +923,7 @@ export interface Vesting extends BaseContract {
         totalAmount: bigint;
         amountReleased: bigint;
         nextReleaseStep: bigint;
-        toVault: boolean;
+        isWithdraw: boolean;
       }
     ],
     "view"

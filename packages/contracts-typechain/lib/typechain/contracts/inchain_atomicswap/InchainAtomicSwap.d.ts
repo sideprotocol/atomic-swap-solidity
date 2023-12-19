@@ -36,6 +36,8 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: AddressLike;
         minBidAmount: BigNumberish;
         acceptBid: boolean;
+        isMakerWithdraw: boolean;
+        isTakerWithdraw: boolean;
         makerSignature: IAtomicSwapBase.PermitSignatureStruct;
         takerSignature: IAtomicSwapBase.PermitSignatureStruct;
     };
@@ -46,6 +48,8 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: string,
         minBidAmount: bigint,
         acceptBid: boolean,
+        isMakerWithdraw: boolean,
+        isTakerWithdraw: boolean,
         makerSignature: IAtomicSwapBase.PermitSignatureStructOutput,
         takerSignature: IAtomicSwapBase.PermitSignatureStructOutput
     ] & {
@@ -55,6 +59,8 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: string;
         minBidAmount: bigint;
         acceptBid: boolean;
+        isMakerWithdraw: boolean;
+        isTakerWithdraw: boolean;
         makerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
         takerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
     };
