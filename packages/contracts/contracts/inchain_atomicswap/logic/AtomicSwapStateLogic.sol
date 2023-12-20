@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
-import {AtomicSwapMsgValidator} from "./AtomicSwapMsgValidator.sol";
 import {IVaultPermit} from "../../vault/interfaces/IVaultPermit.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVesting} from "../../vesting/interfaces/IVesting.sol";

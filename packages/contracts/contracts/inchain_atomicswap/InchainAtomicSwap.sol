@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
-import {AtomicSwapMsgValidator} from "./logic/AtomicSwapMsgValidator.sol";
 import {AtomicSwapStateLogic} from "./logic/AtomicSwapStateLogic.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
@@ -10,7 +9,6 @@ import {IVesting} from "../vesting/interfaces/IVesting.sol";
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
 /// @dev Extends the AtomicSwapBase and implements the IInchainAtomicSwap interface.
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
-    using AtomicSwapMsgValidator for *;
     using AtomicSwapStateLogic for *;
 
     /// @notice Initializes the contract with necessary parameters.

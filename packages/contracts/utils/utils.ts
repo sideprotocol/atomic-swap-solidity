@@ -41,17 +41,11 @@ export const Utils = {
     const AnteHandlerFactory = await ethers.getContractFactory("AnteHandler");
     const anteHandler = await AnteHandlerFactory.deploy();
 
-    const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-      "AtomicSwapMsgValidator",
-    );
-    const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
-
     const atomicSwapStateLogicFactory = await ethers.getContractFactory(
       "AtomicSwapStateLogic",
       {
         libraries: {
           AnteHandler: await anteHandler.getAddress(),
-          //AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },
     );
@@ -106,7 +100,6 @@ export const Utils = {
       {
         libraries: {
           AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
-          //AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },
     );
