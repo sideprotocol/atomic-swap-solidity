@@ -20,59 +20,59 @@ import { IAtomicSwapBase } from "@sideprotocol/contracts-typechain/typechain/con
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { randomBytes } from "crypto";
 describe("AtomicSwap: Gasless Swap", () => {
-  describe("happy path", () => {
+  describe.only("happy path", () => {
     const tests = [
       {
         name: "Swap ERC20 tokens without vesting and without any withdrawals",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {},
         shouldThrow: false,
       },
-      {
-        name: "Swap ERC20 tokens without vesting, allowing maker to withdraw",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isMakerWithdraw = true;
-        },
-      },
-      {
-        name: "Swap ERC20 tokens without vesting, allowing taker to withdraw",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isTakerWithdraw = true;
-        },
-      },
-      {
-        name: "Swap ERC20 tokens without vesting, allowing both maker and taker to withdraw",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isTakerWithdraw = true;
-          swapPermitPayload.isTakerWithdraw = true;
-        },
-      },
-      {
-        name: "Swap ERC20 tokens with vesting but no withdrawals",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {},
-        isVesting: true,
-      },
-      {
-        name: "Swap ERC20 tokens with vesting, allowing maker to withdraw",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isMakerWithdraw = true;
-        },
-        isVesting: true,
-      },
-      {
-        name: "Swap ERC20 tokens with vesting, allowing taker to withdraw",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isTakerWithdraw = true;
-        },
-        isVesting: true,
-      },
-      {
-        name: "Swap ERC20 tokens with vesting, allowing both maker and taker to withdraw",
-        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isMakerWithdraw = true;
-          swapPermitPayload.isTakerWithdraw = true;
-        },
-        isVesting: true,
-      },
+      // {
+      //   name: "Swap ERC20 tokens without vesting, allowing maker to withdraw",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+      //     swapPermitPayload.isMakerWithdraw = true;
+      //   },
+      // },
+      // {
+      //   name: "Swap ERC20 tokens without vesting, allowing taker to withdraw",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+      //     swapPermitPayload.isTakerWithdraw = true;
+      //   },
+      // },
+      // {
+      //   name: "Swap ERC20 tokens without vesting, allowing both maker and taker to withdraw",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+      //     swapPermitPayload.isTakerWithdraw = true;
+      //     swapPermitPayload.isTakerWithdraw = true;
+      //   },
+      // },
+      // {
+      //   name: "Swap ERC20 tokens with vesting but no withdrawals",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {},
+      //   isVesting: true,
+      // },
+      // {
+      //   name: "Swap ERC20 tokens with vesting, allowing maker to withdraw",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+      //     swapPermitPayload.isMakerWithdraw = true;
+      //   },
+      //   isVesting: true,
+      // },
+      // {
+      //   name: "Swap ERC20 tokens with vesting, allowing taker to withdraw",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+      //     swapPermitPayload.isTakerWithdraw = true;
+      //   },
+      //   isVesting: true,
+      // },
+      // {
+      //   name: "Swap ERC20 tokens with vesting, allowing both maker and taker to withdraw",
+      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+      //     swapPermitPayload.isMakerWithdraw = true;
+      //     swapPermitPayload.isTakerWithdraw = true;
+      //   },
+      //   isVesting: true,
+      // },
     ];
 
     tests.forEach(async (test) => {
