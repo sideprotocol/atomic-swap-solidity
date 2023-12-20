@@ -2,7 +2,6 @@ import { ethers } from "hardhat";
 import {
   calcSwapAmount,
   generateAgreement,
-  generateOrderID,
   generateRandomTestAddress,
   newAtomicSwapOrderID,
   setupSwapPermitPayload,
@@ -11,16 +10,12 @@ import { Utils } from "../../utils/utils";
 import { BlockTime } from "../../utils/time";
 import { expect } from "chai";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
-import {
-  InchainAtomicSwap,
-  VaultPermit,
-  ecdsa,
-} from "@sideprotocol/contracts-typechain";
+import { ecdsa } from "@sideprotocol/contracts-typechain";
 import { IAtomicSwapBase } from "@sideprotocol/contracts-typechain/typechain/contracts/inchain_atomicswap/InchainAtomicSwap";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { randomBytes } from "crypto";
 describe("AtomicSwap: Gasless Swap", () => {
-  describe.only("happy path", () => {
+  describe("happy path", () => {
     const tests = [
       {
         name: "Swap ERC20 tokens without vesting and without any withdrawals",

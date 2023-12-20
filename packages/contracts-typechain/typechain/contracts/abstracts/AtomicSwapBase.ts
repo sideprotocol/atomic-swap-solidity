@@ -39,9 +39,7 @@ export interface AtomicSwapBaseInterface extends Interface {
       | "PAUSER_ROLE"
       | "addAdmin"
       | "addPauser"
-      | "bids"
       | "buyerFeeRate"
-      | "counteroffers"
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
@@ -65,18 +63,14 @@ export interface AtomicSwapBaseInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "AcceptedBid"
-      | "AtomicSwapOrderCanceled"
       | "AtomicSwapOrderCreated"
       | "AtomicSwapOrderTook"
-      | "CanceledBid"
       | "Initialized"
       | "Paused"
-      | "PlacedBid"
       | "RoleAdminChanged"
       | "RoleGranted"
       | "RoleRevoked"
       | "Unpaused"
-      | "UpdatedBid"
   ): EventFragment;
 
   encodeFunctionData(
@@ -96,16 +90,8 @@ export interface AtomicSwapBaseInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "bids",
-    values: [BytesLike, AddressLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "buyerFeeRate",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "counteroffers",
-    values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -181,13 +167,8 @@ export interface AtomicSwapBaseInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "addAdmin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "addPauser", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "buyerFeeRate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "counteroffers",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -255,18 +236,6 @@ export namespace AcceptedBidEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace AtomicSwapOrderCanceledEvent {
-  export type InputTuple = [id: BytesLike];
-  export type OutputTuple = [id: string];
-  export interface OutputObject {
-    id: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export namespace AtomicSwapOrderCreatedEvent {
   export type InputTuple = [id: BytesLike];
   export type OutputTuple = [id: string];
@@ -297,19 +266,6 @@ export namespace AtomicSwapOrderTookEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace CanceledBidEvent {
-  export type InputTuple = [orderID: BytesLike, bidder: AddressLike];
-  export type OutputTuple = [orderID: string, bidder: string];
-  export interface OutputObject {
-    orderID: string;
-    bidder: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export namespace InitializedEvent {
   export type InputTuple = [version: BigNumberish];
   export type OutputTuple = [version: bigint];
@@ -327,24 +283,6 @@ export namespace PausedEvent {
   export type OutputTuple = [account: string];
   export interface OutputObject {
     account: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace PlacedBidEvent {
-  export type InputTuple = [
-    orderID: BytesLike,
-    bidder: AddressLike,
-    amount: BigNumberish
-  ];
-  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
-  export interface OutputObject {
-    orderID: string;
-    bidder: string;
-    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -422,24 +360,6 @@ export namespace UnpausedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace UpdatedBidEvent {
-  export type InputTuple = [
-    orderID: BytesLike,
-    bidder: AddressLike,
-    amount: BigNumberish
-  ];
-  export type OutputTuple = [orderID: string, bidder: string, amount: bigint];
-  export interface OutputObject {
-    orderID: string;
-    bidder: string;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export interface AtomicSwapBase extends BaseContract {
   connect(runner?: ContractRunner | null): AtomicSwapBase;
   waitForDeployment(): Promise<this>;
@@ -491,28 +411,7 @@ export interface AtomicSwapBase extends BaseContract {
 
   addPauser: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
 
-  bids: TypedContractMethod<
-    [arg0: BytesLike, arg1: AddressLike],
-    [
-      [bigint, string, bigint, string, bigint, bigint] & {
-        amount: bigint;
-        order: string;
-        status: bigint;
-        bidder: string;
-        receiveTimestamp: bigint;
-        expireTimestamp: bigint;
-      }
-    ],
-    "view"
-  >;
-
   buyerFeeRate: TypedContractMethod<[], [bigint], "view">;
-
-  counteroffers: TypedContractMethod<
-    [arg0: BytesLike, arg1: AddressLike],
-    [bigint],
-    "view"
-  >;
 
   getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
 
@@ -635,31 +534,8 @@ export interface AtomicSwapBase extends BaseContract {
     nameOrSignature: "addPauser"
   ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "bids"
-  ): TypedContractMethod<
-    [arg0: BytesLike, arg1: AddressLike],
-    [
-      [bigint, string, bigint, string, bigint, bigint] & {
-        amount: bigint;
-        order: string;
-        status: bigint;
-        bidder: string;
-        receiveTimestamp: bigint;
-        expireTimestamp: bigint;
-      }
-    ],
-    "view"
-  >;
-  getFunction(
     nameOrSignature: "buyerFeeRate"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "counteroffers"
-  ): TypedContractMethod<
-    [arg0: BytesLike, arg1: AddressLike],
-    [bigint],
-    "view"
-  >;
   getFunction(
     nameOrSignature: "getRoleAdmin"
   ): TypedContractMethod<[role: BytesLike], [string], "view">;
@@ -775,13 +651,6 @@ export interface AtomicSwapBase extends BaseContract {
     AcceptedBidEvent.OutputObject
   >;
   getEvent(
-    key: "AtomicSwapOrderCanceled"
-  ): TypedContractEvent<
-    AtomicSwapOrderCanceledEvent.InputTuple,
-    AtomicSwapOrderCanceledEvent.OutputTuple,
-    AtomicSwapOrderCanceledEvent.OutputObject
-  >;
-  getEvent(
     key: "AtomicSwapOrderCreated"
   ): TypedContractEvent<
     AtomicSwapOrderCreatedEvent.InputTuple,
@@ -796,13 +665,6 @@ export interface AtomicSwapBase extends BaseContract {
     AtomicSwapOrderTookEvent.OutputObject
   >;
   getEvent(
-    key: "CanceledBid"
-  ): TypedContractEvent<
-    CanceledBidEvent.InputTuple,
-    CanceledBidEvent.OutputTuple,
-    CanceledBidEvent.OutputObject
-  >;
-  getEvent(
     key: "Initialized"
   ): TypedContractEvent<
     InitializedEvent.InputTuple,
@@ -815,13 +677,6 @@ export interface AtomicSwapBase extends BaseContract {
     PausedEvent.InputTuple,
     PausedEvent.OutputTuple,
     PausedEvent.OutputObject
-  >;
-  getEvent(
-    key: "PlacedBid"
-  ): TypedContractEvent<
-    PlacedBidEvent.InputTuple,
-    PlacedBidEvent.OutputTuple,
-    PlacedBidEvent.OutputObject
   >;
   getEvent(
     key: "RoleAdminChanged"
@@ -851,13 +706,6 @@ export interface AtomicSwapBase extends BaseContract {
     UnpausedEvent.OutputTuple,
     UnpausedEvent.OutputObject
   >;
-  getEvent(
-    key: "UpdatedBid"
-  ): TypedContractEvent<
-    UpdatedBidEvent.InputTuple,
-    UpdatedBidEvent.OutputTuple,
-    UpdatedBidEvent.OutputObject
-  >;
 
   filters: {
     "AcceptedBid(bytes32,address,uint256)": TypedContractEvent<
@@ -869,17 +717,6 @@ export interface AtomicSwapBase extends BaseContract {
       AcceptedBidEvent.InputTuple,
       AcceptedBidEvent.OutputTuple,
       AcceptedBidEvent.OutputObject
-    >;
-
-    "AtomicSwapOrderCanceled(bytes32)": TypedContractEvent<
-      AtomicSwapOrderCanceledEvent.InputTuple,
-      AtomicSwapOrderCanceledEvent.OutputTuple,
-      AtomicSwapOrderCanceledEvent.OutputObject
-    >;
-    AtomicSwapOrderCanceled: TypedContractEvent<
-      AtomicSwapOrderCanceledEvent.InputTuple,
-      AtomicSwapOrderCanceledEvent.OutputTuple,
-      AtomicSwapOrderCanceledEvent.OutputObject
     >;
 
     "AtomicSwapOrderCreated(bytes32)": TypedContractEvent<
@@ -904,17 +741,6 @@ export interface AtomicSwapBase extends BaseContract {
       AtomicSwapOrderTookEvent.OutputObject
     >;
 
-    "CanceledBid(bytes32,address)": TypedContractEvent<
-      CanceledBidEvent.InputTuple,
-      CanceledBidEvent.OutputTuple,
-      CanceledBidEvent.OutputObject
-    >;
-    CanceledBid: TypedContractEvent<
-      CanceledBidEvent.InputTuple,
-      CanceledBidEvent.OutputTuple,
-      CanceledBidEvent.OutputObject
-    >;
-
     "Initialized(uint64)": TypedContractEvent<
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
@@ -935,17 +761,6 @@ export interface AtomicSwapBase extends BaseContract {
       PausedEvent.InputTuple,
       PausedEvent.OutputTuple,
       PausedEvent.OutputObject
-    >;
-
-    "PlacedBid(bytes32,address,uint256)": TypedContractEvent<
-      PlacedBidEvent.InputTuple,
-      PlacedBidEvent.OutputTuple,
-      PlacedBidEvent.OutputObject
-    >;
-    PlacedBid: TypedContractEvent<
-      PlacedBidEvent.InputTuple,
-      PlacedBidEvent.OutputTuple,
-      PlacedBidEvent.OutputObject
     >;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
@@ -990,17 +805,6 @@ export interface AtomicSwapBase extends BaseContract {
       UnpausedEvent.InputTuple,
       UnpausedEvent.OutputTuple,
       UnpausedEvent.OutputObject
-    >;
-
-    "UpdatedBid(bytes32,address,uint256)": TypedContractEvent<
-      UpdatedBidEvent.InputTuple,
-      UpdatedBidEvent.OutputTuple,
-      UpdatedBidEvent.OutputObject
-    >;
-    UpdatedBid: TypedContractEvent<
-      UpdatedBidEvent.InputTuple,
-      UpdatedBidEvent.OutputTuple,
-      UpdatedBidEvent.OutputObject
     >;
   };
 }

@@ -47,9 +47,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         SwapWithPermitMsg calldata swap,
         Release[] calldata releases 
     ) external  nonReentrant whenNotPaused {
-        if(swap.sellToken.token == swap.buyToken.token) {
-            revert UnsupportedTokenPair();
-        }
+        _validateSwapParams(swap);
         FeeParams memory params = FeeParams(
             sellerFeeRate,
             buyerFeeRate,
@@ -72,6 +70,18 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
                 taker,
                 orderId
             );
+        }
+    }
+
+    function _validateSwapParams(SwapWithPermitMsg calldata swap) internal pure {
+        if(swap.sellToken.token == swap.buyToken.token) {
+            revert UnsupportedTokenPair();
+        }
+        if(swap.sellerSignature.owner == swap.buyerSignature.owner ) {
+            revert InvalidSigers();
+        }
+        if(swap.minBidAmount > swap.sellToken.amount) {
+            revert InvalidMinBidAmount(swap.minBidAmount);
         }
     }
 }

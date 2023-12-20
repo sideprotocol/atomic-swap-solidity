@@ -2,48 +2,8 @@ import { type ContractRunner } from "ethers";
 import type { IInchainAtomicSwap, IInchainAtomicSwapInterface } from "../../../../contracts/inchain_atomicswap/interfaces/IInchainAtomicSwap";
 export declare class IInchainAtomicSwap__factory {
     static readonly abi: readonly [{
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "provided";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "expectedExpiry";
-            readonly type: "uint256";
-        }];
-        readonly name: "BidAlreadyExpired";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "BidAlreadyPlaced";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "BidDoesNotExist";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "BidNotAllowed";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "enum IAtomicSwapBase.BidStatus";
-            readonly name: "status";
-            readonly type: "uint8";
-        }];
-        readonly name: "BidNotInPlacedStatus";
-        readonly type: "error";
-    }, {
         readonly inputs: readonly [];
         readonly name: "DuplicateReleaseSchedule";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "InactiveOrder";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "InvaldAddition";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
@@ -51,19 +11,7 @@ export declare class IInchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "InvalidBidderAddress";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
         readonly name: "InvalidBuyerFee";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "contractAddress";
-            readonly type: "address";
-        }];
-        readonly name: "InvalidContractAddress";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
@@ -78,8 +26,12 @@ export declare class IInchainAtomicSwap__factory {
         readonly name: "InvalidExpirationTime";
         readonly type: "error";
     }, {
-        readonly inputs: readonly [];
-        readonly name: "InvalidMinimumBidLimit";
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "InvalidMinBidAmount";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
@@ -91,35 +43,15 @@ export declare class IInchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
+        readonly name: "InvalidSigers";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [];
         readonly name: "InvalidTotalPercentage";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
         readonly name: "InvalidTreasuryAddress";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "MismatchedBidAmount";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "NoBidPlaced";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "allowance";
-            readonly type: "uint256";
-        }];
-        readonly name: "NotAllowedTransferAmount";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
@@ -151,95 +83,11 @@ export declare class IInchainAtomicSwap__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "OrderCanceled";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "OrderDoesNotExist";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "OrderNotAllowTake";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
         readonly name: "OverMaximumReleaseStep";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "to";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "TransferFailed";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "from";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "to";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "TransferFromFailed";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "recipient";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "TransferToRecipientFailed";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "recipient";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "TransferToTreasuryFailed";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "caller";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "expected";
-            readonly type: "address";
-        }];
-        readonly name: "UnauthorizedAcceptAction";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "UnauthorizedCancelAction";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
         readonly name: "UnauthorizedSender";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "UnauthorizedTakeAction";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
@@ -277,16 +125,6 @@ export declare class IInchainAtomicSwap__factory {
             readonly name: "id";
             readonly type: "bytes32";
         }];
-        readonly name: "AtomicSwapOrderCanceled";
-        readonly type: "event";
-    }, {
-        readonly anonymous: false;
-        readonly inputs: readonly [{
-            readonly indexed: true;
-            readonly internalType: "bytes32";
-            readonly name: "id";
-            readonly type: "bytes32";
-        }];
         readonly name: "AtomicSwapOrderCreated";
         readonly type: "event";
     }, {
@@ -308,61 +146,6 @@ export declare class IInchainAtomicSwap__factory {
             readonly type: "bytes32";
         }];
         readonly name: "AtomicSwapOrderTook";
-        readonly type: "event";
-    }, {
-        readonly anonymous: false;
-        readonly inputs: readonly [{
-            readonly indexed: true;
-            readonly internalType: "bytes32";
-            readonly name: "orderID";
-            readonly type: "bytes32";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "address";
-            readonly name: "bidder";
-            readonly type: "address";
-        }];
-        readonly name: "CanceledBid";
-        readonly type: "event";
-    }, {
-        readonly anonymous: false;
-        readonly inputs: readonly [{
-            readonly indexed: true;
-            readonly internalType: "bytes32";
-            readonly name: "orderID";
-            readonly type: "bytes32";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "address";
-            readonly name: "bidder";
-            readonly type: "address";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "PlacedBid";
-        readonly type: "event";
-    }, {
-        readonly anonymous: false;
-        readonly inputs: readonly [{
-            readonly indexed: true;
-            readonly internalType: "bytes32";
-            readonly name: "orderID";
-            readonly type: "bytes32";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "address";
-            readonly name: "bidder";
-            readonly type: "address";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "UpdatedBid";
         readonly type: "event";
     }];
     static createInterface(): IInchainAtomicSwapInterface;

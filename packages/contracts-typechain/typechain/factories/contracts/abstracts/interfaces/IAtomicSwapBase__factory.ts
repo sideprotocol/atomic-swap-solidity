@@ -10,60 +10,8 @@ import type {
 
 const _abi = [
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "provided",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "expectedExpiry",
-        type: "uint256",
-      },
-    ],
-    name: "BidAlreadyExpired",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "BidAlreadyPlaced",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "BidDoesNotExist",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "BidNotAllowed",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "enum IAtomicSwapBase.BidStatus",
-        name: "status",
-        type: "uint8",
-      },
-    ],
-    name: "BidNotInPlacedStatus",
-    type: "error",
-  },
-  {
     inputs: [],
     name: "DuplicateReleaseSchedule",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "InactiveOrder",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "InvaldAddition",
     type: "error",
   },
   {
@@ -73,23 +21,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "InvalidBidderAddress",
-    type: "error",
-  },
-  {
-    inputs: [],
     name: "InvalidBuyerFee",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "contractAddress",
-        type: "address",
-      },
-    ],
-    name: "InvalidContractAddress",
     type: "error",
   },
   {
@@ -109,8 +41,14 @@ const _abi = [
     type: "error",
   },
   {
-    inputs: [],
-    name: "InvalidMinimumBidLimit",
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "InvalidMinBidAmount",
     type: "error",
   },
   {
@@ -125,44 +63,17 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "InvalidSigers",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InvalidTotalPercentage",
     type: "error",
   },
   {
     inputs: [],
     name: "InvalidTreasuryAddress",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "MismatchedBidAmount",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NoBidPlaced",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "allowance",
-        type: "uint256",
-      },
-    ],
-    name: "NotAllowedTransferAmount",
     type: "error",
   },
   {
@@ -204,122 +115,12 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "OrderCanceled",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "OrderDoesNotExist",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "OrderNotAllowTake",
-    type: "error",
-  },
-  {
-    inputs: [],
     name: "OverMaximumReleaseStep",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "TransferFailed",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "TransferFromFailed",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "TransferToRecipientFailed",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "TransferToTreasuryFailed",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "caller",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "expected",
-        type: "address",
-      },
-    ],
-    name: "UnauthorizedAcceptAction",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "UnauthorizedCancelAction",
     type: "error",
   },
   {
     inputs: [],
     name: "UnauthorizedSender",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "UnauthorizedTakeAction",
     type: "error",
   },
   {
@@ -367,19 +168,6 @@ const _abi = [
         type: "bytes32",
       },
     ],
-    name: "AtomicSwapOrderCanceled",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "id",
-        type: "bytes32",
-      },
-    ],
     name: "AtomicSwapOrderCreated",
     type: "event",
   },
@@ -406,75 +194,6 @@ const _abi = [
       },
     ],
     name: "AtomicSwapOrderTook",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "orderID",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "bidder",
-        type: "address",
-      },
-    ],
-    name: "CanceledBid",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "orderID",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "bidder",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "PlacedBid",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "orderID",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "bidder",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "UpdatedBid",
     type: "event",
   },
 ] as const;
