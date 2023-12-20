@@ -192,34 +192,6 @@ const _abi = [
         stateMutability: "nonpayable",
         type: "function",
     },
-    {
-        inputs: [
-            {
-                internalType: "address",
-                name: "token",
-                type: "address",
-            },
-            {
-                internalType: "address",
-                name: "from",
-                type: "address",
-            },
-            {
-                internalType: "address",
-                name: "to",
-                type: "address",
-            },
-            {
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-            },
-        ],
-        name: "withdrawFrom",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-    },
 ];
 class IVault__factory {
     static createInterface() {

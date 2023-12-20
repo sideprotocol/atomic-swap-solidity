@@ -60,7 +60,7 @@ const _abi = [
     },
     {
         inputs: [],
-        name: "InvalidSigers",
+        name: "InvalidSigners",
         type: "error",
     },
     {

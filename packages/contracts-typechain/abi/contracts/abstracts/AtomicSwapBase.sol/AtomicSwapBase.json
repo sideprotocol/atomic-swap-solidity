@@ -93,7 +93,7 @@
     },
     {
       "inputs": [],
-      "name": "InvalidSigers",
+      "name": "InvalidSigners",
       "type": "error"
     },
     {

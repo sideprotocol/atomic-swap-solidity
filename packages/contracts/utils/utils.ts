@@ -62,7 +62,7 @@ export const Utils = {
       buyTokenFeeRate = 120;
     }
     if (!treasury) {
-      treasury = accounts[10].address;
+      treasury = generateRandomTestAddress();
     }
 
     // Deploy Vault contract
@@ -281,7 +281,7 @@ export function generateAgreement(
       swap.desiredTaker,
       swap.minBidAmount,
       swap.acceptBid,
-      swap.isMakerWithdraw,
+      swap.isSellerWithdraw,
     ],
   );
 
@@ -294,7 +294,7 @@ export function setupSwapPermitPayload(
   desiredTaker: string,
 ) {
   const uuid = generateOrderID();
-  return {
+  const swapParams: AtomicSwapBaseData.SwapWithPermitMsgStruct = {
     uuid: uuid,
     sellToken: {
       token: sellToken,
@@ -307,8 +307,8 @@ export function setupSwapPermitPayload(
     minBidAmount: ethers.parseEther("15"),
     desiredTaker,
     acceptBid: true,
-    isMakerWithdraw: false,
-    isTakerWithdraw: false,
+    isSellerWithdraw: false,
+    isBuyerWithdraw: false,
     sellerSignature: {
       v: 27 | 28,
       r: "",
@@ -324,6 +324,7 @@ export function setupSwapPermitPayload(
       deadline: BigInt(0),
     },
   };
+  return swapParams;
 }
 
 export const setupSignature = async (

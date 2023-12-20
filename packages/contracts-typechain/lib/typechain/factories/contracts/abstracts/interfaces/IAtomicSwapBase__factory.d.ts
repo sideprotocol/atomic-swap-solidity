@@ -43,7 +43,7 @@ export declare class IAtomicSwapBase__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [];
-        readonly name: "InvalidSigers";
+        readonly name: "InvalidSigners";
         readonly type: "error";
     }, {
         readonly inputs: readonly [];

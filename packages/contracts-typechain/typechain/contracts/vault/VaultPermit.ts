@@ -55,7 +55,6 @@ export interface VaultPermitInterface extends Interface {
       | "transfer"
       | "transferFrom"
       | "withdraw"
-      | "withdrawFrom"
   ): FunctionFragment;
 
   getEvent(
@@ -114,10 +113,6 @@ export interface VaultPermitInterface extends Interface {
     functionFragment: "withdraw",
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "withdrawFrom",
-    values: [AddressLike, AddressLike, AddressLike, BigNumberish]
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "DOMAIN_SEPARATOR",
@@ -139,10 +134,6 @@ export interface VaultPermitInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawFrom",
-    data: BytesLike
-  ): Result;
 }
 
 export namespace DepositEvent {
@@ -356,17 +347,6 @@ export interface VaultPermit extends BaseContract {
     "nonpayable"
   >;
 
-  withdrawFrom: TypedContractMethod<
-    [
-      token: AddressLike,
-      from: AddressLike,
-      to: AddressLike,
-      amount: BigNumberish
-    ],
-    [void],
-    "nonpayable"
-  >;
-
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -458,18 +438,6 @@ export interface VaultPermit extends BaseContract {
     nameOrSignature: "withdraw"
   ): TypedContractMethod<
     [token: AddressLike, to: AddressLike, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "withdrawFrom"
-  ): TypedContractMethod<
-    [
-      token: AddressLike,
-      from: AddressLike,
-      to: AddressLike,
-      amount: BigNumberish
-    ],
     [void],
     "nonpayable"
   >;

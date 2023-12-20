@@ -1,7 +1,7 @@
 import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, Interface, AddressLike, ContractRunner, ContractMethod, Listener } from "ethers";
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedListener, TypedContractMethod } from "../../../common";
 export interface IVaultInterface extends Interface {
-    getFunction(nameOrSignature: "allowance" | "approve" | "balanceOf" | "deposit" | "transfer" | "transferFrom" | "withdraw" | "withdrawFrom"): FunctionFragment;
+    getFunction(nameOrSignature: "allowance" | "approve" | "balanceOf" | "deposit" | "transfer" | "transferFrom" | "withdraw"): FunctionFragment;
     encodeFunctionData(functionFragment: "allowance", values: [AddressLike, AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "approve", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike, AddressLike]): string;
@@ -9,7 +9,6 @@ export interface IVaultInterface extends Interface {
     encodeFunctionData(functionFragment: "transfer", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "withdraw", values: [AddressLike, AddressLike, BigNumberish]): string;
-    encodeFunctionData(functionFragment: "withdrawFrom", values: [AddressLike, AddressLike, AddressLike, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -17,7 +16,6 @@ export interface IVaultInterface extends Interface {
     decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "withdrawFrom", data: BytesLike): Result;
 }
 export interface IVault extends BaseContract {
     connect(runner?: ContractRunner | null): IVault;
@@ -80,14 +78,6 @@ export interface IVault extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    withdrawFrom: TypedContractMethod<[
-        token: AddressLike,
-        from: AddressLike,
-        to: AddressLike,
-        amount: BigNumberish
-    ], [
-        void
-    ], "nonpayable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "allowance"): TypedContractMethod<[
         token: AddressLike,
@@ -132,14 +122,6 @@ export interface IVault extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "withdraw"): TypedContractMethod<[
         token: AddressLike,
-        to: AddressLike,
-        amount: BigNumberish
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "withdrawFrom"): TypedContractMethod<[
-        token: AddressLike,
-        from: AddressLike,
         to: AddressLike,
         amount: BigNumberish
     ], [

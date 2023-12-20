@@ -78,10 +78,11 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             revert UnsupportedTokenPair();
         }
         if(swap.sellerSignature.owner == swap.buyerSignature.owner ) {
-            revert InvalidSigers();
+            revert InvalidSigners();
         }
         if(swap.minBidAmount > swap.sellToken.amount) {
             revert InvalidMinBidAmount(swap.minBidAmount);
         }
     }
+    receive() external payable {}
 }

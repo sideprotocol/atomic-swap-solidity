@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-// import {EIP712} from  "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
-// import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-// import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 import {Context} from "@openzeppelin/contracts/utils/Context.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVault} from  "./interfaces/IVault.sol";
@@ -185,7 +182,7 @@ abstract contract Vault is Context,IVault  {
             TransferHelper.safeTransferFrom(token, _msgSender(), address(this), amount);
         } else {
             // Deposit is for Ether
-            require(msg.value != amount, "Vault: Ether deposit amount is zero");
+            require(msg.value == amount, "Vault: Ether deposit amount is zero");
         }
         
         // Update the user's balance
@@ -217,29 +214,6 @@ abstract contract Vault is Context,IVault  {
         } 
     }
 
-    function withdrawFrom(address token,address from, address to, uint256 amount) public {
-        address spender = _msgSender();
-        _spendAllowance(token,from, spender, amount);
-        
-        require(amount > 0, "Vault: withdraw amount is zero");
-        uint256 balance = _balances[spender][token];
-        require(balance >= amount, "Vault: withdraw amount exceeds balance");
-
-        // Update the user's balance
-        _balances[spender][token] -= amount;
-
-        if (token == address(0)) {
-            // Withdrawal is for Ether
-            (bool sent, ) = to.call{value: amount}("");
-            require(sent, "Vault: Failed to send Ether");
-        } else {
-            // Withdrawal is for ERC20 tokens
-            TransferHelper.safeTransfer(token, to, amount);
-            emit Withdrawal(token, to, amount);
-        } 
-    }
-    
-    
     // Function to receive Ether when 'send' or 'transfer' is used
     receive() external payable {}
     // Fallback function to receive Ether when called

@@ -73,7 +73,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
             revert IAtomicSwapBase.DuplicateReleaseSchedule();
         }
         releases.validateVestingParams();
-
+        
         _vault.transferFrom(token, totalAmount, isWithdraw);
         uint256 vestingStartTime = block.timestamp;
         uint vestingId = _issueVestingId(buyer, orderId);

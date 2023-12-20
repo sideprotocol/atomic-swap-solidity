@@ -23,7 +23,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VaultPermitInterface extends Interface {
-    getFunction(nameOrSignature: "DOMAIN_SEPARATOR" | "allowance" | "approve" | "balanceOf" | "deposit" | "eip712Domain" | "nonces" | "permit" | "transfer" | "transferFrom" | "withdraw" | "withdrawFrom"): FunctionFragment;
+    getFunction(nameOrSignature: "DOMAIN_SEPARATOR" | "allowance" | "approve" | "balanceOf" | "deposit" | "eip712Domain" | "nonces" | "permit" | "transfer" | "transferFrom" | "withdraw"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Deposit" | "EIP712DomainChanged" | "VaultApproval" | "VaultTransfer" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "DOMAIN_SEPARATOR", values?: undefined): string;
     encodeFunctionData(functionFragment: "allowance", values: [AddressLike, AddressLike, AddressLike]): string;
@@ -42,7 +42,6 @@ export interface VaultPermitInterface extends Interface {
     encodeFunctionData(functionFragment: "transfer", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "transferFrom", values: [AddressLike, AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "withdraw", values: [AddressLike, AddressLike, BigNumberish]): string;
-    encodeFunctionData(functionFragment: "withdrawFrom", values: [AddressLike, AddressLike, AddressLike, BigNumberish]): string;
     decodeFunctionResult(functionFragment: "DOMAIN_SEPARATOR", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
@@ -54,7 +53,6 @@ export interface VaultPermitInterface extends Interface {
     decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "transferFrom", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "withdrawFrom", data: BytesLike): Result;
 }
 export declare namespace DepositEvent {
     type InputTuple = [
@@ -233,14 +231,6 @@ export interface VaultPermit extends BaseContract {
     ], [
         void
     ], "nonpayable">;
-    withdrawFrom: TypedContractMethod<[
-        token: AddressLike,
-        from: AddressLike,
-        to: AddressLike,
-        amount: BigNumberish
-    ], [
-        void
-    ], "nonpayable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "DOMAIN_SEPARATOR"): TypedContractMethod<[], [string], "view">;
     getFunction(nameOrSignature: "allowance"): TypedContractMethod<[
@@ -316,14 +306,6 @@ export interface VaultPermit extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "withdraw"): TypedContractMethod<[
         token: AddressLike,
-        to: AddressLike,
-        amount: BigNumberish
-    ], [
-        void
-    ], "nonpayable">;
-    getFunction(nameOrSignature: "withdrawFrom"): TypedContractMethod<[
-        token: AddressLike,
-        from: AddressLike,
         to: AddressLike,
         amount: BigNumberish
     ], [

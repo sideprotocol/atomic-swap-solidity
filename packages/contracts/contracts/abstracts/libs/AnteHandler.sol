@@ -38,7 +38,6 @@ library AnteHandler {
         }else{
             TransferHelperWithVault.safeTransferFrom(vault,token, from, recipient, amountAfterFee);
         }
-        
         TransferHelperWithVault.safeTransferFrom(vault,token, from, address(this), fee);
         IVault(vault).withdraw(token,treasury, fee);
     }
@@ -54,81 +53,166 @@ library AnteHandler {
         IAtomicSwapBase.FeeParams memory feeParams,
         bool isWithdraw
     ) internal {
-        
         if (releases.length == 0) {
-            // Exchange the tokens
-            // If buying with ERC20 tokens
-            transferFromWithFeeAtVault(
-                vault,
-                sellToken.token,
-                seller,
-                buyer,
-                sellToken.amount,
-                feeParams.buyerFeeRate,
-                feeParams.maxFeeRateScale,
-                feeParams.treasury,
+            _transferWithoutVesting(
+                vault, 
+                sellToken, 
+                seller, 
+                buyer, 
+                feeParams, 
                 isWithdraw
             );
         } else {
-            // Transfer sell token to vesting contract
-            uint256 sellTokenFee = (sellToken.amount * feeParams.buyerFeeRate) /
-                feeParams.maxFeeRateScale;
-            uint256 sellTokenAmountAfterFee = sellToken.amount -
-                sellTokenFee;
-            // Take Fee.
-            // Move fund from vault to contract address for vesting:
-            TransferHelperWithVault.safeTransferFrom(
-                    vault,
-                    sellToken.token,
-                    seller,
-                    address(this),
-                    sellToken.amount
+            _transferWithVesting(
+                orderId,
+                vault,
+                sellToken,
+                seller,
+                buyer,
+                feeParams,
+                isWithdraw,
+                vestingManager,
+                releases
             );
-            
-            // take fee:
-            IVault(vault).withdraw( sellToken.token,feeParams.treasury, sellTokenFee);
-            if(!isWithdraw) {
-                IVault(vault).approve(
-                    sellToken.token,
-                    address(vestingManager),
-                    sellTokenAmountAfterFee
-                );
-                vestingManager.startVesting(
-                        orderId,
-                        buyer,
-                        sellToken.token,
-                        sellTokenAmountAfterFee,
-                        releases,
-                        isWithdraw
-                );
-            }else{
-                if (sellToken.token == address(0)) {
-                    // Take Fee.
-                    // slither-disable-next-line arbitrary-send-eth
-                    vestingManager.startVesting{value: sellTokenAmountAfterFee}(
-                        orderId,
-                        buyer,
-                        sellToken.token,
-                        sellTokenAmountAfterFee,
-                        releases,
-                        false
-                    );
-                } else {
-                    IVault(vault).withdraw(sellToken.token,address(this), sellTokenAmountAfterFee);
-                    IERC20(sellToken.token).approve(
-                        address(vestingManager),
-                        sellTokenAmountAfterFee
-                    );
-                    vestingManager.startVesting(
-                        orderId,
-                        buyer,
-                        sellToken.token,
-                        sellTokenAmountAfterFee,
-                        releases,
-                        isWithdraw
-                    );
-                }
-            }
+        }
+    }
+
+    function _transferWithoutVesting(
+        address vault,
+        IAtomicSwapBase.Coin memory sellToken,
+        address seller,
+        address buyer,
+        IAtomicSwapBase.FeeParams memory feeParams,
+        bool isWithdraw
+    ) private {
+        transferFromWithFeeAtVault(
+            vault,
+            sellToken.token,
+            seller,
+            buyer,
+            sellToken.amount,
+            feeParams.buyerFeeRate,
+            feeParams.maxFeeRateScale,
+            feeParams.treasury,
+            isWithdraw
+        );
+    }
+
+    function _transferWithVesting(
+        bytes32 orderId,
+        address vault,
+        IAtomicSwapBase.Coin memory sellToken,
+        address seller,
+        address buyer,
+        IAtomicSwapBase.FeeParams memory feeParams,
+        bool isWithdraw,
+        IVesting vestingManager,
+        IAtomicSwapBase.Release[] memory releases
+    ) private {
+        (uint256 sellTokenFee, uint256 sellTokenAmountAfterFee) = _calculateSellTokenFee(
+            sellToken.amount, 
+            feeParams
+        );
+
+        TransferHelperWithVault.safeTransferFrom(
+            vault,
+            sellToken.token,
+            seller,
+            address(this),
+            sellToken.amount
+        );
+
+        IVault(vault).withdraw(sellToken.token, feeParams.treasury, sellTokenFee);
+        _handleVesting(
+            orderId,
+            vault,
+            sellToken,
+            buyer,
+            sellTokenAmountAfterFee,
+            isWithdraw,
+            vestingManager,
+            releases
+        );
+    }
+
+    function _calculateSellTokenFee(
+        uint256 amount,
+        IAtomicSwapBase.FeeParams memory feeParams
+    ) private pure returns (uint256 fee, uint256 amountAfterFee) {
+        fee = (amount * feeParams.buyerFeeRate) / feeParams.maxFeeRateScale;
+        amountAfterFee = amount - fee;
+        return (fee, amountAfterFee);
+    }
+
+    function _handleVesting(
+        bytes32 orderId,
+        address vault,
+        IAtomicSwapBase.Coin memory sellToken,
+        address buyer,
+        uint256 sellTokenAmountAfterFee,
+        bool isWithdraw,
+        IVesting vestingManager,
+        IAtomicSwapBase.Release[] memory releases
+    ) private {
+        if (!isWithdraw) {
+            IVault(vault).approve(
+                sellToken.token,
+                address(vestingManager),
+                sellTokenAmountAfterFee
+            );
+            vestingManager.startVesting(
+                orderId,
+                buyer,
+                sellToken.token,
+                sellTokenAmountAfterFee,
+                releases,
+                isWithdraw
+            );
+        } else {
+            _handleWithdrawForVesting(
+                orderId,
+                vault,
+                sellToken,
+                buyer,
+                sellTokenAmountAfterFee,
+                vestingManager,
+                releases
+            );
+        }
+    }
+
+    function _handleWithdrawForVesting(
+        bytes32 orderId,
+        address vault,
+        IAtomicSwapBase.Coin memory sellToken,
+        address buyer,
+        uint256 sellTokenAmountAfterFee,
+        IVesting vestingManager,
+        IAtomicSwapBase.Release[] memory releases
+    ) private {
+        IVault(vault).withdraw(sellToken.token, address(this), sellTokenAmountAfterFee);
+        if (sellToken.token == address(0)) {
+            vestingManager.startVesting{value: sellTokenAmountAfterFee}(
+                orderId,
+                buyer,
+                sellToken.token,
+                sellTokenAmountAfterFee,
+                releases,
+                true // isWithdraw is true here
+            );
+        } else {
+            IERC20(sellToken.token).approve(
+                address(vestingManager),
+                sellTokenAmountAfterFee
+            );
+            vestingManager.startVesting(
+                orderId,
+                buyer,
+                sellToken.token,
+                sellTokenAmountAfterFee,
+                releases,
+                true // isWithdraw is true here
+            );
         }
     }
 }

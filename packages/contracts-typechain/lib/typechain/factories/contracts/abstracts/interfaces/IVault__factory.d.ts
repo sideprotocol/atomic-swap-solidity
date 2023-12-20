@@ -143,28 +143,6 @@ export declare class IVault__factory {
         readonly outputs: readonly [];
         readonly stateMutability: "nonpayable";
         readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
-            readonly name: "token";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "from";
-            readonly type: "address";
-        }, {
-            readonly internalType: "address";
-            readonly name: "to";
-            readonly type: "address";
-        }, {
-            readonly internalType: "uint256";
-            readonly name: "amount";
-            readonly type: "uint256";
-        }];
-        readonly name: "withdrawFrom";
-        readonly outputs: readonly [];
-        readonly stateMutability: "nonpayable";
-        readonly type: "function";
     }];
     static createInterface(): IVaultInterface;
     static connect(address: string, runner?: ContractRunner | null): IVault;

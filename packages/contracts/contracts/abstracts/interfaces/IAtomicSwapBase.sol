@@ -66,8 +66,8 @@ interface IAtomicSwapBase {
         address desiredTaker; // Desired taker address.
         uint256 minBidAmount; // Minimum bid.
         bool   acceptBid;
-        bool isMakerWithdraw;
-        bool isTakerWithdraw;
+        bool isSellerWithdraw;
+        bool isBuyerWithdraw;
         PermitSignature sellerSignature;
         PermitSignature buyerSignature;
     }
@@ -76,7 +76,7 @@ interface IAtomicSwapBase {
     error OrderAlreadyExists();
     error OrderAlreadyExpired(uint256 current, uint256 expiredTime);
     error UnsupportedTokenPair();
-    error InvalidSigers();
+    error InvalidSigners();
     error UnauthorizedSender();
     error InvalidMinBidAmount(uint256 amount);
     error InvalidExpirationTime(uint256 provided, uint256 maximum);

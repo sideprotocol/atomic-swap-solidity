@@ -34,9 +34,6 @@ library AtomicSwapStateLogic {
             revert IAtomicSwapBase.OrderAlreadyExists();
         }
 
-        if(swap.sellToken.token == address(0) || swap.buyToken.token == address(0)) {
-            revert IAtomicSwapBase.UnsupportedTokenPair();
-        }
         if(swap.sellerSignature.deadline < block.timestamp) {
             revert IAtomicSwapBase.InvalidExpirationTime(swap.sellerSignature.deadline, block.timestamp);
         }
@@ -89,7 +86,7 @@ library AtomicSwapStateLogic {
             feeParams.sellerFeeRate,
             feeParams.maxFeeRateScale,
             feeParams.treasury,
-            swap.isMakerWithdraw
+            swap.isSellerWithdraw
         );
 
         AnteHandler.transferFromSellTokenToBuyerAtVault(
@@ -101,7 +98,7 @@ library AtomicSwapStateLogic {
             swap.sellerSignature.owner,
             swap.buyerSignature.owner,
             feeParams,
-            swap.isTakerWithdraw
+            swap.isBuyerWithdraw
         );
     }
 
@@ -115,10 +112,6 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.SwapWithPermitMsg memory swap,
         bytes32 id
     ) internal {
-        if (swapOrder[id].id != bytes32(0x0)) {
-            revert IAtomicSwapBase.OrderAlreadyExists();
-        }
-
         IAtomicSwapBase.AtomicSwapOrder memory order = IAtomicSwapBase.AtomicSwapOrder(
             id,
             IAtomicSwapBase.OrderStatus.INITIAL,
@@ -147,7 +140,7 @@ library AtomicSwapStateLogic {
                 swap.desiredTaker,
                 swap.minBidAmount,
                 swap.acceptBid,
-                swap.isMakerWithdraw
+                swap.isSellerWithdraw
             )
         );
     }

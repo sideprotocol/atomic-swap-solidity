@@ -55,5 +55,4 @@ interface IVault {
     function transferFrom(address token, address from, address to, uint256 value) external returns (bool);
     function deposit(address token, uint amount) external payable;
     function withdraw(address token,address to, uint256 amount) external;
-    function withdrawFrom(address token,address from, address to, uint256 amount) external;
 }
