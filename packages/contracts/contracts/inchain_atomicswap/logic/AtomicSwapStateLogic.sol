@@ -37,12 +37,12 @@ library AtomicSwapStateLogic {
         if(swap.sellToken.token == address(0) || swap.buyToken.token == address(0)) {
             revert IAtomicSwapBase.UnsupportedTokenPair();
         }
-        if(swap.makerSignature.deadline < block.timestamp) {
-            revert IAtomicSwapBase.InvalidExpirationTime(swap.makerSignature.deadline, block.timestamp);
+        if(swap.sellerSignature.deadline < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(swap.sellerSignature.deadline, block.timestamp);
         }
 
-        if(swap.takerSignature.deadline < block.timestamp) {
-            revert IAtomicSwapBase.InvalidExpirationTime(swap.takerSignature.deadline, block.timestamp);
+        if(swap.buyerSignature.deadline < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(swap.buyerSignature.deadline, block.timestamp);
         }
 
         _permitAndTransfer(id,vault,vestingManager, swap,releases,feeParams);
@@ -51,7 +51,7 @@ library AtomicSwapStateLogic {
             swap,
             id
         );
-        return (id, swap.makerSignature.owner, swap.takerSignature.owner);
+        return (id, swap.sellerSignature.owner, swap.buyerSignature.owner);
     }
 
     function _permitAndTransfer(
@@ -70,21 +70,21 @@ library AtomicSwapStateLogic {
             address(this),
             swap.sellToken.amount,
             agreement,
-            swap.makerSignature
+            swap.sellerSignature
         );
         IVaultPermit(vault).permit(
             swap.buyToken.token,
             address(this),
             swap.buyToken.amount,
             agreement,
-            swap.takerSignature
+            swap.buyerSignature
         );
 
         AnteHandler.transferFromWithFeeAtVault(
             address(vault),
             swap.buyToken.token,
-            swap.takerSignature.owner,
-            swap.makerSignature.owner,
+            swap.buyerSignature.owner,
+            swap.sellerSignature.owner,
             swap.buyToken.amount,
             feeParams.sellerFeeRate,
             feeParams.maxFeeRateScale,
@@ -98,8 +98,8 @@ library AtomicSwapStateLogic {
             releases,
             address(vault),
             vestingManager,
-            swap.makerSignature.owner,
-            swap.takerSignature.owner,
+            swap.sellerSignature.owner,
+            swap.buyerSignature.owner,
             feeParams,
             swap.isTakerWithdraw
         );
@@ -122,7 +122,7 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.AtomicSwapOrder memory order = IAtomicSwapBase.AtomicSwapOrder(
             id,
             IAtomicSwapBase.OrderStatus.INITIAL,
-            swap.makerSignature.owner,
+            swap.sellerSignature.owner,
             swap.sellToken,
             swap.desiredTaker,
             swap.buyToken,
@@ -130,7 +130,7 @@ library AtomicSwapStateLogic {
             block.timestamp,
             0,
             0,
-            swap.makerSignature.deadline,
+            swap.sellerSignature.deadline,
             swap.acceptBid
         );
         swapOrder[id] = order;

@@ -309,14 +309,14 @@ export function setupSwapPermitPayload(
     acceptBid: true,
     isMakerWithdraw: false,
     isTakerWithdraw: false,
-    makerSignature: {
+    sellerSignature: {
       v: 27 | 28,
       r: "",
       s: "",
       owner: "",
       deadline: BigInt(0),
     },
-    takerSignature: {
+    buyerSignature: {
       v: 27 | 28,
       r: "",
       s: "",
@@ -339,7 +339,7 @@ export const setupSignature = async (
   swapPermitPayload.buyToken.amount = attackAmount;
   // Recreate taker signature with the attack amount
   const takerNonce = await vault.nonces(taker.address);
-  const { signature: takerSignature } = await ecdsa.createPermitSignature({
+  const { signature: buyerSignature } = await ecdsa.createPermitSignature({
     tokenName: vaultName,
     contractAddress: await vault.getAddress(),
     chainId: chainId,
@@ -350,8 +350,8 @@ export const setupSignature = async (
     nonce: takerNonce,
     deadline,
   });
-  const takerSig = ethers.Signature.from(takerSignature);
-  swapPermitPayload.takerSignature = {
+  const takerSig = ethers.Signature.from(buyerSignature);
+  swapPermitPayload.buyerSignature = {
     deadline,
     v: takerSig.v,
     r: takerSig.r,

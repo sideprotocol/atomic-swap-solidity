@@ -27,52 +27,52 @@ describe("AtomicSwap: Gasless Swap", () => {
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {},
         shouldThrow: false,
       },
-      // {
-      //   name: "Swap ERC20 tokens without vesting, allowing maker to withdraw",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-      //     swapPermitPayload.isMakerWithdraw = true;
-      //   },
-      // },
-      // {
-      //   name: "Swap ERC20 tokens without vesting, allowing taker to withdraw",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-      //     swapPermitPayload.isTakerWithdraw = true;
-      //   },
-      // },
-      // {
-      //   name: "Swap ERC20 tokens without vesting, allowing both maker and taker to withdraw",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-      //     swapPermitPayload.isTakerWithdraw = true;
-      //     swapPermitPayload.isTakerWithdraw = true;
-      //   },
-      // },
-      // {
-      //   name: "Swap ERC20 tokens with vesting but no withdrawals",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {},
-      //   isVesting: true,
-      // },
-      // {
-      //   name: "Swap ERC20 tokens with vesting, allowing maker to withdraw",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-      //     swapPermitPayload.isMakerWithdraw = true;
-      //   },
-      //   isVesting: true,
-      // },
-      // {
-      //   name: "Swap ERC20 tokens with vesting, allowing taker to withdraw",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-      //     swapPermitPayload.isTakerWithdraw = true;
-      //   },
-      //   isVesting: true,
-      // },
-      // {
-      //   name: "Swap ERC20 tokens with vesting, allowing both maker and taker to withdraw",
-      //   mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-      //     swapPermitPayload.isMakerWithdraw = true;
-      //     swapPermitPayload.isTakerWithdraw = true;
-      //   },
-      //   isVesting: true,
-      // },
+      {
+        name: "Swap ERC20 tokens without vesting, allowing maker to withdraw",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.isMakerWithdraw = true;
+        },
+      },
+      {
+        name: "Swap ERC20 tokens without vesting, allowing taker to withdraw",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.isTakerWithdraw = true;
+        },
+      },
+      {
+        name: "Swap ERC20 tokens without vesting, allowing both maker and taker to withdraw",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.isTakerWithdraw = true;
+          swapPermitPayload.isTakerWithdraw = true;
+        },
+      },
+      {
+        name: "Swap ERC20 tokens with vesting but no withdrawals",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {},
+        isVesting: true,
+      },
+      {
+        name: "Swap ERC20 tokens with vesting, allowing maker to withdraw",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.isMakerWithdraw = true;
+        },
+        isVesting: true,
+      },
+      {
+        name: "Swap ERC20 tokens with vesting, allowing taker to withdraw",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.isTakerWithdraw = true;
+        },
+        isVesting: true,
+      },
+      {
+        name: "Swap ERC20 tokens with vesting, allowing both maker and taker to withdraw",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.isMakerWithdraw = true;
+          swapPermitPayload.isTakerWithdraw = true;
+        },
+        isVesting: true,
+      },
     ];
 
     tests.forEach(async (test) => {
@@ -123,8 +123,8 @@ describe("AtomicSwap: Gasless Swap", () => {
         const deadline = BigInt(await BlockTime.AfterSeconds(100000));
         const makerNonce = await vault.nonces(maker.address);
         const agreement = generateAgreement(swapPermitPayload);
-        const { signature: makerSignature } = await ecdsa.createPermitSignature(
-          {
+        const { signature: sellerSignature } =
+          await ecdsa.createPermitSignature({
             tokenName: vaultName,
             contractAddress: await vault.getAddress(),
             chainId: chainId,
@@ -134,11 +134,10 @@ describe("AtomicSwap: Gasless Swap", () => {
             agreement,
             nonce: makerNonce,
             deadline,
-          },
-        );
+          });
 
-        const makerSig = ethers.Signature.from(makerSignature);
-        swapPermitPayload.makerSignature = {
+        const makerSig = ethers.Signature.from(sellerSignature);
+        swapPermitPayload.sellerSignature = {
           deadline,
           v: makerSig.v,
           r: makerSig.r,
@@ -147,7 +146,7 @@ describe("AtomicSwap: Gasless Swap", () => {
         };
 
         const takerNonce = await vault.nonces(taker.address);
-        const { signature: takerSignature } = await ecdsa.createPermitSignature(
+        const { signature: buyerSignature } = await ecdsa.createPermitSignature(
           {
             tokenName: vaultName,
             contractAddress: await vault.getAddress(),
@@ -160,8 +159,8 @@ describe("AtomicSwap: Gasless Swap", () => {
             deadline,
           },
         );
-        const takerSig = ethers.Signature.from(takerSignature);
-        swapPermitPayload.takerSignature = {
+        const takerSig = ethers.Signature.from(buyerSignature);
+        swapPermitPayload.buyerSignature = {
           deadline,
           v: takerSig.v,
           r: takerSig.r,
@@ -243,8 +242,8 @@ describe("AtomicSwap: Gasless Swap", () => {
         ) => {},
         expectedRevertError: "VaultInvalidSigner",
         from: "vault",
-        isManipulateTakerSignature: true,
-        malletTakerSignature: async (
+        isManipulatebuyerSignature: true,
+        malletbuyerSignature: async (
           swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct,
           atomicSwapAddress?: string,
           vaultAddress?: string,
@@ -256,7 +255,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           const { chainId } = await ethers.provider.getNetwork();
           const attackAmount = ethers.parseEther("15");
           const deadline = await BlockTime.AfterSeconds(1000);
-          const { signature: takerSignature } =
+          const { signature: buyerSignature } =
             await ecdsa.createPermitSignature({
               tokenName: vaultName!,
               contractAddress: vaultAddress!,
@@ -268,8 +267,8 @@ describe("AtomicSwap: Gasless Swap", () => {
               nonce: nonce!,
               deadline,
             });
-          const takerSig = ethers.Signature.from(takerSignature);
-          swapPermitPayload.takerSignature = {
+          const takerSig = ethers.Signature.from(buyerSignature);
+          swapPermitPayload.buyerSignature = {
             deadline,
             v: takerSig.v,
             r: takerSig.r,
@@ -285,8 +284,8 @@ describe("AtomicSwap: Gasless Swap", () => {
         ) => {},
         expectedRevertError: "VaultInvalidSigner",
         from: "vault",
-        isManipulateTakerSignature: true,
-        malletTakerSignature: async (
+        isManipulatebuyerSignature: true,
+        malletbuyerSignature: async (
           swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct,
           atomicSwapAddress?: string,
           vaultAddress?: string,
@@ -300,7 +299,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           const deadline = await BlockTime.AfterSeconds(1000);
           swapPermitPayload.buyToken.amount = attackAmount;
 
-          const { signature: takerSignature } =
+          const { signature: buyerSignature } =
             await ecdsa.createPermitSignature({
               tokenName: vaultName!,
               contractAddress: vaultAddress!,
@@ -312,8 +311,8 @@ describe("AtomicSwap: Gasless Swap", () => {
               nonce: nonce!,
               deadline,
             });
-          const takerSig = ethers.Signature.from(takerSignature);
-          swapPermitPayload.takerSignature = {
+          const takerSig = ethers.Signature.from(buyerSignature);
+          swapPermitPayload.buyerSignature = {
             deadline,
             v: takerSig.v,
             r: takerSig.r,
@@ -347,7 +346,7 @@ describe("AtomicSwap: Gasless Swap", () => {
         mallet: (
           swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct,
         ) => {
-          swapPermitPayload.makerSignature.deadline = BigInt(1000);
+          swapPermitPayload.sellerSignature.deadline = BigInt(1000);
         },
         expectedRevertError: "InvalidExpirationTime",
         from: "",
@@ -357,7 +356,7 @@ describe("AtomicSwap: Gasless Swap", () => {
         mallet: (
           swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct,
         ) => {
-          swapPermitPayload.makerSignature.owner = generateRandomTestAddress();
+          swapPermitPayload.sellerSignature.owner = generateRandomTestAddress();
         },
         expectedRevertError: "VaultInvalidSigner",
         from: "vault",
@@ -399,10 +398,10 @@ describe("AtomicSwap: Gasless Swap", () => {
       ({
         name,
         mallet,
-        malletTakerSignature,
+        malletbuyerSignature,
         expectedRevertError,
         from,
-        isManipulateTakerSignature,
+        isManipulatebuyerSignature,
       }) => {
         it(name, async () => {
           const {
@@ -450,7 +449,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           const agreement = generateAgreement(swapPermitPayload);
 
           // Maker signature setup
-          const { signature: makerSignature } =
+          const { signature: sellerSignature } =
             await ecdsa.createPermitSignature({
               tokenName: vaultName,
               contractAddress: vaultAddress,
@@ -462,8 +461,8 @@ describe("AtomicSwap: Gasless Swap", () => {
               nonce: makerNonce,
               deadline,
             });
-          const makerSig = ethers.Signature.from(makerSignature);
-          swapPermitPayload.makerSignature = {
+          const makerSig = ethers.Signature.from(sellerSignature);
+          swapPermitPayload.sellerSignature = {
             deadline,
             v: makerSig.v,
             r: makerSig.r,
@@ -473,8 +472,8 @@ describe("AtomicSwap: Gasless Swap", () => {
 
           const takerNonce = await vault.nonces(taker.address);
           //const attackAmount = ethers.parseEther("15");
-          if (isManipulateTakerSignature) {
-            await malletTakerSignature(
+          if (isManipulatebuyerSignature) {
+            await malletbuyerSignature(
               swapPermitPayload,
               atomicSwapAddress,
               vaultAddress,
@@ -484,7 +483,7 @@ describe("AtomicSwap: Gasless Swap", () => {
               takerNonce,
             );
           } else {
-            const { signature: takerSignature } =
+            const { signature: buyerSignature } =
               await ecdsa.createPermitSignature({
                 tokenName: vaultName,
                 contractAddress: vaultAddress,
@@ -497,8 +496,8 @@ describe("AtomicSwap: Gasless Swap", () => {
                 deadline,
               });
 
-            const takerSig = ethers.Signature.from(takerSignature);
-            swapPermitPayload.takerSignature = {
+            const takerSig = ethers.Signature.from(buyerSignature);
+            swapPermitPayload.buyerSignature = {
               deadline,
               v: takerSig.v,
               r: takerSig.r,

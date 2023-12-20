@@ -145,8 +145,8 @@ interface IAtomicSwapBase {
         bool   acceptBid;
         bool isMakerWithdraw;
         bool isTakerWithdraw;
-        PermitSignature makerSignature;
-        PermitSignature takerSignature;
+        PermitSignature sellerSignature;
+        PermitSignature buyerSignature;
     }
 
     // Custom errors
