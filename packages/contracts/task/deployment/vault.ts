@@ -4,13 +4,17 @@ import { task } from "hardhat/config";
 dotenv.config();
 
 task("deploy:vault", "deploy vault contract").setAction(
-  async ({}, { ethers, network }) => {
+  async ({}, { ethers, network, upgrades }) => {
     //deploy contracts
     const admin = process.env.ADMIN;
+    
     // AtomicSwap contract deploy
-    const vaultFactory = await ethers.getContractFactory("Vault");
+    const vaultFactory = await ethers.getContractFactory("VaultPermit");
     // deploy contract
-    const vault = await vaultFactory.deploy("SideVault");
+    const vault = await upgrades.deployProxy(vaultFactory, [
+      admin,
+      "SideVault",
+    ]);
     const vaultContractAddress = await vault.getAddress();
     await saveItemsToSetting([
       {

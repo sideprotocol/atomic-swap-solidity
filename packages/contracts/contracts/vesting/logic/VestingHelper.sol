@@ -7,7 +7,7 @@ library VestingHelper {
       /// @notice Validates vesting parameters for an atomic swap.
     /// @param releases Array of release schedules for the vesting.
     /// @dev Ensures the total percentage of releases equals 100% and the number of releases is within limits.
-    function validateVestingParams(IAtomicSwapBase.Release[] memory releases) external pure {
+    function validateVestingParams(IAtomicSwapBase.Release[] memory releases) internal pure {
         if (releases.length == 0) {
             revert IAtomicSwapBase.ZeroReleaseSchedule();
         }
@@ -35,7 +35,7 @@ library VestingHelper {
         address token, 
         uint amount,
         bool isWithdraw
-    ) external {
+    ) internal {
         if(!isWithdraw) {
             TransferHelperWithVault.safeTransferFrom(
                 vault,

@@ -80,7 +80,5 @@ export type { VaultPermit } from "./contracts/vault/VaultPermit";
 export { VaultPermit__factory } from "./factories/contracts/vault/VaultPermit__factory";
 export type { IVesting } from "./contracts/vesting/interfaces/IVesting";
 export { IVesting__factory } from "./factories/contracts/vesting/interfaces/IVesting__factory";
-export type { VestingHelper } from "./contracts/vesting/logic/VestingHelper";
-export { VestingHelper__factory } from "./factories/contracts/vesting/logic/VestingHelper__factory";
 export type { Vesting } from "./contracts/vesting/Vesting";
 export { Vesting__factory } from "./factories/contracts/vesting/Vesting__factory";

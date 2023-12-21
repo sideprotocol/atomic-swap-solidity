@@ -162,10 +162,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVesting__factory>;
     getContractFactory(
-      name: "VestingHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VestingHelper__factory>;
-    getContractFactory(
       name: "Vesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Vesting__factory>;
@@ -356,11 +352,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IVesting>;
     getContractAt(
-      name: "VestingHelper",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VestingHelper>;
-    getContractAt(
       name: "Vesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -514,10 +505,6 @@ declare module "hardhat/types/runtime" {
       name: "IVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVesting>;
-    deployContract(
-      name: "VestingHelper",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.VestingHelper>;
     deployContract(
       name: "Vesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -708,11 +695,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVesting>;
-    deployContract(
-      name: "VestingHelper",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.VestingHelper>;
     deployContract(
       name: "Vesting",
       args: any[],
