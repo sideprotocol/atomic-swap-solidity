@@ -68,7 +68,11 @@ export const Utils = {
     // Deploy Vault contract
     const vaultName = "Side_Vault";
     const vaultFactory = await ethers.getContractFactory("VaultPermit");
-    const vault = await vaultFactory.deploy(vaultName);
+    const vault = await upgrades.deployProxy(vaultFactory, [
+      owner.address,
+      vaultName,
+    ]);
+    //await vaultFactory.deploy(vaultName);
     const vaultAddress = await vault.getAddress();
 
     // Deploy vesting contract.

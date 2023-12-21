@@ -3,7 +3,6 @@ pragma solidity ^0.8.19;
 import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {TransferHelperWithVault} from "../../abstracts/libs/TransferHelperWithVault.sol";
-import "hardhat/console.sol";
 library VestingHelper { 
       /// @notice Validates vesting parameters for an atomic swap.
     /// @param releases Array of release schedules for the vesting.
@@ -37,7 +36,6 @@ library VestingHelper {
         uint amount,
         bool isWithdraw
     ) external {
-        console.log("isWithdraw", isWithdraw);
         if(!isWithdraw) {
             TransferHelperWithVault.safeTransferFrom(
                 vault,

@@ -2,7 +2,7 @@ import type { BaseContract, BigNumberish, BytesLike, FunctionFragment, Result, I
 import type { TypedContractEvent, TypedDeferredTopicFilter, TypedEventLog, TypedLogDescription, TypedListener, TypedContractMethod } from "../../common";
 export interface VaultInterface extends Interface {
     getFunction(nameOrSignature: "allowance" | "approve" | "balanceOf" | "deposit" | "transfer" | "transferFrom" | "withdraw"): FunctionFragment;
-    getEvent(nameOrSignatureOrTopic: "Deposit" | "VaultApproval" | "VaultTransfer" | "Withdrawal"): EventFragment;
+    getEvent(nameOrSignatureOrTopic: "Deposit" | "Initialized" | "VaultApproval" | "VaultTransfer" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "allowance", values: [AddressLike, AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "approve", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike, AddressLike]): string;
@@ -29,6 +29,17 @@ export declare namespace DepositEvent {
         token: string;
         from: string;
         value: bigint;
+    }
+    type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+    type Filter = TypedDeferredTopicFilter<Event>;
+    type Log = TypedEventLog<Event>;
+    type LogDescription = TypedLogDescription<Event>;
+}
+export declare namespace InitializedEvent {
+    type InputTuple = [version: BigNumberish];
+    type OutputTuple = [version: bigint];
+    interface OutputObject {
+        version: bigint;
     }
     type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
     type Filter = TypedDeferredTopicFilter<Event>;
@@ -204,12 +215,15 @@ export interface Vault extends BaseContract {
         void
     ], "nonpayable">;
     getEvent(key: "Deposit"): TypedContractEvent<DepositEvent.InputTuple, DepositEvent.OutputTuple, DepositEvent.OutputObject>;
+    getEvent(key: "Initialized"): TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
     getEvent(key: "VaultApproval"): TypedContractEvent<VaultApprovalEvent.InputTuple, VaultApprovalEvent.OutputTuple, VaultApprovalEvent.OutputObject>;
     getEvent(key: "VaultTransfer"): TypedContractEvent<VaultTransferEvent.InputTuple, VaultTransferEvent.OutputTuple, VaultTransferEvent.OutputObject>;
     getEvent(key: "Withdrawal"): TypedContractEvent<WithdrawalEvent.InputTuple, WithdrawalEvent.OutputTuple, WithdrawalEvent.OutputObject>;
     filters: {
         "Deposit(address,address,uint256)": TypedContractEvent<DepositEvent.InputTuple, DepositEvent.OutputTuple, DepositEvent.OutputObject>;
         Deposit: TypedContractEvent<DepositEvent.InputTuple, DepositEvent.OutputTuple, DepositEvent.OutputObject>;
+        "Initialized(uint64)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
+        Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
         "VaultApproval(address,address,uint256)": TypedContractEvent<VaultApprovalEvent.InputTuple, VaultApprovalEvent.OutputTuple, VaultApprovalEvent.OutputObject>;
         VaultApproval: TypedContractEvent<VaultApprovalEvent.InputTuple, VaultApprovalEvent.OutputTuple, VaultApprovalEvent.OutputObject>;
         "VaultTransfer(address,address,address,uint256)": TypedContractEvent<VaultTransferEvent.InputTuple, VaultTransferEvent.OutputTuple, VaultTransferEvent.OutputObject>;

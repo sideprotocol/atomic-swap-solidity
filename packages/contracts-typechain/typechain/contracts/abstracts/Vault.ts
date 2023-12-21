@@ -38,6 +38,7 @@ export interface VaultInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "Deposit"
+      | "Initialized"
       | "VaultApproval"
       | "VaultTransfer"
       | "Withdrawal"
@@ -95,6 +96,18 @@ export namespace DepositEvent {
     token: string;
     from: string;
     value: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -320,6 +333,13 @@ export interface Vault extends BaseContract {
     DepositEvent.OutputObject
   >;
   getEvent(
+    key: "Initialized"
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
+  >;
+  getEvent(
     key: "VaultApproval"
   ): TypedContractEvent<
     VaultApprovalEvent.InputTuple,
@@ -351,6 +371,17 @@ export interface Vault extends BaseContract {
       DepositEvent.InputTuple,
       DepositEvent.OutputTuple,
       DepositEvent.OutputObject
+    >;
+
+    "Initialized(uint64)": TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
     >;
 
     "VaultApproval(address,address,uint256)": TypedContractEvent<

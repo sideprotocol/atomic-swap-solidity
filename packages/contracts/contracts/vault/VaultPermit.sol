@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-import {EIP712} from  "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import {EIP712Upgradeable} from  "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
+import {NoncesUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable.sol";
 import {IAtomicSwapBase} from "../abstracts/interfaces/IAtomicSwapBase.sol";
 import {IVaultPermit} from  "./interfaces/IVaultPermit.sol" ;
 import {Vault} from "../abstracts/Vault.sol";
 import {IAtomicSwapBase} from "./../abstracts/interfaces/IAtomicSwapBase.sol";
-
-contract VaultPermit is  Vault, EIP712, Nonces,IVaultPermit {
+import {OwnablePausableUpgradeable} from  "../abstracts/OwnablePausableUpgradeable.sol";
+contract VaultPermit is  Vault, EIP712Upgradeable, NoncesUpgradeable,IVaultPermit, OwnablePausableUpgradeable {
     bytes32 private constant PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,bytes32 agreement,uint256 nonce,uint256 deadline)");
     /**
      * @dev Permit deadline has expired.
@@ -20,7 +20,12 @@ contract VaultPermit is  Vault, EIP712, Nonces,IVaultPermit {
      */
     error VaultInvalidSigner(address signer, address owner);
 
-    constructor(string memory name) EIP712(name, "1") {}
+    /// @notice Initializes the vesting contract with necessary parameters.
+    function initialize(address admin, string memory name) external initializer {
+        __OwnablePausableUpgradeable_init(admin);
+        __EIP712_init(name,"1");
+    }
+
 
     function permit(
         address token, 
@@ -65,7 +70,7 @@ contract VaultPermit is  Vault, EIP712, Nonces,IVaultPermit {
         }
         _approve(token,signature.owner, spender, value, true);
     }
-    function nonces(address owner) public view virtual override(IVaultPermit,Nonces) returns (uint256) {
+    function nonces(address owner) public view virtual override(IVaultPermit,NoncesUpgradeable) returns (uint256) {
         return super.nonces(owner);
     }
 

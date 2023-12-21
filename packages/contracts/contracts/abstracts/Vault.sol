@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {ContextUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {IVault} from  "./interfaces/IVault.sol";
 
-abstract contract Vault is Context,IVault  {
+abstract contract Vault is ContextUpgradeable,IVault  {
     
     mapping(address account => mapping(address token => uint amount)) private _balances;
     mapping(address account => mapping(address  token => mapping(address spender => uint256))) private _allowances;
 
-    
     event  VaultApproval(address indexed owner, address indexed spender, uint indexed value);
     event  VaultTransfer(address token, address from, address to, uint value);
       // Event for Deposits
