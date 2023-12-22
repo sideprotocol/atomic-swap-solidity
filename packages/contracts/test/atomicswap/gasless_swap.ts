@@ -100,7 +100,6 @@ describe("AtomicSwap: Gasless Swap", () => {
         isVesting: true,
       },
     ];
-
     swapCases.forEach(async (test) => {
       it(test.name, async () => {
         const {

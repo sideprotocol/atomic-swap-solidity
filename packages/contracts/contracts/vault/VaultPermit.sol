@@ -43,9 +43,6 @@ contract VaultPermit is  Vault, EIP712Upgradeable,IVaultPermit, OwnablePausableU
         bytes32 agreement,
         IAtomicSwapBase.PermitSignature calldata signature
     ) public virtual {
-        // if(_agreements[agreement]>1) {
-        //     revert VaultDuplicatedAgreement(agreement);
-        // }
         if(_agreements.contains(agreement)) {
             revert VaultDuplicatedAgreement(agreement);
         }
