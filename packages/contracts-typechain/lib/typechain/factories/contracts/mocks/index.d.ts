@@ -1,2 +1,1 @@
-export * as mockErc20Sol from "./MockERC20.sol";
 export { MockToken__factory } from "./MockToken__factory";

@@ -1,2 +1,3 @@
-export type { IVault } from "./IVault";
-export type { Vault } from "./Vault";
+import type * as interfaces from "./interfaces";
+export type { interfaces };
+export type { VaultPermit } from "./VaultPermit";

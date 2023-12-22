@@ -6,7 +6,6 @@ import {ReentrancyGuardUpgradeable} from  "@openzeppelin/contracts-upgradeable/u
 
 import { IAtomicSwapBase } from "./interfaces/IAtomicSwapBase.sol";
 import {IVesting} from  "../vesting/interfaces/IVesting.sol";
-import {IVault} from "../vault/IVault.sol";
 
 /// @title AtomicSwapBase
 /// @notice Abstract contract for creating atomic swap orders with support for vesting parameters.
@@ -17,9 +16,6 @@ abstract contract AtomicSwapBase is OwnablePausableUpgradeable, ReentrancyGuardU
 
     /// @notice Records vesting parameters for each swap order.
     mapping(bytes32 => Release[]) public swapOrderVestingParams;
-
-    /// @notice Stores the bids for each swap order by bidder address.
-    mapping(bytes32 => mapping(address => Bid)) public bids;
 
     /// @notice Contract managing the vesting of tokens.
     IVesting internal vestingManager;
@@ -36,26 +32,4 @@ abstract contract AtomicSwapBase is OwnablePausableUpgradeable, ReentrancyGuardU
 
     /// @dev Maximum scale for fee rate calculations.
     uint256 constant internal MAX_FEE_RATE_SCALE = 1e4;
-
-    /// @notice Mapping of counteroffers for each bid.
-    /// @dev Primary mapping using BidKey (order + bidder).
-    mapping(bytes32 => mapping(address => uint256)) public counteroffers;
-
-    /// @notice Ensures that the order exists before proceeding.
-    /// @param id The unique identifier of the order.
-    modifier onlyExist(bytes32 id) {
-        if (swapOrder[id].maker == address(0)) {
-            revert OrderDoesNotExist();
-        }
-        _;
-    }
-
-    /// @notice Ensures that the order status is initial.
-    /// @param id The unique identifier of the order.
-    modifier onlyActiveOrder(bytes32 id) {
-        if (swapOrder[id].status != OrderStatus.INITIAL) {
-            revert InactiveOrder();
-        }
-        _;
-    }
 }

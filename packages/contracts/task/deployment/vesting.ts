@@ -8,18 +8,6 @@ task("deploy:vesting", "deploy vesting contract").setAction(
   async ({}, { ethers, upgrades, network }) => {
     //deploy contracts
     const admin = process.env.ADMIN;
-    let AtomicSwapMsgValidatorAddress =
-      Settings[
-        `AtomicSwapMsgValidator_${network.name}` as keyof typeof Settings
-      ];
-    if (!ethers.isAddress(AtomicSwapMsgValidatorAddress)) {
-      const AtomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-        `AtomicSwapMsgValidator`,
-      );
-      const AtomicSwapMsgValidator =
-        await AtomicSwapMsgValidatorFactory.deploy();
-      AtomicSwapMsgValidatorAddress = await AtomicSwapMsgValidator.getAddress();
-    }
 
     let vaultAddress =
       Settings[`vault_${network.name}` as keyof typeof Settings];
@@ -29,11 +17,7 @@ task("deploy:vesting", "deploy vesting contract").setAction(
     }
 
     // AtomicSwap contract deploy
-    const vestingFactory = await ethers.getContractFactory(`Vesting`, {
-      libraries: {
-        AtomicSwapMsgValidator: AtomicSwapMsgValidatorAddress,
-      },
-    });
+    const vestingFactory = await ethers.getContractFactory(`Vesting`);
     // deploy contract
     const vesting = await upgrades.deployProxy(
       vestingFactory,

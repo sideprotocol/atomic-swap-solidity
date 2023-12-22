@@ -8,7 +8,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "@nomicfoundation/hardhat-chai-matchers";
 import "hardhat-contract-sizer";
 import "@nomiclabs/hardhat-solhint";
-import "@nomicfoundation/hardhat-foundry";
+//import "@nomicfoundation/hardhat-foundry";
 dotenv.config();
 
 import "./task/deployment/inchain_atomicswap";
@@ -41,9 +41,9 @@ const config: HardhatUserConfig = {
       },
       optimizer: {
         enabled: true,
-        runs: 100,
+        runs: 10000,
       },
-      viaIR: true,
+      viaIR: false,
       diagnostics: {
         overwriteStack: true,
       },

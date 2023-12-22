@@ -2,15 +2,13 @@
 pragma solidity ^0.8.19;
 
 import {AtomicSwapBase} from "../abstracts/AtomicSwapBase.sol";
-import {AtomicSwapMsgValidator} from "../abstracts/libs/utils/AtomicSwapMsgValidator.sol";
-import {AtomicSwapStateLogic} from "../abstracts/libs/logic/AtomicSwapStateLogic.sol";
+import {AtomicSwapStateLogic} from "./logic/AtomicSwapStateLogic.sol";
 import {IInchainAtomicSwap} from "./interfaces/IInchainAtomicSwap.sol";
 import {IVesting} from "../vesting/interfaces/IVesting.sol";
 /// @title Inchain Atomic Swap
 /// @notice Contract for handling in-chain atomic swaps with vesting capabilities.
 /// @dev Extends the AtomicSwapBase and implements the IInchainAtomicSwap interface.
 contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
-    using AtomicSwapMsgValidator for *;
     using AtomicSwapStateLogic for *;
 
     /// @notice Initializes the contract with necessary parameters.
@@ -49,9 +47,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         SwapWithPermitMsg calldata swap,
         Release[] calldata releases 
     ) external  nonReentrant whenNotPaused {
-        if(swap.sellToken.token == swap.buyToken.token) {
-            revert UnsupportedTokenPair();
-        }
+        _validateSwapParams(swap);
         FeeParams memory params = FeeParams(
             sellerFeeRate,
             buyerFeeRate,
@@ -76,4 +72,17 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             );
         }
     }
+
+    function _validateSwapParams(SwapWithPermitMsg calldata swap) internal pure {
+        if(swap.sellToken.token == swap.buyToken.token) {
+            revert UnsupportedTokenPair();
+        }
+        if(swap.sellerSignature.owner == swap.buyerSignature.owner ) {
+            revert InvalidSigners();
+        }
+        if(swap.minBidAmount > swap.sellToken.amount) {
+            revert InvalidMinBidAmount(swap.minBidAmount);
+        }
+    }
+    receive() external payable {}
 }

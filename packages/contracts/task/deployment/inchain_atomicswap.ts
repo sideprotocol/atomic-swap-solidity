@@ -12,19 +12,11 @@ task("deploy:in-chain:lib", "deploy libraries")
     const AnteHandler = await AnteHandlerFactory.deploy();
     const AnteHandlerAddress = await AnteHandler.getAddress();
 
-    const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-      "AtomicSwapMsgValidator",
-    );
-    const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
-    const atomicSwapMsgValidatorAddress =
-      await atomicSwapMsgValidator.getAddress();
-
     const atomicSwapStateLogicFactory = await ethers.getContractFactory(
       "AtomicSwapStateLogic",
       {
         libraries: {
           AnteHandler: AnteHandlerAddress,
-          //AtomicSwapMsgValidator: atomicSwapMsgValidatorAddress,
         },
       },
     );
@@ -41,10 +33,6 @@ task("deploy:in-chain:lib", "deploy libraries")
           title: `AnteHandler_${network.name}`,
           value: AnteHandlerAddress,
         },
-        {
-          title: `atomicSwapMsgValidator_${network.name}`,
-          value: atomicSwapMsgValidatorAddress,
-        },
       ],
       f,
     );
@@ -54,10 +42,6 @@ task("deploy:in-chain:lib", "deploy libraries")
     );
 
     console.log(`AnteHandler_${network.name}`, AnteHandlerAddress);
-    console.log(
-      `atomicSwapMsgValidator_${network.name}`,
-      atomicSwapMsgValidatorAddress,
-    );
   });
 
 task("deploy:in-chain:contract", "deploy in chain ").setAction(

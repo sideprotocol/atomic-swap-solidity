@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
+import {IVaultPermit} from "../../vault/interfaces/IVaultPermit.sol";
+import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
+import {IVesting} from "../../vesting/interfaces/IVesting.sol";
+import {AnteHandler} from "../../abstracts/libs/AnteHandler.sol";
+/// @title Atomic Swap State Logic
+/// @notice Library providing state management functions for atomic swap orders and bids.
+/// @dev Used by atomic swap contracts to manipulate order and bid states.
+library AtomicSwapStateLogic {
+    /// @notice Generates a new unique identifier for an atomic swap.
+    /// @param uuid A unique value used to generate the ID.
+    /// @param contractAddress The address of the contract using the ID.
+    /// @return id The generated unique identifier.
+    /// @dev Uses keccak256 hashing to generate a unique ID.
+    function generateNewAtomicSwapID(bytes32 uuid, address contractAddress) public pure returns (bytes32 id) {
+        id = keccak256(abi.encode(contractAddress, uuid));
+    }
+
+    function executeSwapWithPermit(
+        mapping( bytes32 => IAtomicSwapBase.AtomicSwapOrder
+    ) storage swapOrder,
+        IAtomicSwapBase.SwapWithPermitMsg calldata swap,
+        IAtomicSwapBase.Release[] calldata releases,  
+        address vault,
+        IVesting vestingManager, 
+        IAtomicSwapBase.FeeParams memory feeParams
+    ) external returns (bytes32 id, address, address) {
+
+        id = generateNewAtomicSwapID(swap.uuid, address(this));
+        if(swapOrder[id].maker != address(0)) {
+            revert IAtomicSwapBase.OrderAlreadyExists();
+        }
+
+        if(swap.sellerSignature.deadline < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(swap.sellerSignature.deadline, block.timestamp);
+        }
+
+        if(swap.buyerSignature.deadline < block.timestamp) {
+            revert IAtomicSwapBase.InvalidExpirationTime(swap.buyerSignature.deadline, block.timestamp);
+        }
+
+        _permitAndTransfer(id,vault,vestingManager, swap,releases,feeParams);
+        _addNewSwapOrder(
+            swapOrder,
+            swap,
+            id
+        );
+        return (id, swap.sellerSignature.owner, swap.buyerSignature.owner);
+    }
+
+    function _permitAndTransfer(
+        bytes32 orderId,
+        address vault,
+        IVesting vestingManager, 
+        IAtomicSwapBase.SwapWithPermitMsg calldata swap,
+        IAtomicSwapBase.Release[] calldata releases,
+        IAtomicSwapBase.FeeParams memory feeParams
+    ) internal {
+        //
+        bytes32 agreement = _generateAgreement(swap);
+        // Call permit to approve token transfer
+        IVaultPermit(vault).permit(
+            swap.sellToken.token,
+            address(this),
+            swap.sellToken.amount,
+            agreement,
+            swap.sellerSignature
+        );
+        IVaultPermit(vault).permit(
+            swap.buyToken.token,
+            address(this),
+            swap.buyToken.amount,
+            agreement,
+            swap.buyerSignature
+        );
+
+        AnteHandler.transferFromWithFeeAtVault(
+            address(vault),
+            swap.buyToken.token,
+            swap.buyerSignature.owner,
+            swap.sellerSignature.owner,
+            swap.buyToken.amount,
+            feeParams.sellerFeeRate,
+            feeParams.maxFeeRateScale,
+            feeParams.treasury,
+            swap.isSellerWithdraw
+        );
+
+        AnteHandler.transferFromSellTokenToBuyerAtVault(
+            orderId,
+            swap.sellToken,
+            releases,
+            address(vault),
+            vestingManager,
+            swap.sellerSignature.owner,
+            swap.buyerSignature.owner,
+            feeParams,
+            swap.isBuyerWithdraw
+        );
+    }
+
+    /// @notice Adds a new swap order to the mapping.
+    /// @param swapOrder The mapping of swap orders.
+    /// @param swap The details of the swap to be added.
+    /// @param id The unique identifier for the new swap order.
+    /// @dev Reverts if an order with the same ID already exists.
+    function _addNewSwapOrder(
+        mapping(bytes32 => IAtomicSwapBase.AtomicSwapOrder) storage swapOrder,
+        IAtomicSwapBase.SwapWithPermitMsg memory swap,
+        bytes32 id
+    ) internal {
+        IAtomicSwapBase.AtomicSwapOrder memory order = IAtomicSwapBase.AtomicSwapOrder(
+            id,
+            IAtomicSwapBase.OrderStatus.INITIAL,
+            swap.sellerSignature.owner,
+            swap.sellToken,
+            swap.desiredTaker,
+            swap.buyToken,
+            swap.minBidAmount,
+            block.timestamp,
+            0,
+            0,
+            swap.sellerSignature.deadline,
+            swap.acceptBid
+        );
+        swapOrder[id] = order;
+    }
+
+    function _generateAgreement(
+        IAtomicSwapBase.SwapWithPermitMsg calldata swap
+    ) internal pure returns  (bytes32 agreement) {
+        agreement = keccak256(
+            abi.encode(
+                swap.uuid,
+                swap.sellToken,
+                swap.buyToken, 
+                swap.desiredTaker,
+                swap.minBidAmount,
+                swap.acceptBid,
+                swap.isSellerWithdraw
+            )
+        );
+    }
+}

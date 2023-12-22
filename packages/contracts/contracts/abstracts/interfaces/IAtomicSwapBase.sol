@@ -5,17 +5,6 @@ pragma solidity ^0.8.9;
 /// @notice Interface for atomic swap operations and data structures.
 /// @dev Defines enums, structs, events, and custom errors for atomic swaps.
 interface IAtomicSwapBase {
-    /// @notice Enumeration of different message types in an atomic swap.
-    enum MsgType {
-        MAKESWAP,
-        TAKESWAP,
-        CANCELSWAP,
-        PLACEBID,
-        UPDATEBID,
-        ACCEPTBID,
-        CANCELBID
-    }
-
     /// @notice Represents a coin with its address (use address(0) for Ether) and amount.
     struct Coin {
         address token; // Token address or zero address for Ether.
@@ -46,78 +35,12 @@ interface IAtomicSwapBase {
         bool acceptBid; // True if the order accepts bids.
     }
 
-    /// @notice Enumeration of bid statuses in an atomic swap.
-    enum BidStatus {
-        Cancelled,
-        Executed,
-        Placed // Default status upon placement.
-    }
-
-    /// @notice Represents a bid on an atomic swap order.
-    struct Bid {
-        uint256 amount; // Bid amount.
-        bytes32 order; // Associated order ID.
-        BidStatus status; // Current status.
-        address bidder; // Bidder's address.
-        uint256 receiveTimestamp; // Receipt timestamp.
-        uint256 expireTimestamp; // Expiration timestamp.
-    }
-
-    /// @notice Details for creating an atomic swap order.
-    struct MakeSwapMsg {
-        bytes32 uuid; // UUID from frontend.
-        Coin sellToken; // Token/coin to sell.
-        Coin buyToken; // Token/coin to buy.
-        address maker; // Order creator.
-        address desiredTaker; // Desired taker address.
-        uint256 minBidAmount; // Minimum bid.
-        uint256 expireAt; // Expiration timestamp.
-        bool acceptBid; // True if accepting bids.
-    }
-
     /// @notice Release parameters for vesting schedules.
     struct Release {
         uint256 durationInHours; // Duration until release.
         uint256 percentage; // Percentage of total to release.
     }
 
-    /// @notice Details for taking an existing atomic swap order.
-    struct TakeSwapMsg {
-        bytes32 orderID; // Order ID.
-        address takerReceiver; // Receiver of the swapped asset.
-    }
-
-    /// @notice Details for placing a bid on an atomic swap order.
-    struct PlaceBidMsg {
-        uint256 bidAmount; // Bid amount.
-        address bidder; // Bidder's address.
-        bytes32 orderID; // Order ID.
-        uint256 expireTimestamp; // Expiration timestamp.
-    }
-
-    /// @notice Details for updating an existing bid.
-    struct UpdateBidMsg {
-        bytes32 orderID; // Order ID.
-        address bidder; // Bidder's address.
-        uint256 addition; // Additional amount.
-    }
-
-    /// @notice Details for accepting a bid on an atomic swap order.
-    struct AcceptBidMsg {
-        bytes32 orderID; // Order ID.
-        address bidder; // Bidder's address.
-    }
-
-    /// @notice Details for canceling an atomic swap order.
-    struct CancelSwapMsg {
-        bytes32 orderID; // Order ID.
-    }
-
-    struct CounterOfferMsg {
-        bytes32 orderID; // Order ID.
-        address bidder; // Bidder's address.
-        uint256 amount; // Counteroffer amount.
-    }
 
     // Signature 
     struct PermitSignature {
@@ -143,35 +66,21 @@ interface IAtomicSwapBase {
         address desiredTaker; // Desired taker address.
         uint256 minBidAmount; // Minimum bid.
         bool   acceptBid;
-        PermitSignature makerSignature;
-        PermitSignature takerSignature;
+        bool isSellerWithdraw;
+        bool isBuyerWithdraw;
+        PermitSignature sellerSignature;
+        PermitSignature buyerSignature;
     }
 
     // Custom errors
-    error BidNotInPlacedStatus(BidStatus status);
     error OrderAlreadyExists();
-    error OrderDoesNotExist();
-    error BidDoesNotExist();
-    error UnauthorizedTakeAction();
-    error InactiveOrder();
-    error OrderCanceled();
-    error OrderNotAllowTake();
     error OrderAlreadyExpired(uint256 current, uint256 expiredTime);
-    error InvalidBidderAddress();
-    error UnauthorizedCancelAction();
     error UnsupportedTokenPair();
-    error InvalidContractAddress(address contractAddress);
+    error InvalidSigners();
     error UnauthorizedSender();
-    error MismatchedBidAmount(uint256 amount);
-    error UnauthorizedAcceptAction(address caller, address expected);
-    error BidNotAllowed();
-    error BidAlreadyExpired(uint256 provided, uint256 expectedExpiry);
+    error InvalidMinBidAmount(uint256 amount);
     error InvalidExpirationTime(uint256 provided, uint256 maximum);
     
-    error InvalidMinimumBidLimit();
-    error BidAlreadyPlaced();
-    error NoBidPlaced();
-    error NotAllowedTransferAmount(uint256 amount, uint256 allowance);
     error NotEnoughFund(uint256 real, uint256 expected);
     error DuplicateReleaseSchedule();
     error ZeroReleaseSchedule();
@@ -182,19 +91,10 @@ interface IAtomicSwapBase {
     error InvalidSellerFee();
     error InvalidBuyerFee();
     error InvalidTreasuryAddress();
-    error TransferToRecipientFailed(address recipient, uint256 amount);
-    error TransferToTreasuryFailed(address recipient, uint256 amount);
-    error TransferFromFailed(address from, address  to, uint256 amount);
-    error TransferFailed(address  to, uint256 amount);
-    error InvaldAddition();
 
     // Events
     event AtomicSwapOrderCreated(bytes32 indexed id);
     event AtomicSwapOrderTook(address indexed maker, address indexed taker, bytes32 indexed id);
-    event AtomicSwapOrderCanceled(bytes32 indexed id);
-    event UpdatedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
     event AcceptedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
-    event CanceledBid(bytes32 indexed orderID, address indexed bidder);
-    event PlacedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
-
+    
 }

@@ -30,9 +30,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ContextUpgradeable__factory>;
     getContractFactory(
+      name: "EIP712Upgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EIP712Upgradeable__factory>;
+    getContractFactory(
       name: "ERC165Upgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC165Upgradeable__factory>;
+    getContractFactory(
+      name: "NoncesUpgradeable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.NoncesUpgradeable__factory>;
     getContractFactory(
       name: "PausableUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -90,10 +98,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ECDSA__factory>;
     getContractFactory(
-      name: "EIP712",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.EIP712__factory>;
-    getContractFactory(
       name: "IERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
@@ -101,14 +105,6 @@ declare module "hardhat/types/runtime" {
       name: "Math",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Math__factory>;
-    getContractFactory(
-      name: "Nonces",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Nonces__factory>;
-    getContractFactory(
-      name: "ShortStrings",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ShortStrings__factory>;
     getContractFactory(
       name: "Strings",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -126,21 +122,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IOwnablePausable__factory>;
     getContractFactory(
-      name: "AtomicSwapStateLogic",
+      name: "IVault",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AtomicSwapStateLogic__factory>;
-    getContractFactory(
-      name: "AnteHandler",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AnteHandler__factory>;
-    getContractFactory(
-      name: "AtomicSwapMsgValidator",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AtomicSwapMsgValidator__factory>;
+    ): Promise<Contracts.IVault__factory>;
     getContractFactory(
       name: "OwnablePausableUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.OwnablePausableUpgradeable__factory>;
+    getContractFactory(
+      name: "Vault",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Vault__factory>;
     getContractFactory(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -150,21 +142,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IInchainAtomicSwap__factory>;
     getContractFactory(
-      name: "MockERC20Token",
+      name: "AtomicSwapStateLogic",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MockERC20Token__factory>;
+    ): Promise<Contracts.AtomicSwapStateLogic__factory>;
     getContractFactory(
       name: "MockToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockToken__factory>;
     getContractFactory(
-      name: "IVault",
+      name: "IVaultPermit",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IVault__factory>;
+    ): Promise<Contracts.IVaultPermit__factory>;
     getContractFactory(
-      name: "Vault",
+      name: "VaultPermit",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Vault__factory>;
+    ): Promise<Contracts.VaultPermit__factory>;
     getContractFactory(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -195,10 +187,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ContextUpgradeable>;
     getContractAt(
+      name: "EIP712Upgradeable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EIP712Upgradeable>;
+    getContractAt(
       name: "ERC165Upgradeable",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC165Upgradeable>;
+    getContractAt(
+      name: "NoncesUpgradeable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.NoncesUpgradeable>;
     getContractAt(
       name: "PausableUpgradeable",
       address: string | ethers.Addressable,
@@ -270,11 +272,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ECDSA>;
     getContractAt(
-      name: "EIP712",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.EIP712>;
-    getContractAt(
       name: "IERC165",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -284,16 +281,6 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.Math>;
-    getContractAt(
-      name: "Nonces",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Nonces>;
-    getContractAt(
-      name: "ShortStrings",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ShortStrings>;
     getContractAt(
       name: "Strings",
       address: string | ethers.Addressable,
@@ -315,25 +302,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IOwnablePausable>;
     getContractAt(
-      name: "AtomicSwapStateLogic",
+      name: "IVault",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.AtomicSwapStateLogic>;
-    getContractAt(
-      name: "AnteHandler",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AnteHandler>;
-    getContractAt(
-      name: "AtomicSwapMsgValidator",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    ): Promise<Contracts.IVault>;
     getContractAt(
       name: "OwnablePausableUpgradeable",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.OwnablePausableUpgradeable>;
+    getContractAt(
+      name: "Vault",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Vault>;
     getContractAt(
       name: "InchainAtomicSwap",
       address: string | ethers.Addressable,
@@ -345,25 +327,25 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IInchainAtomicSwap>;
     getContractAt(
-      name: "MockERC20Token",
+      name: "AtomicSwapStateLogic",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.MockERC20Token>;
+    ): Promise<Contracts.AtomicSwapStateLogic>;
     getContractAt(
       name: "MockToken",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.MockToken>;
     getContractAt(
-      name: "IVault",
+      name: "IVaultPermit",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.IVault>;
+    ): Promise<Contracts.IVaultPermit>;
     getContractAt(
-      name: "Vault",
+      name: "VaultPermit",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.Vault>;
+    ): Promise<Contracts.VaultPermit>;
     getContractAt(
       name: "IVesting",
       address: string | ethers.Addressable,
@@ -392,9 +374,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ContextUpgradeable>;
     deployContract(
+      name: "EIP712Upgradeable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EIP712Upgradeable>;
+    deployContract(
       name: "ERC165Upgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC165Upgradeable>;
+    deployContract(
+      name: "NoncesUpgradeable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.NoncesUpgradeable>;
     deployContract(
       name: "PausableUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -452,10 +442,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ECDSA>;
     deployContract(
-      name: "EIP712",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.EIP712>;
-    deployContract(
       name: "IERC165",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
@@ -463,14 +449,6 @@ declare module "hardhat/types/runtime" {
       name: "Math",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Math>;
-    deployContract(
-      name: "Nonces",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Nonces>;
-    deployContract(
-      name: "ShortStrings",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ShortStrings>;
     deployContract(
       name: "Strings",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -488,21 +466,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IOwnablePausable>;
     deployContract(
-      name: "AtomicSwapStateLogic",
+      name: "IVault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapStateLogic>;
-    deployContract(
-      name: "AnteHandler",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AnteHandler>;
-    deployContract(
-      name: "AtomicSwapMsgValidator",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    ): Promise<Contracts.IVault>;
     deployContract(
       name: "OwnablePausableUpgradeable",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.OwnablePausableUpgradeable>;
+    deployContract(
+      name: "Vault",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Vault>;
     deployContract(
       name: "InchainAtomicSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -512,21 +486,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IInchainAtomicSwap>;
     deployContract(
-      name: "MockERC20Token",
+      name: "AtomicSwapStateLogic",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.MockERC20Token>;
+    ): Promise<Contracts.AtomicSwapStateLogic>;
     deployContract(
       name: "MockToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
     deployContract(
-      name: "IVault",
+      name: "IVaultPermit",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IVault>;
+    ): Promise<Contracts.IVaultPermit>;
     deployContract(
-      name: "Vault",
+      name: "VaultPermit",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Vault>;
+    ): Promise<Contracts.VaultPermit>;
     deployContract(
       name: "IVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -557,10 +531,20 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ContextUpgradeable>;
     deployContract(
+      name: "EIP712Upgradeable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EIP712Upgradeable>;
+    deployContract(
       name: "ERC165Upgradeable",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC165Upgradeable>;
+    deployContract(
+      name: "NoncesUpgradeable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.NoncesUpgradeable>;
     deployContract(
       name: "PausableUpgradeable",
       args: any[],
@@ -632,11 +616,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ECDSA>;
     deployContract(
-      name: "EIP712",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.EIP712>;
-    deployContract(
       name: "IERC165",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -646,16 +625,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Math>;
-    deployContract(
-      name: "Nonces",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Nonces>;
-    deployContract(
-      name: "ShortStrings",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ShortStrings>;
     deployContract(
       name: "Strings",
       args: any[],
@@ -677,25 +646,20 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IOwnablePausable>;
     deployContract(
-      name: "AtomicSwapStateLogic",
+      name: "IVault",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapStateLogic>;
-    deployContract(
-      name: "AnteHandler",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AnteHandler>;
-    deployContract(
-      name: "AtomicSwapMsgValidator",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.AtomicSwapMsgValidator>;
+    ): Promise<Contracts.IVault>;
     deployContract(
       name: "OwnablePausableUpgradeable",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.OwnablePausableUpgradeable>;
+    deployContract(
+      name: "Vault",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Vault>;
     deployContract(
       name: "InchainAtomicSwap",
       args: any[],
@@ -707,25 +671,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IInchainAtomicSwap>;
     deployContract(
-      name: "MockERC20Token",
+      name: "AtomicSwapStateLogic",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.MockERC20Token>;
+    ): Promise<Contracts.AtomicSwapStateLogic>;
     deployContract(
       name: "MockToken",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MockToken>;
     deployContract(
-      name: "IVault",
+      name: "IVaultPermit",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IVault>;
+    ): Promise<Contracts.IVaultPermit>;
     deployContract(
-      name: "Vault",
+      name: "VaultPermit",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Vault>;
+    ): Promise<Contracts.VaultPermit>;
     deployContract(
       name: "IVesting",
       args: any[],

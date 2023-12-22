@@ -8,12 +8,15 @@ import {
   IVesting,
   Vault,
   MockToken,
+  VaultPermit,
+  ecdsa,
 } from "@sideprotocol/contracts-typechain";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { keccak256 } from "ethers";
+import { Signer, keccak256 } from "ethers";
 import { BlockTime } from "./time";
-
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { IAtomicSwapBase as AtomicSwapBaseData } from "@sideprotocol/contracts-typechain/typechain/contracts/inchain_atomicswap/InchainAtomicSwap";
 export const ERC20_MINT_AMOUNT = 100000000;
 // stable coins
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
@@ -38,21 +41,19 @@ export const Utils = {
     const AnteHandlerFactory = await ethers.getContractFactory("AnteHandler");
     const anteHandler = await AnteHandlerFactory.deploy();
 
-    const atomicSwapMsgValidatorFactory = await ethers.getContractFactory(
-      "AtomicSwapMsgValidator",
-    );
-    const atomicSwapMsgValidator = await atomicSwapMsgValidatorFactory.deploy();
-
     const atomicSwapStateLogicFactory = await ethers.getContractFactory(
       "AtomicSwapStateLogic",
       {
         libraries: {
           AnteHandler: await anteHandler.getAddress(),
-          //AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },
     );
     const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+
+    const vestingHelperFactory =
+      await ethers.getContractFactory("VestingHelper");
+    const vestingHelper = await vestingHelperFactory.deploy();
 
     if (!sellTokenFeeRate) {
       sellTokenFeeRate = 100;
@@ -61,19 +62,23 @@ export const Utils = {
       buyTokenFeeRate = 120;
     }
     if (!treasury) {
-      treasury = accounts[10].address;
+      treasury = generateRandomTestAddress();
     }
 
     // Deploy Vault contract
     const vaultName = "Side_Vault";
-    const vaultFactory = await ethers.getContractFactory("Vault");
-    const vault = await vaultFactory.deploy(vaultName);
+    const vaultFactory = await ethers.getContractFactory("VaultPermit");
+    const vault = await upgrades.deployProxy(vaultFactory, [
+      owner.address,
+      vaultName,
+    ]);
+    //await vaultFactory.deploy(vaultName);
     const vaultAddress = await vault.getAddress();
 
     // Deploy vesting contract.
     const vestingManagerFactory = await ethers.getContractFactory("Vesting", {
       libraries: {
-        AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
+        VestingHelper: await vestingHelper.getAddress(),
       },
     });
     const vestingManager = await upgrades.deployProxy(
@@ -99,7 +104,6 @@ export const Utils = {
       {
         libraries: {
           AtomicSwapStateLogic: await atomicSwapStateLogic.getAddress(),
-          //AtomicSwapMsgValidator: await atomicSwapMsgValidator.getAddress(),
         },
       },
     );
@@ -132,27 +136,34 @@ export const Utils = {
     const MINT_AMOUNT = ethers.parseEther("100000");
 
     await Promise.all(
-      accounts.map(async (account) => {
-        await mockUSDC.mint(account.address, MINT_AMOUNT);
-        await mockUSDT.mint(account.address, MINT_AMOUNT);
-        await mockDAI.mint(account.address, MINT_AMOUNT);
+      accounts.map(async (account, index) => {
+        if (account.address == treasury) {
+          return;
+        }
+        if (index !== 0) {
+          await mockUSDT.mint(account.address, MINT_AMOUNT);
+        }
+        if (index !== 1) {
+          await mockUSDC.mint(account.address, MINT_AMOUNT);
+        }
 
         await mockUSDC.approve(await atomicSwap.getAddress(), MINT_AMOUNT);
         await mockUSDT.approve(await atomicSwap.getAddress(), MINT_AMOUNT);
-        await mockDAI.approve(await atomicSwap.getAddress(), MINT_AMOUNT);
       }),
     );
 
     return {
       atomicSwap: atomicSwap as unknown as ICAtomicSwap,
       usdc: mockUSDC as unknown as MockToken,
+      usdcAddress: await mockUSDC.getAddress(),
       usdt: mockUSDT as unknown as MockToken,
+      usdtAddress: await mockUSDT.getAddress(),
       dai: mockDAI as unknown as MockToken,
       vestingManager: vestingManager as unknown as Vesting,
       sellTokenFeeRate,
       buyTokenFeeRate,
       treasury,
-      vault: vault as unknown as Vault,
+      vault: vault as unknown as VaultPermit,
       vaultName,
     };
   },
@@ -252,20 +263,9 @@ export const getCustomSigner = async (
   return signer;
 };
 
-export function generateAgreement(swap: {
-  uuid: string; // UUID from frontend.
-  sellToken: {
-    token: string;
-    amount: bigint;
-  }; // Token/coin to sell.
-  buyToken: {
-    token: string;
-    amount: bigint;
-  }; // Token/coin to buy.
-  desiredTaker: string; // Desired taker address.
-  minBidAmount: bigint; // Minimum bid.
-  acceptBid: boolean;
-}): string {
+export function generateAgreement(
+  swap: AtomicSwapBaseData.SwapWithPermitMsgStruct,
+): string {
   const abiCoder = new ethers.AbiCoder();
 
   const encoded = abiCoder.encode(
@@ -276,6 +276,7 @@ export function generateAgreement(swap: {
       "address",
       "uint256",
       "bool",
+      "bool",
     ],
     [
       swap.uuid, // Convert string uuid to bytes32 array
@@ -284,8 +285,92 @@ export function generateAgreement(swap: {
       swap.desiredTaker,
       swap.minBidAmount,
       swap.acceptBid,
+      swap.isSellerWithdraw,
     ],
   );
 
   return ethers.keccak256(encoded);
+}
+
+export function setupSwapPermitPayload(
+  sellToken: string,
+  buyToken: string,
+  desiredTaker: string,
+) {
+  const uuid = generateOrderID();
+  const swapParams: AtomicSwapBaseData.SwapWithPermitMsgStruct = {
+    uuid: uuid,
+    sellToken: {
+      token: sellToken,
+      amount: ethers.parseEther("20"),
+    },
+    buyToken: {
+      token: buyToken,
+      amount: ethers.parseEther("20"),
+    },
+    minBidAmount: ethers.parseEther("15"),
+    desiredTaker,
+    acceptBid: true,
+    isSellerWithdraw: false,
+    isBuyerWithdraw: false,
+    sellerSignature: {
+      v: 27 | 28,
+      r: "",
+      s: "",
+      owner: "",
+      deadline: BigInt(0),
+    },
+    buyerSignature: {
+      v: 27 | 28,
+      r: "",
+      s: "",
+      owner: "",
+      deadline: BigInt(0),
+    },
+  };
+  return swapParams;
+}
+
+export const setupSignature = async (
+  swapPermitPayload: AtomicSwapBaseData.SwapWithPermitMsgStruct,
+  atomicSwapAddress: string,
+  vaultName: string,
+  chainId: string,
+  taker: HardhatEthersSigner,
+  deadline: bigint,
+  vault: VaultPermit,
+) => {
+  const attackAmount = ethers.parseEther("15");
+  swapPermitPayload.buyToken.amount = attackAmount;
+  // Recreate taker signature with the attack amount
+  const takerNonce = await vault.nonces(taker.address);
+  const { signature: buyerSignature } = await ecdsa.createPermitSignature({
+    tokenName: vaultName,
+    contractAddress: await vault.getAddress(),
+    chainId: chainId,
+    author: taker,
+    spender: atomicSwapAddress,
+    value: attackAmount,
+    agreement: generateAgreement(swapPermitPayload),
+    nonce: takerNonce,
+    deadline,
+  });
+  const takerSig = ethers.Signature.from(buyerSignature);
+  swapPermitPayload.buyerSignature = {
+    deadline,
+    v: takerSig.v,
+    r: takerSig.r,
+    s: takerSig.s,
+    owner: taker.address,
+  };
+};
+
+export function generateRandomTestAddress() {
+  // Generate a random hex string
+  const randomHexString = ethers.hexlify(ethers.randomBytes(20));
+
+  // Ensure the string is formatted as an Ethereum address
+  const randomAddress = ethers.getAddress(randomHexString);
+
+  return randomAddress;
 }
