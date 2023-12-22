@@ -38,6 +38,13 @@ contract VaultPermit is  Vault, EIP712Upgradeable, NoncesUpgradeable,IVaultPermi
             revert VaultExpiredSignature(signature.deadline);
         }
 
+        // mapping(bytes32 => unit256) public _agreements;
+        // if (_agreements[agreement] != 0) {
+        //  revert ExistingAgreement(agreement);   
+        // }
+        // _agreements[agreement] = value
+        // bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, signature.owner, spender, value,agreement, signature.deadline));
+
         bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, signature.owner, spender, value,agreement,_useNonce(signature.owner), signature.deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
