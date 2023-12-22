@@ -66,8 +66,8 @@ interface IAtomicSwapBase {
         address desiredTaker; // Desired taker address.
         uint256 minBidAmount; // Minimum bid.
         bool   acceptBid;
-        bool isSellerWithdraw;
-        bool isBuyerWithdraw;
+        bool withdrawToSellerAccount;
+        bool withdrawToBuyerAccount;
         PermitSignature sellerSignature;
         PermitSignature buyerSignature;
     }

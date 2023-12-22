@@ -11,11 +11,6 @@ import type {
 const _abi = [
   {
     inputs: [],
-    name: "InvalidTotalPercentage",
-    type: "error",
-  },
-  {
-    inputs: [],
     name: "InvalidVesting",
     type: "error",
   },
@@ -32,11 +27,6 @@ const _abi = [
   {
     inputs: [],
     name: "NoVestedTokensForRelease",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "OverMaximumReleaseStep",
     type: "error",
   },
   {

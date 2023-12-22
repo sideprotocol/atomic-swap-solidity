@@ -60,20 +60,21 @@ library AtomicSwapStateLogic {
         IAtomicSwapBase.FeeParams memory feeParams
     ) internal {
         //
-        bytes32 agreement = _generateAgreement(swap);
+        (bytes32 sellerAgreement, bytes32 buyerAgreement) = _generateAgreement(swap);
         // Call permit to approve token transfer
         IVaultPermit(vault).permit(
             swap.sellToken.token,
             address(this),
             swap.sellToken.amount,
-            agreement,
+            sellerAgreement,
             swap.sellerSignature
         );
+
         IVaultPermit(vault).permit(
             swap.buyToken.token,
             address(this),
             swap.buyToken.amount,
-            agreement,
+            buyerAgreement,
             swap.buyerSignature
         );
 
@@ -86,7 +87,7 @@ library AtomicSwapStateLogic {
             feeParams.sellerFeeRate,
             feeParams.maxFeeRateScale,
             feeParams.treasury,
-            swap.isSellerWithdraw
+            swap.withdrawToSellerAccount
         );
 
         AnteHandler.transferFromSellTokenToBuyerAtVault(
@@ -98,7 +99,7 @@ library AtomicSwapStateLogic {
             swap.sellerSignature.owner,
             swap.buyerSignature.owner,
             feeParams,
-            swap.isBuyerWithdraw
+            swap.withdrawToBuyerAccount
         );
     }
 
@@ -131,16 +132,30 @@ library AtomicSwapStateLogic {
 
     function _generateAgreement(
         IAtomicSwapBase.SwapWithPermitMsg calldata swap
-    ) internal pure returns  (bytes32 agreement) {
-        agreement = keccak256(
+    ) internal pure returns  (bytes32 sellerAgreement, bytes32 buyerAgreement) {
+        sellerAgreement = keccak256(
             abi.encode(
+                swap.sellerSignature.owner,
                 swap.uuid,
                 swap.sellToken,
                 swap.buyToken, 
                 swap.desiredTaker,
                 swap.minBidAmount,
                 swap.acceptBid,
-                swap.isSellerWithdraw
+                swap.withdrawToSellerAccount
+            )
+        );
+
+        buyerAgreement = keccak256(
+            abi.encode(
+                swap.buyerSignature.owner,
+                swap.uuid,
+                swap.sellToken,
+                swap.buyToken, 
+                swap.desiredTaker,
+                swap.minBidAmount,
+                swap.acceptBid,
+                swap.withdrawToSellerAccount
             )
         );
     }

@@ -40,7 +40,7 @@ describe("AtomicSwap: Gasless Swap", () => {
         name: "Swap ether-ERC20 token without vesting",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
           swapPermitPayload.sellToken.address = ZeroAddress;
-          swapPermitPayload.isSellerWithdraw = true;
+          swapPermitPayload.withdrawToSellerAccount = true;
         },
         shouldThrow: false,
       },
@@ -48,7 +48,7 @@ describe("AtomicSwap: Gasless Swap", () => {
         name: "Swap ether-ERC20 token without vesting  and with buyer withdraw ",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
           swapPermitPayload.sellToken.token = ZeroAddress;
-          swapPermitPayload.isBuyerWithdraw = true;
+          swapPermitPayload.withdrawToBuyerAccount = true;
         },
         shouldThrow: false,
         isVesting: true,
@@ -56,20 +56,20 @@ describe("AtomicSwap: Gasless Swap", () => {
       {
         name: "Swap ERC20 tokens without vesting, allowing maker to withdraw",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isSellerWithdraw = true;
+          swapPermitPayload.withdrawToSellerAccount = true;
         },
       },
       {
         name: "Swap ERC20 tokens without vesting, allowing taker to withdraw",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isBuyerWithdraw = true;
+          swapPermitPayload.withdrawToBuyerAccount = true;
         },
       },
       {
         name: "Swap ERC20 tokens without vesting, allowing both maker and taker to withdraw",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isBuyerWithdraw = true;
-          swapPermitPayload.isBuyerWithdraw = true;
+          swapPermitPayload.withdrawToBuyerAccount = true;
+          swapPermitPayload.withdrawToBuyerAccount = true;
         },
       },
       {
@@ -80,22 +80,22 @@ describe("AtomicSwap: Gasless Swap", () => {
       {
         name: "Swap ERC20 tokens with vesting, allowing maker to withdraw",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isSellerWithdraw = true;
+          swapPermitPayload.withdrawToSellerAccount = true;
         },
         isVesting: true,
       },
       {
         name: "Swap ERC20 tokens with vesting, allowing taker to withdraw",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isBuyerWithdraw = true;
+          swapPermitPayload.withdrawToBuyerAccount = true;
         },
         isVesting: true,
       },
       {
         name: "Swap ERC20 tokens with vesting, allowing both maker and taker to withdraw",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.isSellerWithdraw = true;
-          swapPermitPayload.isBuyerWithdraw = true;
+          swapPermitPayload.withdrawToSellerAccount = true;
+          swapPermitPayload.withdrawToBuyerAccount = true;
         },
         isVesting: true,
       },
@@ -117,28 +117,28 @@ describe("AtomicSwap: Gasless Swap", () => {
           vestingManager,
         } = await loadFixture(Utils.prepareInChainAtomicTest);
         const accounts = await ethers.getSigners();
-        const [maker, taker] = accounts;
+        const [seller, buyer] = accounts;
         const swapPermitPayload = setupSwapPermitPayload(
           usdcAddress,
           usdtAddress,
-          taker.address,
+          buyer.address,
         );
         test.mallet(swapPermitPayload);
         // Approve
         await usdc
-          .connect(maker)
+          .connect(seller)
           .approve(
             await vault.getAddress(),
             swapPermitPayload.sellToken.amount,
           );
 
         await usdt
-          .connect(taker)
+          .connect(buyer)
           .approve(await vault.getAddress(), swapPermitPayload.buyToken.amount);
 
         // Deposit
         await vault
-          .connect(maker)
+          .connect(seller)
           .deposit(
             swapPermitPayload.sellToken.token,
             swapPermitPayload.sellToken.amount,
@@ -150,7 +150,7 @@ describe("AtomicSwap: Gasless Swap", () => {
             },
           );
         await vault
-          .connect(taker)
+          .connect(buyer)
           .deposit(
             swapPermitPayload.buyToken.token,
             swapPermitPayload.buyToken.amount,
@@ -159,51 +159,52 @@ describe("AtomicSwap: Gasless Swap", () => {
         const atomicSwapAddress = await atomicSwap.getAddress();
         const { chainId } = await ethers.provider.getNetwork();
         const deadline = BigInt(await BlockTime.AfterSeconds(100000));
-        const makerNonce = await vault.nonces(maker.address);
-        const agreement = generateAgreement(swapPermitPayload);
+
+        const { sellerAgreement, buyerAgreement } = generateAgreement(
+          swapPermitPayload,
+          seller.address,
+          buyer.address,
+        );
         const { signature: sellerSignature } =
           await ecdsa.createPermitSignature({
             tokenName: vaultName,
             contractAddress: await vault.getAddress(),
             chainId: chainId,
-            author: maker,
+            author: seller,
             spender: atomicSwapAddress,
             value: swapPermitPayload.sellToken.amount,
-            agreement,
-            nonce: makerNonce,
+            agreement: sellerAgreement,
             deadline,
           });
 
-        const makerSig = ethers.Signature.from(sellerSignature);
+        const sellerSig = ethers.Signature.from(sellerSignature);
         swapPermitPayload.sellerSignature = {
           deadline,
-          v: makerSig.v,
-          r: makerSig.r,
-          s: makerSig.s,
-          owner: maker.address,
+          v: sellerSig.v,
+          r: sellerSig.r,
+          s: sellerSig.s,
+          owner: seller.address,
         };
 
-        const takerNonce = await vault.nonces(taker.address);
         const { signature: buyerSignature } = await ecdsa.createPermitSignature(
           {
             tokenName: vaultName,
             contractAddress: await vault.getAddress(),
             chainId: chainId,
-            author: taker,
+            author: buyer,
             spender: atomicSwapAddress,
             value: swapPermitPayload.buyToken.amount,
-            agreement,
-            nonce: takerNonce,
+            agreement: buyerAgreement,
             deadline,
           },
         );
-        const takerSig = ethers.Signature.from(buyerSignature);
+        const buyerSig = ethers.Signature.from(buyerSignature);
         swapPermitPayload.buyerSignature = {
           deadline,
-          v: takerSig.v,
-          r: takerSig.r,
-          s: takerSig.s,
-          owner: taker.address,
+          v: buyerSig.v,
+          r: buyerSig.r,
+          s: buyerSig.s,
+          owner: buyer.address,
         };
 
         const release = test.isVesting
@@ -219,8 +220,8 @@ describe("AtomicSwap: Gasless Swap", () => {
             ]
           : [];
 
-        const takerOriginalBalance = await ethers.provider.getBalance(
-          taker.address,
+        const buyerOriginalBalance = await ethers.provider.getBalance(
+          buyer.address,
         );
 
         if (test.shouldThrow) {
@@ -260,16 +261,16 @@ describe("AtomicSwap: Gasless Swap", () => {
 
           let sellerBuyTokenAmount =
             swapPermitPayload.buyToken.token == ZeroAddress
-              ? (await ethers.provider.getBalance(maker.address)) -
-                takerOriginalBalance
+              ? (await ethers.provider.getBalance(seller.address)) -
+                buyerOriginalBalance
               : await MockToken__factory.connect(
                   swapPermitPayload.buyToken.token,
                   ethers.provider,
-                ).balanceOf(maker.address);
+                ).balanceOf(seller.address);
 
-          if (!swapPermitPayload.isSellerWithdraw) {
+          if (!swapPermitPayload.withdrawToSellerAccount) {
             sellerBuyTokenAmount = await vault.balanceOf(
-              maker.address,
+              seller.address,
               usdtAddress,
             );
           }
@@ -288,24 +289,24 @@ describe("AtomicSwap: Gasless Swap", () => {
             expect(isERC721).to.equal(true);
             expect(tokenUrl).to.contain(vestingId);
             await time.increase(3600);
-            await vestingManager.connect(taker).release(vestingId);
+            await vestingManager.connect(buyer).release(vestingId);
             // 1 hour later, release second release from vesting contract.
             await time.increase(3600);
-            await vestingManager.connect(taker).release(vestingId);
+            await vestingManager.connect(buyer).release(vestingId);
           }
 
           let buyerSellTokenAmount =
             swapPermitPayload.sellToken.token == ZeroAddress
-              ? (await ethers.provider.getBalance(taker.address)) -
-                takerOriginalBalance
+              ? (await ethers.provider.getBalance(buyer.address)) -
+                buyerOriginalBalance
               : await MockToken__factory.connect(
                   swapPermitPayload.sellToken.token,
                   ethers.provider,
-                ).balanceOf(taker.address);
+                ).balanceOf(buyer.address);
 
-          if (!swapPermitPayload.isBuyerWithdraw) {
+          if (!swapPermitPayload.withdrawToBuyerAccount) {
             buyerSellTokenAmount = await vault.balanceOf(
-              taker.address,
+              buyer.address,
               swapPermitPayload.sellToken.token,
             );
           }
@@ -321,6 +322,7 @@ describe("AtomicSwap: Gasless Swap", () => {
       });
     });
   });
+
   describe("signature manipulation", () => {
     const revertCases = [
       {
@@ -339,7 +341,6 @@ describe("AtomicSwap: Gasless Swap", () => {
         ) => {},
         expectedRevertError: "VaultInvalidSigner",
         from: "vault",
-        isManipulatebuyerSignature: true,
         malletBuyerSignature: async (
           swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct,
           atomicSwapAddress?: string,
@@ -347,7 +348,6 @@ describe("AtomicSwap: Gasless Swap", () => {
           vaultName?: string,
           taker?: HardhatEthersSigner,
           agreement?: string,
-          nonce?: bigint,
         ) => {
           const { chainId } = await ethers.provider.getNetwork();
           const attackAmount = ethers.parseEther("15");
@@ -361,7 +361,6 @@ describe("AtomicSwap: Gasless Swap", () => {
               spender: atomicSwapAddress!,
               value: attackAmount,
               agreement: agreement!,
-              nonce: nonce!,
               deadline,
             });
           const takerSig = ethers.Signature.from(buyerSignature);
@@ -389,7 +388,6 @@ describe("AtomicSwap: Gasless Swap", () => {
           vaultName?: string,
           taker?: HardhatEthersSigner,
           agreement?: string,
-          nonce?: bigint,
         ) => {
           const { chainId } = await ethers.provider.getNetwork();
           const attackAmount = ethers.parseEther("15");
@@ -405,7 +403,6 @@ describe("AtomicSwap: Gasless Swap", () => {
               spender: atomicSwapAddress!,
               value: attackAmount,
               agreement: ethers.keccak256(randomBytes(32)),
-              nonce: nonce!,
               deadline,
             });
           const takerSig = ethers.Signature.from(buyerSignature);
@@ -473,8 +470,8 @@ describe("AtomicSwap: Gasless Swap", () => {
         mallet: (
           swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct,
         ) => {
-          swapPermitPayload.isSellerWithdraw =
-            !swapPermitPayload.isSellerWithdraw;
+          swapPermitPayload.withdrawToSellerAccount =
+            !swapPermitPayload.withdrawToSellerAccount;
         },
         expectedRevertError: "VaultInvalidSigner",
         from: "vault",
@@ -521,38 +518,43 @@ describe("AtomicSwap: Gasless Swap", () => {
           } = await loadFixture(Utils.prepareInChainAtomicTest);
           const vaultAddress = await vault.getAddress();
           const accounts = await ethers.getSigners();
-          const [maker, taker] = accounts;
+          const [seller, buyer] = accounts;
           const swapPermitPayload = setupSwapPermitPayload(
             usdcAddress,
             usdtAddress,
-            taker.address,
+            buyer.address,
           );
 
           // Common setup for all attack tests
           await usdc
-            .connect(maker)
+            .connect(seller)
             .approve(
               await vault.getAddress(),
               swapPermitPayload.sellToken.amount,
             );
           await usdt
-            .connect(taker)
+            .connect(buyer)
             .approve(
               await vault.getAddress(),
               swapPermitPayload.buyToken.amount,
             );
           await vault
-            .connect(maker)
+            .connect(seller)
             .deposit(usdcAddress, swapPermitPayload.sellToken.amount);
           await vault
-            .connect(taker)
+            .connect(buyer)
             .deposit(usdtAddress, swapPermitPayload.buyToken.amount);
 
           const atomicSwapAddress = await atomicSwap.getAddress();
           const { chainId } = await ethers.provider.getNetwork();
           const deadline = BigInt(await BlockTime.AfterSeconds(100000));
-          const makerNonce = await vault.nonces(maker.address);
-          const agreement = generateAgreement(swapPermitPayload);
+          swapPermitPayload.sellerSignature.owner = seller.address;
+          swapPermitPayload.buyerSignature.owner = buyer.address;
+          const { sellerAgreement, buyerAgreement } = generateAgreement(
+            swapPermitPayload,
+            seller.address,
+            buyer.address,
+          );
 
           // Maker signature setup
           const { signature: sellerSignature } =
@@ -560,11 +562,10 @@ describe("AtomicSwap: Gasless Swap", () => {
               tokenName: vaultName,
               contractAddress: vaultAddress,
               chainId: chainId,
-              author: maker,
+              author: seller,
               spender: atomicSwapAddress,
               value: swapPermitPayload.sellToken.amount,
-              agreement,
-              nonce: makerNonce,
+              agreement: sellerAgreement,
               deadline,
             });
           const makerSig = ethers.Signature.from(sellerSignature);
@@ -573,20 +574,17 @@ describe("AtomicSwap: Gasless Swap", () => {
             v: makerSig.v,
             r: makerSig.r,
             s: makerSig.s,
-            owner: maker.address,
+            owner: seller.address,
           };
 
-          const takerNonce = await vault.nonces(taker.address);
-          //const attackAmount = ethers.parseEther("15");
           if (malletBuyerSignature) {
             await malletBuyerSignature(
               swapPermitPayload,
               atomicSwapAddress,
               vaultAddress,
               vaultName,
-              taker,
-              agreement,
-              takerNonce,
+              buyer,
+              buyerAgreement,
             );
           } else {
             const { signature: buyerSignature } =
@@ -594,21 +592,19 @@ describe("AtomicSwap: Gasless Swap", () => {
                 tokenName: vaultName,
                 contractAddress: vaultAddress,
                 chainId: chainId,
-                author: taker,
+                author: buyer,
                 spender: atomicSwapAddress,
                 value: swapPermitPayload.buyToken.amount, // Different amount of maker suggestion.
-                agreement,
-                nonce: takerNonce,
+                agreement: buyerAgreement,
                 deadline,
               });
-
-            const takerSig = ethers.Signature.from(buyerSignature);
+            const buyerSig = ethers.Signature.from(buyerSignature);
             swapPermitPayload.buyerSignature = {
               deadline,
-              v: takerSig.v,
-              r: takerSig.r,
-              s: takerSig.s,
-              owner: taker.address,
+              v: buyerSig.v,
+              r: buyerSig.r,
+              s: buyerSig.s,
+              owner: buyer.address,
             };
           }
 
@@ -636,6 +632,7 @@ describe("AtomicSwap: Gasless Swap", () => {
       },
     );
   });
+
   describe("invalid parameters", () => {
     const invalidParameterTests = [
       {
@@ -683,38 +680,41 @@ describe("AtomicSwap: Gasless Swap", () => {
           } = await loadFixture(Utils.prepareInChainAtomicTest);
           const vaultAddress = await vault.getAddress();
           const accounts = await ethers.getSigners();
-          const [maker, taker] = accounts;
+          const [seller, buyer] = accounts;
           const swapPermitPayload = setupSwapPermitPayload(
             usdcAddress,
             usdtAddress,
-            taker.address,
+            buyer.address,
           );
 
           // Common setup for all attack tests
           await usdc
-            .connect(maker)
+            .connect(seller)
             .approve(
               await vault.getAddress(),
               swapPermitPayload.sellToken.amount,
             );
           await usdt
-            .connect(taker)
+            .connect(buyer)
             .approve(
               await vault.getAddress(),
               swapPermitPayload.buyToken.amount,
             );
           await vault
-            .connect(maker)
+            .connect(seller)
             .deposit(usdcAddress, swapPermitPayload.sellToken.amount);
           await vault
-            .connect(taker)
+            .connect(buyer)
             .deposit(usdtAddress, swapPermitPayload.buyToken.amount);
 
           const atomicSwapAddress = await atomicSwap.getAddress();
           const { chainId } = await ethers.provider.getNetwork();
           const deadline = BigInt(await BlockTime.AfterSeconds(100000));
-          const makerNonce = await vault.nonces(maker.address);
-          const agreement = generateAgreement(swapPermitPayload);
+          const { sellerAgreement, buyerAgreement } = generateAgreement(
+            swapPermitPayload,
+            seller.address,
+            buyer.address,
+          );
 
           // Maker signature setup
           const { signature: sellerSignature } =
@@ -722,11 +722,10 @@ describe("AtomicSwap: Gasless Swap", () => {
               tokenName: vaultName,
               contractAddress: vaultAddress,
               chainId: chainId,
-              author: maker,
+              author: seller,
               spender: atomicSwapAddress,
               value: swapPermitPayload.sellToken.amount,
-              agreement,
-              nonce: makerNonce,
+              agreement: sellerAgreement,
               deadline,
             });
           const makerSig = ethers.Signature.from(sellerSignature);
@@ -735,21 +734,18 @@ describe("AtomicSwap: Gasless Swap", () => {
             v: makerSig.v,
             r: makerSig.r,
             s: makerSig.s,
-            owner: maker.address,
+            owner: seller.address,
           };
 
-          const takerNonce = await vault.nonces(taker.address);
-          //const attackAmount = ethers.parseEther("15");
           const { signature: buyerSignature } =
             await ecdsa.createPermitSignature({
               tokenName: vaultName,
               contractAddress: vaultAddress,
               chainId: chainId,
-              author: taker,
+              author: buyer,
               spender: atomicSwapAddress,
               value: swapPermitPayload.buyToken.amount, // Different amount of maker suggestion.
-              agreement,
-              nonce: takerNonce,
+              agreement: buyerAgreement,
               deadline,
             });
 
@@ -759,7 +755,7 @@ describe("AtomicSwap: Gasless Swap", () => {
             v: takerSig.v,
             r: takerSig.r,
             s: takerSig.s,
-            owner: taker.address,
+            owner: buyer.address,
           };
 
           // Apply specific setup for each test case

@@ -15,8 +15,6 @@ export type { EIP712Upgradeable } from "./@openzeppelin/contracts-upgradeable/ut
 export { EIP712Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable__factory";
 export type { ERC165Upgradeable } from "./@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable";
 export { ERC165Upgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable__factory";
-export type { NoncesUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable";
-export { NoncesUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable__factory";
 export type { PausableUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable";
 export { PausableUpgradeable__factory } from "./factories/@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable__factory";
 export type { ReentrancyGuardUpgradeable } from "./@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable";
@@ -77,7 +75,5 @@ export type { VaultPermit } from "./contracts/vault/VaultPermit";
 export { VaultPermit__factory } from "./factories/contracts/vault/VaultPermit__factory";
 export type { IVesting } from "./contracts/vesting/interfaces/IVesting";
 export { IVesting__factory } from "./factories/contracts/vesting/interfaces/IVesting__factory";
-export type { VestingHelper } from "./contracts/vesting/logic/VestingHelper";
-export { VestingHelper__factory } from "./factories/contracts/vesting/logic/VestingHelper__factory";
 export type { Vesting } from "./contracts/vesting/Vesting";
 export { Vesting__factory } from "./factories/contracts/vesting/Vesting__factory";

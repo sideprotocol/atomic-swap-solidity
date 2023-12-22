@@ -40,15 +40,12 @@ export declare namespace IAtomicSwapBase {
 }
 
 export interface IVaultPermitInterface extends Interface {
-  getFunction(
-    nameOrSignature: "DOMAIN_SEPARATOR" | "nonces" | "permit"
-  ): FunctionFragment;
+  getFunction(nameOrSignature: "DOMAIN_SEPARATOR" | "permit"): FunctionFragment;
 
   encodeFunctionData(
     functionFragment: "DOMAIN_SEPARATOR",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "permit",
     values: [
@@ -64,7 +61,6 @@ export interface IVaultPermitInterface extends Interface {
     functionFragment: "DOMAIN_SEPARATOR",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
 }
 
@@ -113,8 +109,6 @@ export interface IVaultPermit extends BaseContract {
 
   DOMAIN_SEPARATOR: TypedContractMethod<[], [string], "view">;
 
-  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
-
   permit: TypedContractMethod<
     [
       token: AddressLike,
@@ -134,9 +128,6 @@ export interface IVaultPermit extends BaseContract {
   getFunction(
     nameOrSignature: "DOMAIN_SEPARATOR"
   ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "nonces"
-  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "permit"
   ): TypedContractMethod<

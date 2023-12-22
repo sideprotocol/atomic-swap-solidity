@@ -23,9 +23,8 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface IVaultPermitInterface extends Interface {
-    getFunction(nameOrSignature: "DOMAIN_SEPARATOR" | "nonces" | "permit"): FunctionFragment;
+    getFunction(nameOrSignature: "DOMAIN_SEPARATOR" | "permit"): FunctionFragment;
     encodeFunctionData(functionFragment: "DOMAIN_SEPARATOR", values?: undefined): string;
-    encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "permit", values: [
         AddressLike,
         AddressLike,
@@ -34,7 +33,6 @@ export interface IVaultPermitInterface extends Interface {
         IAtomicSwapBase.PermitSignatureStruct
     ]): string;
     decodeFunctionResult(functionFragment: "DOMAIN_SEPARATOR", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
 }
 export interface IVaultPermit extends BaseContract {
@@ -51,7 +49,6 @@ export interface IVaultPermit extends BaseContract {
     listeners(eventName?: string): Promise<Array<Listener>>;
     removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
     DOMAIN_SEPARATOR: TypedContractMethod<[], [string], "view">;
-    nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     permit: TypedContractMethod<[
         token: AddressLike,
         spender: AddressLike,
@@ -63,7 +60,6 @@ export interface IVaultPermit extends BaseContract {
     ], "nonpayable">;
     getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
     getFunction(nameOrSignature: "DOMAIN_SEPARATOR"): TypedContractMethod<[], [string], "view">;
-    getFunction(nameOrSignature: "nonces"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "permit"): TypedContractMethod<[
         token: AddressLike,
         spender: AddressLike,

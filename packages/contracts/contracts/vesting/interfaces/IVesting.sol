@@ -62,8 +62,6 @@ interface IVesting {
     error VestingNotStarted();
     error InvalidVesting();
     error NoVestedTokensAvailable();
-    error OverMaximumReleaseStep();
-    error InvalidTotalPercentage();
     error NoVestedTokensForRelease();
     error NoPermissionToRelease();
 }

@@ -77,9 +77,9 @@ export const Utils = {
 
     // Deploy vesting contract.
     const vestingManagerFactory = await ethers.getContractFactory("Vesting", {
-      libraries: {
-        VestingHelper: await vestingHelper.getAddress(),
-      },
+      // libraries: {
+      //   VestingHelper: await vestingHelper.getAddress(),
+      // },
     });
     const vestingManager = await upgrades.deployProxy(
       vestingManagerFactory,
@@ -92,7 +92,7 @@ export const Utils = {
       ],
       {
         initializer: "initialize",
-        unsafeAllowLinkedLibraries: true,
+        //unsafeAllowLinkedLibraries: true,
       },
     );
 
@@ -265,11 +265,23 @@ export const getCustomSigner = async (
 
 export function generateAgreement(
   swap: AtomicSwapBaseData.SwapWithPermitMsgStruct,
+  seller: string,
+  buyer: string,
+): { sellerAgreement: string; buyerAgreement: string } {
+  return {
+    sellerAgreement: _generateAgreement(swap, seller),
+    buyerAgreement: _generateAgreement(swap, buyer),
+  };
+}
+
+function _generateAgreement(
+  swap: AtomicSwapBaseData.SwapWithPermitMsgStruct,
+  signer: string,
 ): string {
   const abiCoder = new ethers.AbiCoder();
-
   const encoded = abiCoder.encode(
     [
+      "address",
       "bytes32",
       "tuple(address, uint256)",
       "tuple(address, uint256)",
@@ -279,13 +291,14 @@ export function generateAgreement(
       "bool",
     ],
     [
+      signer,
       swap.uuid, // Convert string uuid to bytes32 array
       [swap.sellToken.token, swap.sellToken.amount],
       [swap.buyToken.token, swap.buyToken.amount],
       swap.desiredTaker,
       swap.minBidAmount,
       swap.acceptBid,
-      swap.isSellerWithdraw,
+      swap.withdrawToSellerAccount,
     ],
   );
 
@@ -311,8 +324,8 @@ export function setupSwapPermitPayload(
     minBidAmount: ethers.parseEther("15"),
     desiredTaker,
     acceptBid: true,
-    isSellerWithdraw: false,
-    isBuyerWithdraw: false,
+    withdrawToSellerAccount: false,
+    withdrawToBuyerAccount: false,
     sellerSignature: {
       v: 27 | 28,
       r: "",
@@ -343,7 +356,6 @@ export const setupSignature = async (
   const attackAmount = ethers.parseEther("15");
   swapPermitPayload.buyToken.amount = attackAmount;
   // Recreate taker signature with the attack amount
-  const takerNonce = await vault.nonces(taker.address);
   const { signature: buyerSignature } = await ecdsa.createPermitSignature({
     tokenName: vaultName,
     contractAddress: await vault.getAddress(),
@@ -352,7 +364,6 @@ export const setupSignature = async (
     spender: atomicSwapAddress,
     value: attackAmount,
     agreement: generateAgreement(swapPermitPayload),
-    nonce: takerNonce,
     deadline,
   });
   const takerSig = ethers.Signature.from(buyerSignature);

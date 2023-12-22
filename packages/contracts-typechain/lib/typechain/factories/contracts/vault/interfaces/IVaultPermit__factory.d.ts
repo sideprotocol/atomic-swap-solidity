@@ -14,20 +14,6 @@ export declare class IVaultPermit__factory {
     }, {
         readonly inputs: readonly [{
             readonly internalType: "address";
-            readonly name: "owner";
-            readonly type: "address";
-        }];
-        readonly name: "nonces";
-        readonly outputs: readonly [{
-            readonly internalType: "uint256";
-            readonly name: "";
-            readonly type: "uint256";
-        }];
-        readonly stateMutability: "view";
-        readonly type: "function";
-    }, {
-        readonly inputs: readonly [{
-            readonly internalType: "address";
             readonly name: "token";
             readonly type: "address";
         }, {

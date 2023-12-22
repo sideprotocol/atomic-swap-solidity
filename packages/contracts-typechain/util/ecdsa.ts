@@ -12,25 +12,17 @@ interface Permit {
   spender: string;
   value: BigNumberish;
   agreement: string;
-  nonce: BigNumberish;
   deadline: BigNumberish;
 }
 
 //const SIGNING_DOMAIN_NAME = "SideProtocol";
 
 const types = {
-  // EIP712Domain: [
-  //   { name: "name", type: "string" },
-  //   { name: "version", type: "string" },
-  //   { name: "chainId", type: "uint256" },
-  //   { name: "verifyingContract", type: "address" },
-  // ],
   Permit: [
     { name: "owner", type: "address" },
     { name: "spender", type: "address" },
     { name: "value", type: "uint256" },
     { name: "agreement", type: "bytes32" },
-    { name: "nonce", type: "uint256" },
     { name: "deadline", type: "uint256" },
   ],
 };
@@ -72,16 +64,14 @@ export const createPermitSignature = async (params: {
   spender: string;
   value: BigNumberish;
   agreement: string;
-  nonce: BigNumberish;
   deadline: BigNumberish;
 }): Promise<{ signature: string }> => {
-  const { chainId, tokenName, contractAddress, author, spender, value, agreement, nonce, deadline } = params;
+  const { chainId, tokenName, contractAddress, author, spender, value, agreement, deadline } = params;
   const permitMsg: Permit = {
     owner: await author.getAddress(),
     spender,
     value,
     agreement,
-    nonce: nonce,
     deadline,
   };
   const signature = await _formatSignature({

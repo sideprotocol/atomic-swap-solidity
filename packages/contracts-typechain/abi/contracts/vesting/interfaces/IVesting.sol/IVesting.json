@@ -5,11 +5,6 @@
   "abi": [
     {
       "inputs": [],
-      "name": "InvalidTotalPercentage",
-      "type": "error"
-    },
-    {
-      "inputs": [],
       "name": "InvalidVesting",
       "type": "error"
     },
@@ -26,11 +21,6 @@
     {
       "inputs": [],
       "name": "NoVestedTokensForRelease",
-      "type": "error"
-    },
-    {
-      "inputs": [],
-      "name": "OverMaximumReleaseStep",
       "type": "error"
     },
     {

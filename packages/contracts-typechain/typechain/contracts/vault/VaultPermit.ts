@@ -61,7 +61,6 @@ export interface VaultPermitInterface extends Interface {
       | "initialize"
       | "isAdmin"
       | "isPauser"
-      | "nonces"
       | "paginationSize"
       | "pause"
       | "paused"
@@ -167,7 +166,6 @@ export interface VaultPermitInterface extends Interface {
     functionFragment: "isPauser",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "paginationSize",
     values?: undefined
@@ -257,7 +255,6 @@ export interface VaultPermitInterface extends Interface {
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isPauser", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "paginationSize",
     data: BytesLike
@@ -607,8 +604,6 @@ export interface VaultPermit extends BaseContract {
 
   isPauser: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
 
-  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
-
   paginationSize: TypedContractMethod<[], [bigint], "view">;
 
   pause: TypedContractMethod<[], [void], "nonpayable">;
@@ -795,9 +790,6 @@ export interface VaultPermit extends BaseContract {
   getFunction(
     nameOrSignature: "isPauser"
   ): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "nonces"
-  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "paginationSize"
   ): TypedContractMethod<[], [bigint], "view">;

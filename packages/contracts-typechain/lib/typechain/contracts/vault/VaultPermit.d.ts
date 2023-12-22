@@ -23,7 +23,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VaultPermitInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "DOMAIN_SEPARATOR" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "allowance" | "approve" | "balanceOf" | "cancelPermit" | "deposit" | "eip712Domain" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isPauser" | "nonces" | "paginationSize" | "pause" | "paused" | "permit" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "setPaginationSize" | "supportsInterface" | "transfer" | "transferFrom" | "unpause" | "withdraw"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "DOMAIN_SEPARATOR" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "allowance" | "approve" | "balanceOf" | "cancelPermit" | "deposit" | "eip712Domain" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isPauser" | "paginationSize" | "pause" | "paused" | "permit" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "setPaginationSize" | "supportsInterface" | "transfer" | "transferFrom" | "unpause" | "withdraw"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Deposit" | "EIP712DomainChanged" | "Initialized" | "Paused" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "VaultApproval" | "VaultTransfer" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "DOMAIN_SEPARATOR", values?: undefined): string;
@@ -48,7 +48,6 @@ export interface VaultPermitInterface extends Interface {
     encodeFunctionData(functionFragment: "initialize", values: [AddressLike, string]): string;
     encodeFunctionData(functionFragment: "isAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "isPauser", values: [AddressLike]): string;
-    encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "paginationSize", values?: undefined): string;
     encodeFunctionData(functionFragment: "pause", values?: undefined): string;
     encodeFunctionData(functionFragment: "paused", values?: undefined): string;
@@ -86,7 +85,6 @@ export interface VaultPermitInterface extends Interface {
     decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "isPauser", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paginationSize", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
@@ -369,7 +367,6 @@ export interface VaultPermit extends BaseContract {
     ], "nonpayable">;
     isAdmin: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
     isPauser: TypedContractMethod<[_account: AddressLike], [boolean], "view">;
-    nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     paginationSize: TypedContractMethod<[], [bigint], "view">;
     pause: TypedContractMethod<[], [void], "nonpayable">;
     paused: TypedContractMethod<[], [boolean], "view">;
@@ -519,7 +516,6 @@ export interface VaultPermit extends BaseContract {
     ], "nonpayable">;
     getFunction(nameOrSignature: "isAdmin"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
     getFunction(nameOrSignature: "isPauser"): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
-    getFunction(nameOrSignature: "nonces"): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
     getFunction(nameOrSignature: "paginationSize"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
     getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;

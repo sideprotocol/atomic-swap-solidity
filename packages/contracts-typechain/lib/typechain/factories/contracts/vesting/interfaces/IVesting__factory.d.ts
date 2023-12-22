@@ -3,10 +3,6 @@ import type { IVesting, IVestingInterface } from "../../../../contracts/vesting/
 export declare class IVesting__factory {
     static readonly abi: readonly [{
         readonly inputs: readonly [];
-        readonly name: "InvalidTotalPercentage";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
         readonly name: "InvalidVesting";
         readonly type: "error";
     }, {
@@ -20,10 +16,6 @@ export declare class IVesting__factory {
     }, {
         readonly inputs: readonly [];
         readonly name: "NoVestedTokensForRelease";
-        readonly type: "error";
-    }, {
-        readonly inputs: readonly [];
-        readonly name: "OverMaximumReleaseStep";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
