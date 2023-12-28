@@ -11,6 +11,14 @@ export declare class Vault__factory {
         readonly type: "error";
     }, {
         readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "VaultAdditionalEther";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
             readonly internalType: "address";
             readonly name: "spender";
             readonly type: "address";
@@ -44,6 +52,14 @@ export declare class Vault__factory {
             readonly type: "uint256";
         }];
         readonly name: "VaultInsufficientBalance";
+        readonly type: "error";
+    }, {
+        readonly inputs: readonly [{
+            readonly internalType: "uint256";
+            readonly name: "amount";
+            readonly type: "uint256";
+        }];
+        readonly name: "VaultInvalidAmount";
         readonly type: "error";
     }, {
         readonly inputs: readonly [{

@@ -6,6 +6,7 @@ import type {
   BigNumberish,
   BytesLike,
   FunctionFragment,
+  Result,
   Interface,
   EventFragment,
   AddressLike,
@@ -19,15 +20,103 @@ import type {
   TypedEventLog,
   TypedLogDescription,
   TypedListener,
+  TypedContractMethod,
 } from "../../../common";
 
+export declare namespace IAtomicSwapBase {
+  export type CoinStruct = { token: AddressLike; amount: BigNumberish };
+
+  export type CoinStructOutput = [token: string, amount: bigint] & {
+    token: string;
+    amount: bigint;
+  };
+
+  export type PermitSignatureStruct = {
+    v: BigNumberish;
+    r: BytesLike;
+    s: BytesLike;
+    owner: AddressLike;
+    deadline: BigNumberish;
+  };
+
+  export type PermitSignatureStructOutput = [
+    v: bigint,
+    r: string,
+    s: string,
+    owner: string,
+    deadline: bigint
+  ] & { v: bigint; r: string; s: string; owner: string; deadline: bigint };
+
+  export type SwapWithPermitMsgStruct = {
+    uuid: BytesLike;
+    sellToken: IAtomicSwapBase.CoinStruct;
+    buyToken: IAtomicSwapBase.CoinStruct;
+    desiredTaker: AddressLike;
+    minBidAmount: BigNumberish;
+    acceptBid: boolean;
+    withdrawToSellerAccount: boolean;
+    withdrawToBuyerAccount: boolean;
+    sellerSignature: IAtomicSwapBase.PermitSignatureStruct;
+    buyerSignature: IAtomicSwapBase.PermitSignatureStruct;
+  };
+
+  export type SwapWithPermitMsgStructOutput = [
+    uuid: string,
+    sellToken: IAtomicSwapBase.CoinStructOutput,
+    buyToken: IAtomicSwapBase.CoinStructOutput,
+    desiredTaker: string,
+    minBidAmount: bigint,
+    acceptBid: boolean,
+    withdrawToSellerAccount: boolean,
+    withdrawToBuyerAccount: boolean,
+    sellerSignature: IAtomicSwapBase.PermitSignatureStructOutput,
+    buyerSignature: IAtomicSwapBase.PermitSignatureStructOutput
+  ] & {
+    uuid: string;
+    sellToken: IAtomicSwapBase.CoinStructOutput;
+    buyToken: IAtomicSwapBase.CoinStructOutput;
+    desiredTaker: string;
+    minBidAmount: bigint;
+    acceptBid: boolean;
+    withdrawToSellerAccount: boolean;
+    withdrawToBuyerAccount: boolean;
+    sellerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
+    buyerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
+  };
+
+  export type ReleaseStruct = {
+    durationInHours: BigNumberish;
+    percentage: BigNumberish;
+  };
+
+  export type ReleaseStructOutput = [
+    durationInHours: bigint,
+    percentage: bigint
+  ] & { durationInHours: bigint; percentage: bigint };
+}
+
 export interface IInchainAtomicSwapInterface extends Interface {
+  getFunction(nameOrSignature: "executeSwapWithPermit"): FunctionFragment;
+
   getEvent(
     nameOrSignatureOrTopic:
       | "AcceptedBid"
       | "AtomicSwapOrderCreated"
       | "AtomicSwapOrderTook"
   ): EventFragment;
+
+  encodeFunctionData(
+    functionFragment: "executeSwapWithPermit",
+    values: [
+      IAtomicSwapBase.SwapWithPermitMsgStruct,
+      IAtomicSwapBase.ReleaseStruct[]
+    ]
+  ): string;
+
+  decodeFunctionResult(
+    functionFragment: "executeSwapWithPermit",
+    data: BytesLike
+  ): Result;
 }
 
 export namespace AcceptedBidEvent {
@@ -121,9 +210,29 @@ export interface IInchainAtomicSwap extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  executeSwapWithPermit: TypedContractMethod<
+    [
+      swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
+      releases: IAtomicSwapBase.ReleaseStruct[]
+    ],
+    [void],
+    "nonpayable"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
+
+  getFunction(
+    nameOrSignature: "executeSwapWithPermit"
+  ): TypedContractMethod<
+    [
+      swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
+      releases: IAtomicSwapBase.ReleaseStruct[]
+    ],
+    [void],
+    "nonpayable"
+  >;
 
   getEvent(
     key: "AcceptedBid"
