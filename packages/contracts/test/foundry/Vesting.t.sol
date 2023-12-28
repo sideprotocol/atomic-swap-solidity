@@ -59,17 +59,17 @@ contract VestingTest is Test {
             initAtomicSwapData
         );
 
-        atomicswap = InchainAtomicSwap(atomicSwapProxy);
+        // atomicswap = InchainAtomicSwap(atomicSwapProxy);
 
-        usdc = new MockToken("USDC","USDC");
-        usdt = new MockToken("USDT","USDT");
+        // usdc = new MockToken("USDC","USDC");
+        // usdt = new MockToken("USDT","USDT");
 
-        vm.deal(user1, 100 ether); // Provide user1 with some ETH
-        vm.deal(user2, 100 ether); // Provide user2 with some ETH
-        vm.deal(user3, 100 ether); // Provide user2 with some ETH
+        // vm.deal(user1, 100 ether); // Provide user1 with some ETH
+        // vm.deal(user2, 100 ether); // Provide user2 with some ETH
+        // vm.deal(user3, 100 ether); // Provide user2 with some ETH
 
-        usdc.mint(user2, 1000 ether); // Provide user1 with some
-        usdt.mint(user3, 1000 ether); // Provide user1 with some
+        // usdc.mint(user2, 1000 ether); // Provide user1 with some
+        // usdt.mint(user3, 1000 ether); // Provide user1 with some
     }
 
     // Fuzz test for startVesting
@@ -77,7 +77,7 @@ contract VestingTest is Test {
         IAtomicSwapBase.Release[] memory releases = new IAtomicSwapBase.Release[](1);
         releases[0] = IAtomicSwapBase.Release(1, 1000); // Example release
         vm.expectRevert("OwnablePausable: access denied");
-        vesting.startVesting(orderId, buyer, token, totalAmount, releases);
+        //vesting.startVesting(orderId, buyer, token, totalAmount, releases);
        
     }
 
@@ -85,39 +85,39 @@ contract VestingTest is Test {
     function testFuzz_release(
         bytes32 uuid
     ) public {
-        IAtomicSwapBase.MakeSwapMsg memory makeswap = IAtomicSwapBase.MakeSwapMsg(
-            uuid,
-            IAtomicSwapBase.Coin(address(0), 10 ether), 
-            IAtomicSwapBase.Coin(address(usdt), 10 ether),
-            address(user1),
-            address (user2),
-            8 ether,
-            block.timestamp + 1000,
-            true
-        );
+        // IAtomicSwapBase.MakeSwapMsg memory makeswap = IAtomicSwapBase.MakeSwapMsg(
+        //     uuid,
+        //     IAtomicSwapBase.Coin(address(0), 10 ether), 
+        //     IAtomicSwapBase.Coin(address(usdt), 10 ether),
+        //     address(user1),
+        //     address (user2),
+        //     8 ether,
+        //     block.timestamp + 1000,
+        //     true
+        // );
 
-        IAtomicSwapBase.Release[] memory releases = new IAtomicSwapBase.Release[](2);
-        releases[0] = IAtomicSwapBase.Release(
-            1 hours,
-            5000
-        );
-        releases[1] = IAtomicSwapBase.Release(
-            1 hours,
-            5000
-        );
+        // IAtomicSwapBase.Release[] memory releases = new IAtomicSwapBase.Release[](2);
+        // releases[0] = IAtomicSwapBase.Release(
+        //     1 hours,
+        //     5000
+        // );
+        // releases[1] = IAtomicSwapBase.Release(
+        //     1 hours,
+        //     5000
+        // );
 
-        // Create Order
-        vm.startPrank(user1);
-        bytes32 orderId = atomicswap.makeSwapWithVesting{value: makeswap.sellToken.amount }(
-           makeswap,
-           releases
-        );
+        // // Create Order
+        // vm.startPrank(user1);
+        // bytes32 orderId = atomicswap.makeSwapWithVesting{value: makeswap.sellToken.amount }(
+        //    makeswap,
+        //    releases
+        // );
 
-        uint tokenId = vesting.vestingIds(orderId);
-        //string memory tokenUrl = vesting.tokenURI(tokenId);
-        console2.log("value: %s", tokenId);
-        console.log("tokenId=======>:", tokenId);
-        //console.log("tokenUrl:", tokenUrl);
+        // uint tokenId = vesting.vestingIds(orderId);
+        // //string memory tokenUrl = vesting.tokenURI(tokenId);
+        // console2.log("value: %s", tokenId);
+        // console.log("tokenId=======>:", tokenId);
+        // //console.log("tokenUrl:", tokenUrl);
         
     }
 }

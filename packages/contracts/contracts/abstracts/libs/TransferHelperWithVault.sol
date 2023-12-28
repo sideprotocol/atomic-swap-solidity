@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity >=0.6.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
 
-import {IVault} from '../interfaces/IVault.sol';
+import {IVault} from "../interfaces/IVault.sol";
 
 library TransferHelperWithVault {
     /// @notice Transfers tokens from the targeted address to the given destination
@@ -19,7 +19,7 @@ library TransferHelperWithVault {
     ) internal {
         (bool success, bytes memory data) =
             vault.call(abi.encodeWithSelector(IVault.transferFrom.selector, token, from, to, value));
-            require(success && (data.length == 0 || abi.decode(data, (bool))), 'STF');
+            require(success && (data.length == 0 || abi.decode(data, (bool))), "STF");
     }
 
     /// @notice Transfers tokens from msg.sender to a recipient
@@ -34,7 +34,7 @@ library TransferHelperWithVault {
         uint256 value
     ) internal {
         (bool success, bytes memory data) = vault.call(abi.encodeWithSelector(IVault.transfer.selector,token, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), 'ST');
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "ST");
     }
 
     /// @notice Approves the stipulated contract to spend the given allowance in the given token
@@ -49,6 +49,6 @@ library TransferHelperWithVault {
         uint256 value
     ) internal {
         (bool success, bytes memory data) = vault.call(abi.encodeWithSelector(IVault.approve.selector,token, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), 'SA');
+        require(success && (data.length == 0 || abi.decode(data, (bool))), "SA");
     }
 }

@@ -2,15 +2,12 @@
 pragma solidity ^0.8.19;
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import {OwnablePausableUpgradeable} from "../abstracts/OwnablePausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {TransferHelper} from "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 import {TransferHelperWithVault} from "../abstracts/libs/TransferHelperWithVault.sol";
 import {IVesting, IAtomicSwapBase} from "./interfaces/IVesting.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-//import {IVault} from "./abstracts/interfaces/IVault.sol";
-import {IVault} from "../abstracts/interfaces/IVault.sol";
 import {VestingHelper} from  "./logic/VestingHelper.sol";
 /// @title Vesting Contract
 /// @notice Implements vesting schedules for token distribution with a cliff period.
@@ -24,20 +21,20 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     uint256 constant internal RELEASE_PERCENT_SCALE_FACTOR = 1e4;
 
     /// @notice Stores vesting schedules for each vestingId.
-    mapping(uint => VestingSchedule)
+    mapping(uint256 => VestingSchedule)
         public vesting;
     
     /// @dev Counter for generating unique token IDs for new vestings.
     /// The counter starts from 1 and is incremented each time a new token is minted.
     uint256 private _lastTokenId;
 
-    /// @dev Mapping to associate each orderId (bytes32) with a unique vestingId (uint).
+    /// @dev Mapping to associate each orderId (bytes32) with a unique vestingId (uint256).
     /// This mapping helps in tracking the relationship between orderIds and their respective vestingIds.
-    mapping (bytes32 => uint) public vestingIds;
+    mapping (bytes32 => uint256) public vestingIds;
 
     /// @notice Stores release information for each vestingId.
     // slither-disable-next-line uninitialized-state
-    mapping(uint => IAtomicSwapBase.Release[])
+    mapping(uint256 => IAtomicSwapBase.Release[])
         public releaseInfo;
     address private _vault;
 
@@ -76,7 +73,7 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
         
         _vault.transferFrom(token, totalAmount, isWithdraw);
         uint256 vestingStartTime = block.timestamp;
-        uint vestingId = _issueVestingId(buyer, orderId);
+        uint256 vestingId = _issueVestingId(buyer, orderId);
             
         VestingSchedule memory newVesting = VestingSchedule({
             from: msg.sender,
@@ -100,10 +97,10 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
 
   
     /// @notice Releases vested tokens to the beneficiary.
-    /// @param vestingId The uint of the identity to release tokens to.
+    /// @param vestingId The uint256 of the identity to release tokens to.
     /// @dev Calculates the amount of tokens to be released and transfers them to the beneficiary.
     function release(
-        uint vestingId
+        uint256 vestingId
     ) external nonReentrant whenNotPaused {
         // Try to remove identifiers 
         if (ownerOf(vestingId) != msg.sender) {
@@ -170,8 +167,8 @@ contract Vesting is OwnablePausableUpgradeable, ReentrancyGuardUpgradeable, IVes
     /// This function can only be called by an administrator of the contract.
     /// @param to The address to which the vesting ID and corresponding tokens will be issued.
     /// @param orderId The order ID based on which the vesting ID is generated.
-    /// @return vestingId The generated vesting ID as a uint.
-    function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint) {
+    /// @return vestingId The generated vesting ID as a uint256.
+    function _issueVestingId(address to, bytes32 orderId) internal onlyAdmin returns(uint256) {
         _lastTokenId++;
         vestingIds[orderId] = _lastTokenId;
         _mint(to, _lastTokenId);    

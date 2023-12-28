@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-import {IAtomicSwapBase} from "./IAtomicSwapBase.sol";
 interface IVault {
 
     /**
@@ -53,6 +52,6 @@ interface IVault {
      * Emits a {Transfer} event.
      */
     function transferFrom(address token, address from, address to, uint256 value) external returns (bool);
-    function deposit(address token, uint amount) external payable;
+    function deposit(address token, uint256 amount) external payable;
     function withdraw(address token,address to, uint256 amount) external;
 }

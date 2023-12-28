@@ -6,11 +6,11 @@ import {IVault} from  "./interfaces/IVault.sol";
 
 abstract contract Vault is ContextUpgradeable,IVault  {
     
-    mapping(address account => mapping(address token => uint amount)) private _balances;
+    mapping(address account => mapping(address token => uint256 amount)) private _balances;
     mapping(address account => mapping(address  token => mapping(address spender => uint256))) private _allowances;
 
-    event  VaultApproval(address indexed owner, address indexed spender, uint indexed value);
-    event  VaultTransfer(address token, address from, address to, uint value);
+    event  VaultApproval(address indexed owner, address indexed spender, uint256 indexed value);
+    event  VaultTransfer(address token, address from, address to, uint256 value);
       // Event for Deposits
     event Deposit(address indexed token, address indexed from, uint256 value);
     // Event for Withdrawals
@@ -23,11 +23,13 @@ abstract contract Vault is ContextUpgradeable,IVault  {
     error VaultInvalidSender(address sender);
     error VaultInvalidReceiver(address receiver);
 
-    error VaultInsufficientAllowance(address spender, uint currentAllowance, uint value);
+    error VaultInsufficientAllowance(address spender, uint256 currentAllowance, uint256 value);
     
     
-    error VaultInsufficientBalance(address token, address from, uint fromBalance, uint value);
+    error VaultInsufficientBalance(address token, address from, uint256 fromBalance, uint256 value);
 
+    error VaultInvalidAmount(uint256 amount);
+    error VaultAdditionalEther(uint256 amount);
     /**
      * @dev See {IERC20-approve}.
      *
@@ -174,14 +176,17 @@ abstract contract Vault is ContextUpgradeable,IVault  {
      * @dev Allows a user to deposit ERC20 tokens or Ether into the vault.
      * @param token The address of the ERC20 token contract, or the zero address for Ether.
      */
-    function deposit(address token, uint amount) public payable {
+    function deposit(address token, uint256 amount) public payable {
         if (token != address(0)) {
             // Deposit is for ERC20 tokens
-            require(msg.value == 0, "Vault: Ether sent with ERC20 deposit");
+            if(msg.value != 0) {
+                revert VaultAdditionalEther(amount);
+            }
             TransferHelper.safeTransferFrom(token, _msgSender(), address(this), amount);
         } else {
-            // Deposit is for Ether
-            require(msg.value == amount, "Vault: Ether deposit amount is zero");
+            if(msg.value != amount) {
+                revert VaultInvalidAmount(amount);
+            }
         }
         
         // Update the user's balance
@@ -195,9 +200,13 @@ abstract contract Vault is ContextUpgradeable,IVault  {
      * @param amount The amount of tokens or Ether to withdraw.
      */
     function withdraw(address token,address to, uint256 amount) public {
-        require(amount > 0, "Vault: withdraw amount is zero");
+        if(amount < 0) {
+            revert VaultInvalidAmount(amount);
+        }
         uint256 balance = _balances[_msgSender()][token];
-        require(balance >= amount, "Vault: withdraw amount exceeds balance");
+        if(balance < amount) {
+            revert VaultInvalidAmount(amount);
+        }
 
         // Update the user's balance
         _balances[_msgSender()][token] -= amount;
