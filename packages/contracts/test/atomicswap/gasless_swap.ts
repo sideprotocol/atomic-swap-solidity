@@ -39,7 +39,7 @@ describe("AtomicSwap: Gasless Swap", () => {
       {
         name: "Swap ether-ERC20 token without vesting",
         mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
-          swapPermitPayload.sellToken.address = ZeroAddress;
+          swapPermitPayload.sellToken.token = ZeroAddress;
           swapPermitPayload.withdrawToSellerAccount = true;
         },
         shouldThrow: false,
@@ -164,6 +164,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           seller.address,
           buyer.address,
         );
+        
         const { signature: sellerSignature } =
           await ecdsa.createPermitSignature({
             tokenName: vaultName,
@@ -233,11 +234,11 @@ describe("AtomicSwap: Gasless Swap", () => {
           ).not.to.reverted;
 
           const sellerSwapAmount = calcSwapAmount(
-            swapPermitPayload.buyToken.amount,
+            BigInt(swapPermitPayload.buyToken.amount),
             sellTokenFeeRate,
           );
           const buyerSwapAmount = calcSwapAmount(
-            swapPermitPayload.sellToken.amount,
+            BigInt(swapPermitPayload.sellToken.amount),
             buyTokenFeeRate,
           );
           //
