@@ -79,6 +79,11 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    bera: {
+      //chainId: parseInt(`${process.env.CHAIN_ID}`),
+      url: `${process.env.BERA_TESTNET_URL || ""}`,
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+    },
   },
   gasReporter: {
     enabled: true,

@@ -5,43 +5,52 @@ import { Settings, Vesting__factory } from "@sideprotocol/contracts-typechain";
 dotenv.config();
 task("deploy:in-chain:lib", "deploy libraries")
   .addOptionalParam("f", "force write")
-  .setAction(async ({ f }, { ethers, upgrades, network }) => {
+  .setAction(async ({ f }, { ethers, upgrades, network, artifacts }) => {
     // deploy libraries
+    if (network.name == "bera") {
+      const paths = await artifacts.getArtifactPaths();
+      paths.find((item)=> item.includes(""))
+      console.log("paths:", paths);
+      
+      // const artifactFile = fs.readFileSync(
+      //   `${await artifacts.getArtifactPaths()}/contracts/${contractName}.sol/${contractName}.json`,
+      // );
+    } else {
+      const AnteHandlerFactory = await ethers.getContractFactory(`AnteHandler`);
+      const AnteHandler = await AnteHandlerFactory.deploy();
+      const AnteHandlerAddress = await AnteHandler.getAddress();
 
-    const AnteHandlerFactory = await ethers.getContractFactory(`AnteHandler`);
-    const AnteHandler = await AnteHandlerFactory.deploy();
-    const AnteHandlerAddress = await AnteHandler.getAddress();
-
-    const atomicSwapStateLogicFactory = await ethers.getContractFactory(
-      "AtomicSwapStateLogic",
-      {
-        libraries: {
-          AnteHandler: AnteHandlerAddress,
-        },
-      },
-    );
-    const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
-    const atomicSwapStateLogicAddress = await atomicSwapStateLogic.getAddress();
-
-    await saveItemsToSetting(
-      [
+      const atomicSwapStateLogicFactory = await ethers.getContractFactory(
+        "AtomicSwapStateLogic",
         {
-          title: `atomicSwapStateLogic_${network.name}`,
-          value: atomicSwapStateLogicAddress,
+          libraries: {
+            AnteHandler: AnteHandlerAddress,
+          },
         },
-        {
-          title: `AnteHandler_${network.name}`,
-          value: AnteHandlerAddress,
-        },
-      ],
-      f,
-    );
-    console.log(
-      `atomicSwapStateLogic_${network.name}`,
-      atomicSwapStateLogicAddress,
-    );
+      );
+      const atomicSwapStateLogic = await atomicSwapStateLogicFactory.deploy();
+      const atomicSwapStateLogicAddress =
+        await atomicSwapStateLogic.getAddress();
+      await saveItemsToSetting(
+        [
+          {
+            title: `atomicSwapStateLogic_${network.name}`,
+            value: atomicSwapStateLogicAddress,
+          },
+          {
+            title: `AnteHandler_${network.name}`,
+            value: AnteHandlerAddress,
+          },
+        ],
+        f,
+      );
+      console.log(
+        `atomicSwapStateLogic_${network.name}`,
+        atomicSwapStateLogicAddress,
+      );
 
-    console.log(`AnteHandler_${network.name}`, AnteHandlerAddress);
+      console.log(`AnteHandler_${network.name}`, AnteHandlerAddress);
+    }
   });
 
 task("deploy:in-chain:contract", "deploy in chain ").setAction(

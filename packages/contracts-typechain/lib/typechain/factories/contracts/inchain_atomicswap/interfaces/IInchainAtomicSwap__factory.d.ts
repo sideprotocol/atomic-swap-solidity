@@ -147,6 +147,130 @@ export declare class IInchainAtomicSwap__factory {
         }];
         readonly name: "AtomicSwapOrderTook";
         readonly type: "event";
+    }, {
+        readonly inputs: readonly [{
+            readonly components: readonly [{
+                readonly internalType: "bytes32";
+                readonly name: "uuid";
+                readonly type: "bytes32";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amount";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct IAtomicSwapBase.Coin";
+                readonly name: "sellToken";
+                readonly type: "tuple";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "address";
+                    readonly name: "token";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "amount";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct IAtomicSwapBase.Coin";
+                readonly name: "buyToken";
+                readonly type: "tuple";
+            }, {
+                readonly internalType: "address";
+                readonly name: "desiredTaker";
+                readonly type: "address";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "minBidAmount";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "bool";
+                readonly name: "acceptBid";
+                readonly type: "bool";
+            }, {
+                readonly internalType: "bool";
+                readonly name: "withdrawToSellerAccount";
+                readonly type: "bool";
+            }, {
+                readonly internalType: "bool";
+                readonly name: "withdrawToBuyerAccount";
+                readonly type: "bool";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "uint8";
+                    readonly name: "v";
+                    readonly type: "uint8";
+                }, {
+                    readonly internalType: "bytes32";
+                    readonly name: "r";
+                    readonly type: "bytes32";
+                }, {
+                    readonly internalType: "bytes32";
+                    readonly name: "s";
+                    readonly type: "bytes32";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "owner";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "deadline";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct IAtomicSwapBase.PermitSignature";
+                readonly name: "sellerSignature";
+                readonly type: "tuple";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "uint8";
+                    readonly name: "v";
+                    readonly type: "uint8";
+                }, {
+                    readonly internalType: "bytes32";
+                    readonly name: "r";
+                    readonly type: "bytes32";
+                }, {
+                    readonly internalType: "bytes32";
+                    readonly name: "s";
+                    readonly type: "bytes32";
+                }, {
+                    readonly internalType: "address";
+                    readonly name: "owner";
+                    readonly type: "address";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "deadline";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct IAtomicSwapBase.PermitSignature";
+                readonly name: "buyerSignature";
+                readonly type: "tuple";
+            }];
+            readonly internalType: "struct IAtomicSwapBase.SwapWithPermitMsg";
+            readonly name: "swap";
+            readonly type: "tuple";
+        }, {
+            readonly components: readonly [{
+                readonly internalType: "uint256";
+                readonly name: "durationInHours";
+                readonly type: "uint256";
+            }, {
+                readonly internalType: "uint256";
+                readonly name: "percentage";
+                readonly type: "uint256";
+            }];
+            readonly internalType: "struct IAtomicSwapBase.Release[]";
+            readonly name: "releases";
+            readonly type: "tuple[]";
+        }];
+        readonly name: "executeSwapWithPermit";
+        readonly outputs: readonly [];
+        readonly stateMutability: "nonpayable";
+        readonly type: "function";
     }];
     static createInterface(): IInchainAtomicSwapInterface;
     static connect(address: string, runner?: ContractRunner | null): IInchainAtomicSwap;

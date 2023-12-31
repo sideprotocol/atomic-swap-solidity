@@ -23,7 +23,7 @@ export declare namespace IAtomicSwapBase {
     };
 }
 export interface VaultPermitInterface extends Interface {
-    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "DOMAIN_SEPARATOR" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "allowance" | "approve" | "balanceOf" | "cancelPermit" | "deposit" | "eip712Domain" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isPauser" | "paginationSize" | "pause" | "paused" | "permit" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "setPaginationSize" | "supportsInterface" | "transfer" | "transferFrom" | "unpause" | "withdraw"): FunctionFragment;
+    getFunction(nameOrSignature: "DEFAULT_ADMIN_ROLE" | "DOMAIN_SEPARATOR" | "PAUSER_ROLE" | "addAdmin" | "addPauser" | "allowance" | "approve" | "balanceOf" | "deposit" | "eip712Domain" | "getRoleAdmin" | "grantRole" | "hasRole" | "initialize" | "isAdmin" | "isPauser" | "paginationSize" | "pause" | "paused" | "permit" | "removeAdmin" | "removePauser" | "renounceRole" | "revokeRole" | "setPaginationSize" | "supportsInterface" | "transfer" | "transferFrom" | "unpause" | "withdraw"): FunctionFragment;
     getEvent(nameOrSignatureOrTopic: "Deposit" | "EIP712DomainChanged" | "Initialized" | "Paused" | "RoleAdminChanged" | "RoleGranted" | "RoleRevoked" | "Unpaused" | "VaultApproval" | "VaultTransfer" | "Withdrawal"): EventFragment;
     encodeFunctionData(functionFragment: "DEFAULT_ADMIN_ROLE", values?: undefined): string;
     encodeFunctionData(functionFragment: "DOMAIN_SEPARATOR", values?: undefined): string;
@@ -33,13 +33,6 @@ export interface VaultPermitInterface extends Interface {
     encodeFunctionData(functionFragment: "allowance", values: [AddressLike, AddressLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "approve", values: [AddressLike, AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "balanceOf", values: [AddressLike, AddressLike]): string;
-    encodeFunctionData(functionFragment: "cancelPermit", values: [
-        AddressLike,
-        AddressLike,
-        BigNumberish,
-        BytesLike,
-        IAtomicSwapBase.PermitSignatureStruct
-    ]): string;
     encodeFunctionData(functionFragment: "deposit", values: [AddressLike, BigNumberish]): string;
     encodeFunctionData(functionFragment: "eip712Domain", values?: undefined): string;
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
@@ -76,7 +69,6 @@ export interface VaultPermitInterface extends Interface {
     decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-    decodeFunctionResult(functionFragment: "cancelPermit", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "eip712Domain", data: BytesLike): Result;
     decodeFunctionResult(functionFragment: "getRoleAdmin", data: BytesLike): Result;
@@ -311,15 +303,6 @@ export interface VaultPermit extends BaseContract {
     ], [
         bigint
     ], "view">;
-    cancelPermit: TypedContractMethod<[
-        token: AddressLike,
-        spender: AddressLike,
-        value: BigNumberish,
-        agreement: BytesLike,
-        signature: IAtomicSwapBase.PermitSignatureStruct
-    ], [
-        void
-    ], "nonpayable">;
     deposit: TypedContractMethod<[
         token: AddressLike,
         amount: BigNumberish
@@ -460,15 +443,6 @@ export interface VaultPermit extends BaseContract {
     ], [
         bigint
     ], "view">;
-    getFunction(nameOrSignature: "cancelPermit"): TypedContractMethod<[
-        token: AddressLike,
-        spender: AddressLike,
-        value: BigNumberish,
-        agreement: BytesLike,
-        signature: IAtomicSwapBase.PermitSignatureStruct
-    ], [
-        void
-    ], "nonpayable">;
     getFunction(nameOrSignature: "deposit"): TypedContractMethod<[
         token: AddressLike,
         amount: BigNumberish

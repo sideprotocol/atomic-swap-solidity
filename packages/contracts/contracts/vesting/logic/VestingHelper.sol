@@ -33,7 +33,7 @@ library VestingHelper {
     function transferFrom(
         address vault,
         address token, 
-        uint amount,
+        uint256 amount,
         bool isWithdraw
     ) internal {
         if(!isWithdraw) {

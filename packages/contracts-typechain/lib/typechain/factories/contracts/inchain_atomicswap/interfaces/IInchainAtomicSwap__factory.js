@@ -193,6 +193,166 @@ const _abi = [
         name: "AtomicSwapOrderTook",
         type: "event",
     },
+    {
+        inputs: [
+            {
+                components: [
+                    {
+                        internalType: "bytes32",
+                        name: "uuid",
+                        type: "bytes32",
+                    },
+                    {
+                        components: [
+                            {
+                                internalType: "address",
+                                name: "token",
+                                type: "address",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "amount",
+                                type: "uint256",
+                            },
+                        ],
+                        internalType: "struct IAtomicSwapBase.Coin",
+                        name: "sellToken",
+                        type: "tuple",
+                    },
+                    {
+                        components: [
+                            {
+                                internalType: "address",
+                                name: "token",
+                                type: "address",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "amount",
+                                type: "uint256",
+                            },
+                        ],
+                        internalType: "struct IAtomicSwapBase.Coin",
+                        name: "buyToken",
+                        type: "tuple",
+                    },
+                    {
+                        internalType: "address",
+                        name: "desiredTaker",
+                        type: "address",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "minBidAmount",
+                        type: "uint256",
+                    },
+                    {
+                        internalType: "bool",
+                        name: "acceptBid",
+                        type: "bool",
+                    },
+                    {
+                        internalType: "bool",
+                        name: "withdrawToSellerAccount",
+                        type: "bool",
+                    },
+                    {
+                        internalType: "bool",
+                        name: "withdrawToBuyerAccount",
+                        type: "bool",
+                    },
+                    {
+                        components: [
+                            {
+                                internalType: "uint8",
+                                name: "v",
+                                type: "uint8",
+                            },
+                            {
+                                internalType: "bytes32",
+                                name: "r",
+                                type: "bytes32",
+                            },
+                            {
+                                internalType: "bytes32",
+                                name: "s",
+                                type: "bytes32",
+                            },
+                            {
+                                internalType: "address",
+                                name: "owner",
+                                type: "address",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "deadline",
+                                type: "uint256",
+                            },
+                        ],
+                        internalType: "struct IAtomicSwapBase.PermitSignature",
+                        name: "sellerSignature",
+                        type: "tuple",
+                    },
+                    {
+                        components: [
+                            {
+                                internalType: "uint8",
+                                name: "v",
+                                type: "uint8",
+                            },
+                            {
+                                internalType: "bytes32",
+                                name: "r",
+                                type: "bytes32",
+                            },
+                            {
+                                internalType: "bytes32",
+                                name: "s",
+                                type: "bytes32",
+                            },
+                            {
+                                internalType: "address",
+                                name: "owner",
+                                type: "address",
+                            },
+                            {
+                                internalType: "uint256",
+                                name: "deadline",
+                                type: "uint256",
+                            },
+                        ],
+                        internalType: "struct IAtomicSwapBase.PermitSignature",
+                        name: "buyerSignature",
+                        type: "tuple",
+                    },
+                ],
+                internalType: "struct IAtomicSwapBase.SwapWithPermitMsg",
+                name: "swap",
+                type: "tuple",
+            },
+            {
+                components: [
+                    {
+                        internalType: "uint256",
+                        name: "durationInHours",
+                        type: "uint256",
+                    },
+                    {
+                        internalType: "uint256",
+                        name: "percentage",
+                        type: "uint256",
+                    },
+                ],
+                internalType: "struct IAtomicSwapBase.Release[]",
+                name: "releases",
+                type: "tuple[]",
+            },
+        ],
+        name: "executeSwapWithPermit",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
 ];
 class IInchainAtomicSwap__factory {
     static createInterface() {

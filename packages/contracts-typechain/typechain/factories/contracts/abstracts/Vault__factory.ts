@@ -19,6 +19,17 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "VaultAdditionalEther",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "spender",
         type: "address",
@@ -61,6 +72,17 @@ const _abi = [
       },
     ],
     name: "VaultInsufficientBalance",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "VaultInvalidAmount",
     type: "error",
   },
   {

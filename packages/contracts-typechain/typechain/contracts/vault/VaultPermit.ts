@@ -52,7 +52,6 @@ export interface VaultPermitInterface extends Interface {
       | "allowance"
       | "approve"
       | "balanceOf"
-      | "cancelPermit"
       | "deposit"
       | "eip712Domain"
       | "getRoleAdmin"
@@ -123,16 +122,6 @@ export interface VaultPermitInterface extends Interface {
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [AddressLike, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "cancelPermit",
-    values: [
-      AddressLike,
-      AddressLike,
-      BigNumberish,
-      BytesLike,
-      IAtomicSwapBase.PermitSignatureStruct
-    ]
   ): string;
   encodeFunctionData(
     functionFragment: "deposit",
@@ -237,10 +226,6 @@ export interface VaultPermitInterface extends Interface {
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelPermit",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "eip712Domain",
@@ -546,18 +531,6 @@ export interface VaultPermit extends BaseContract {
     "view"
   >;
 
-  cancelPermit: TypedContractMethod<
-    [
-      token: AddressLike,
-      spender: AddressLike,
-      value: BigNumberish,
-      agreement: BytesLike,
-      signature: IAtomicSwapBase.PermitSignatureStruct
-    ],
-    [void],
-    "nonpayable"
-  >;
-
   deposit: TypedContractMethod<
     [token: AddressLike, amount: BigNumberish],
     [void],
@@ -722,19 +695,6 @@ export interface VaultPermit extends BaseContract {
     [account: AddressLike, token: AddressLike],
     [bigint],
     "view"
-  >;
-  getFunction(
-    nameOrSignature: "cancelPermit"
-  ): TypedContractMethod<
-    [
-      token: AddressLike,
-      spender: AddressLike,
-      value: BigNumberish,
-      agreement: BytesLike,
-      signature: IAtomicSwapBase.PermitSignatureStruct
-    ],
-    [void],
-    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "deposit"
