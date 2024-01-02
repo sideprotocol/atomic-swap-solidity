@@ -1,4 +1,5 @@
-import { ZeroAddress, ethers } from "ethers";
+//import { ZeroAddress, ethers } from "ethers";
+import { ethers } from "ethers";
 import {
   Settings,
   CONSTANTS,
@@ -10,14 +11,9 @@ import { InchainAtomicSwap__factory } from "@sideprotocol/contracts-typechain";
 
 import { BlockTimer, generateAgreement, setupSwapPermitPayload } from "./utils";
 const vaultName = "SideVault";
+console.log("vaultName", vaultName);
 const enum AtomicSwapMsgType {
-  MAKE_SWAP,
-  TAKE_SWAP,
-  CANCEL_SWAP,
-  PLACE_BID,
-  UPDATE_BID,
-  ACCEPT_BID,
-  CANCEL_BID,
+  EXECUTE_SWAP,
 }
 export class AtomicSwapCli {
   protected maker: ethers.Wallet;
@@ -38,16 +34,21 @@ export class AtomicSwapCli {
     const usdc = MockToken__factory.connect(Settings.mockUSDC_sepolia, this.maker);
     const usdt = MockToken__factory.connect(Settings.mockUSDT_sepolia, this.taker);
     const vault = VaultPermit__factory.connect(Settings.vault_sepolia, this.maker);
-    const chainInfo = CONSTANTS.getChainInfo(chain);
-    await usdc.mint(this.maker.address, tokenA);
-    await usdt.mint(this.taker.address, tokenB);
 
-    await usdc.approve(await atomicSwap.getAddress(), tokenA);
+    await usdc.connect(this.taker).mint(this.maker.address, tokenA);
+    await usdt.connect(this.taker).mint(this.taker.address, tokenB);
+
+    await usdc.connect(this.maker).approve(await vault.getAddress(), tokenA);
+    await usdt.connect(this.taker).approve(await vault.getAddress(), tokenB);
+
     const usdcAddress = await usdc.getAddress();
     const usdtAddress = await usdt.getAddress();
     const atomicSwapAddress = await atomicSwap.getAddress();
+    const vaultAddress = await vault.getAddress();
+    console.log("atomicSwapAddress:", atomicSwapAddress);
 
     const minBidAmount = (tokenA * BigInt(80)) / BigInt(100);
+    console.log("minBidAmount:", minBidAmount);
     const swapPermitPayload = setupSwapPermitPayload(
       usdcAddress,
       usdtAddress,
@@ -56,7 +57,10 @@ export class AtomicSwapCli {
       tokenB,
       minBidAmount
     );
-    const deadline = BigInt(await this.timer.AfterSeconds(100000));
+    const sellTokenBalance = await vault.balanceOf(this.maker.address, swapPermitPayload.sellToken.token);
+    console.log("sellTokenBalance:", sellTokenBalance);
+    const buyTokenBalance = await vault.balanceOf(this.taker.address, swapPermitPayload.buyToken.token);
+    console.log("buyTokenBalance:", buyTokenBalance);
 
     // Deposit
     await vault.connect(this.maker).deposit(swapPermitPayload.sellToken.token, swapPermitPayload.sellToken.amount, {
@@ -64,8 +68,8 @@ export class AtomicSwapCli {
     });
     await vault.connect(this.taker).deposit(swapPermitPayload.buyToken.token, swapPermitPayload.buyToken.amount);
 
+    const deadline = BigInt(await this.timer.AfterSeconds(100000));
 
-    
     const { sellerAgreement, buyerAgreement } = generateAgreement(
       swapPermitPayload,
       this.maker.address,
@@ -73,8 +77,8 @@ export class AtomicSwapCli {
     );
     const { signature: sellerSignature } = await ecdsa.createPermitSignature({
       tokenName: vaultName,
-      contractAddress: await vault.getAddress(),
-      chainId: chainInfo.chainId,
+      contractAddress: Settings.vault_sepolia,
+      chainId: 11155111,
       author: this.maker,
       spender: atomicSwapAddress,
       value: swapPermitPayload.sellToken.amount,
@@ -93,8 +97,8 @@ export class AtomicSwapCli {
 
     const { signature: buyerSignature } = await ecdsa.createPermitSignature({
       tokenName: vaultName,
-      contractAddress: await vault.getAddress(),
-      chainId: chainInfo.chainId,
+      contractAddress: vaultAddress,
+      chainId: 11155111,
       author: this.taker,
       spender: atomicSwapAddress,
       value: swapPermitPayload.buyToken.amount,
@@ -109,11 +113,14 @@ export class AtomicSwapCli {
       s: buyerSig.s,
       owner: this.taker.address,
     };
+    console.log("swapPayload", swapPermitPayload);
+    //console.log("Buyer Signature", buyerSignature);
 
-    //const estimateGas = await atomicSwap.executeSwapWithPermit.estimateGas(swapPermitPayload, []);
-    //console.log("estimateGas:", estimateGas);
-    //const tx = await atomicSwap.executeSwapWithPermit(swapPermitPayload, []);
-    //await this.log(AtomicSwapMsgType.MAKE_SWAP, tx);
+    const estimateGas = await atomicSwap.connect(this.taker).executeSwapWithPermit.estimateGas(swapPermitPayload, []);
+    console.log("estimateGas:", estimateGas);
+    const tx = await atomicSwap.connect(this.taker).executeSwapWithPermit(swapPermitPayload, []);
+    console.log(tx.hash);
+    await this.log(AtomicSwapMsgType.EXECUTE_SWAP, tx);
   }
 
   protected async log(msgType: AtomicSwapMsgType, tx: ethers.ContractTransactionResponse) {
@@ -127,22 +134,9 @@ export class AtomicSwapCli {
     }
 
     const contractEvent = events[events.length - 1];
-
     switch (msgType) {
-      case AtomicSwapMsgType.MAKE_SWAP:
-      case AtomicSwapMsgType.CANCEL_SWAP:
+      case AtomicSwapMsgType.EXECUTE_SWAP:
         this.printEventDetail(contractEvent, ["id"]);
-        break;
-      case AtomicSwapMsgType.TAKE_SWAP:
-        this.printEventDetail(contractEvent, ["maker", "taker", "id"]);
-        break;
-      case AtomicSwapMsgType.PLACE_BID:
-        this.printEventDetail(contractEvent, ["maker", "taker", "id"]);
-        break;
-      case AtomicSwapMsgType.ACCEPT_BID:
-      case AtomicSwapMsgType.UPDATE_BID:
-      case AtomicSwapMsgType.CANCEL_BID:
-        this.printEventDetail(contractEvent, ["orderID", "bidder", "amount"]);
         break;
       default:
         console.log("Unexpected msgType:==>", msgType);

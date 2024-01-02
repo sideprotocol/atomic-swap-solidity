@@ -127,7 +127,7 @@ describe("AtomicSwap: Vault", () => {
     const { vault } = await loadFixture(Utils.prepareInChainAtomicTest);
     const domainSeparator = await vault.DOMAIN_SEPARATOR();
     expect(domainSeparator).to.equal(
-      "0x078c2a25cd753936aa4a1528ad0be0a82b1f3e5c94e88dc57380f3fe0defabc4",
+      "0x03fc3b53eca21f8f6aa29fea585e10778bca3aca4cd15706298b113495060b78",
     );
   });
   it("should revert permit when use old time stamp", async () => {

@@ -116,7 +116,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           vestingManager,
         } = await loadFixture(Utils.prepareInChainAtomicTest);
         const accounts = await ethers.getSigners();
-        const [seller, buyer] = accounts;
+        const [seller, buyer, executor] = accounts;
         const swapPermitPayload = setupSwapPermitPayload(
           usdcAddress,
           usdtAddress,
@@ -164,7 +164,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           seller.address,
           buyer.address,
         );
-        
+
         const { signature: sellerSignature } =
           await ecdsa.createPermitSignature({
             tokenName: vaultName,
@@ -226,11 +226,15 @@ describe("AtomicSwap: Gasless Swap", () => {
 
         if (test.shouldThrow) {
           await expect(
-            atomicSwap.executeSwapWithPermit(swapPermitPayload, release),
+            atomicSwap
+              .connect(executor)
+              .executeSwapWithPermit(swapPermitPayload, release),
           ).to.reverted;
         } else {
           await expect(
-            await atomicSwap.executeSwapWithPermit(swapPermitPayload, release),
+            await atomicSwap
+              .connect(executor)
+              .executeSwapWithPermit(swapPermitPayload, release),
           ).not.to.reverted;
 
           const sellerSwapAmount = calcSwapAmount(
