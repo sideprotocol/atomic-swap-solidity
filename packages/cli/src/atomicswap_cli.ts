@@ -1,12 +1,5 @@
-//import { ZeroAddress, ethers } from "ethers";
-import { ethers } from "ethers";
-import {
-  Settings,
-  CONSTANTS,
-  MockToken__factory,
-  ecdsa,
-  VaultPermit__factory,
-} from "@sideprotocol/contracts-typechain";
+import { ZeroAddress, ethers } from "ethers";
+import { Settings, MockToken__factory, ecdsa, VaultPermit__factory } from "@sideprotocol/contracts-typechain";
 import { InchainAtomicSwap__factory } from "@sideprotocol/contracts-typechain";
 
 import { BlockTimer, generateAgreement, setupSwapPermitPayload } from "./utils";
