@@ -20,7 +20,6 @@ contract VaultPermit is Vault, EIP712Upgradeable, IVaultPermit, OwnablePausableU
     // Using EnumerableSet for managing unique agreements.
     using EnumerableSet for EnumerableSet.Bytes32Set;
     EnumerableSet.Bytes32Set private _agreements;
-
     // Custom errors for specific revert conditions.
     error VaultExpiredSignature(uint256 deadline);
     error VaultDuplicatedAgreement(bytes32 agreement);
@@ -47,7 +46,7 @@ contract VaultPermit is Vault, EIP712Upgradeable, IVaultPermit, OwnablePausableU
         uint256 value,
         bytes32 agreement,
         IAtomicSwapBase.PermitSignature calldata signature
-    ) public virtual {
+    ) public virtual onlyAdmin {
         if (_agreements.contains(agreement)) {
             revert VaultDuplicatedAgreement(agreement);
         }

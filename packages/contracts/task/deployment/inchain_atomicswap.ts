@@ -1,7 +1,11 @@
 import dotenv from "dotenv";
 import { saveItemsToSetting } from "../utils/utils";
 import { task } from "hardhat/config";
-import { Settings, Vesting__factory } from "@sideprotocol/contracts-typechain";
+import {
+  Settings,
+  VaultPermit__factory,
+  Vesting__factory,
+} from "@sideprotocol/contracts-typechain";
 dotenv.config();
 task("deploy:in-chain:lib", "deploy libraries")
   .addOptionalParam("f", "force write")
@@ -9,9 +13,9 @@ task("deploy:in-chain:lib", "deploy libraries")
     // deploy libraries
     if (network.name == "bera") {
       const paths = await artifacts.getArtifactPaths();
-      paths.find((item)=> item.includes(""))
+      paths.find((item) => item.includes(""));
       console.log("paths:", paths);
-      
+
       // const artifactFile = fs.readFileSync(
       //   `${await artifacts.getArtifactPaths()}/contracts/${contractName}.sol/${contractName}.json`,
       // );
@@ -166,6 +170,11 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
 
     // atomicsSwap contract ad admin of vesting contract.
     await Vesting__factory.connect(vestingAddress, deployer).addAdmin(
+      await atomicSwap.getAddress(),
+    );
+
+    // atomicsSwap contract ad admin of vesting contract.
+    await VaultPermit__factory.connect(vaultAddress, deployer).addAdmin(
       await atomicSwap.getAddress(),
     );
     // Deploy mock token contracts. This will be used for testing purposes.

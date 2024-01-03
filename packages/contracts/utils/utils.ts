@@ -124,8 +124,9 @@ export const Utils = {
         unsafeAllowLinkedLibraries: true,
       },
     );
-
-    await vestingManager.addAdmin(await atomicSwap.getAddress());
+    const atomicSwapContractAddress = await atomicSwap.getAddress();
+    await vestingManager.addAdmin(atomicSwapContractAddress);
+    await vault.addAdmin(atomicSwapContractAddress);
 
     // Deploy Mock Contracts
     const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");
@@ -344,37 +345,41 @@ export function setupSwapPermitPayload(
   return swapParams;
 }
 
-export const setupSignature = async (
-  swapPermitPayload: AtomicSwapBaseData.SwapWithPermitMsgStruct,
-  atomicSwapAddress: string,
-  vaultName: string,
-  chainId: string,
-  taker: HardhatEthersSigner,
-  deadline: bigint,
-  vault: VaultPermit,
-) => {
-  const attackAmount = ethers.parseEther("15");
-  swapPermitPayload.buyToken.amount = attackAmount;
-  // Recreate taker signature with the attack amount
-  const { signature: buyerSignature } = await ecdsa.createPermitSignature({
-    tokenName: vaultName,
-    contractAddress: await vault.getAddress(),
-    chainId: chainId,
-    author: taker,
-    spender: atomicSwapAddress,
-    value: attackAmount,
-    agreement: generateAgreement(swapPermitPayload),
-    deadline,
-  });
-  const takerSig = ethers.Signature.from(buyerSignature);
-  swapPermitPayload.buyerSignature = {
-    deadline,
-    v: takerSig.v,
-    r: takerSig.r,
-    s: takerSig.s,
-    owner: taker.address,
-  };
-};
+// export const setupSignature = async (
+//   swapPermitPayload: AtomicSwapBaseData.SwapWithPermitMsgStruct,
+//   atomicSwapAddress: string,
+//   vaultName: string,
+//   chainId: string,
+//   taker: HardhatEthersSigner,
+//   deadline: bigint,
+//   vault: VaultPermit,
+// ) => {
+//   const attackAmount = ethers.parseEther("15");
+//   swapPermitPayload.buyToken.amount = attackAmount;
+//   // Recreate taker signature with the attack amount
+//   const { signature: buyerSignature } = await ecdsa.createPermitSignature({
+//     tokenName: vaultName,
+//     contractAddress: await vault.getAddress(),
+//     chainId: chainId,
+//     author: taker,
+//     spender: atomicSwapAddress,
+//     value: attackAmount,
+//     agreement: generateAgreement(
+//       swapPermitPayload,
+//       maker.address,
+//       taker.address,
+//     ),
+//     deadline,
+//   });
+//   const takerSig = ethers.Signature.from(buyerSignature);
+//   swapPermitPayload.buyerSignature = {
+//     deadline,
+//     v: takerSig.v,
+//     r: takerSig.r,
+//     s: takerSig.s,
+//     owner: taker.address,
+//   };
+// };
 
 export function generateRandomTestAddress() {
   // Generate a random hex string
