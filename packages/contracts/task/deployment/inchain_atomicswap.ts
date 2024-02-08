@@ -168,14 +168,16 @@ task("deploy:in-chain:contract", "deploy in chain ").setAction(
       },
     );
 
+    const atomicSwapAddress = await atomicSwap.getAddress();
+    console.log(atomicSwapAddress);
     // atomicsSwap contract ad admin of vesting contract.
     await Vesting__factory.connect(vestingAddress, deployer).addAdmin(
-      await atomicSwap.getAddress(),
+      atomicSwapAddress,
     );
 
     // atomicsSwap contract ad admin of vesting contract.
     await VaultPermit__factory.connect(vaultAddress, deployer).addAdmin(
-      await atomicSwap.getAddress(),
+      atomicSwapAddress,
     );
     // Deploy mock token contracts. This will be used for testing purposes.
     const mockERC20TokenFactory = await ethers.getContractFactory("MockToken");

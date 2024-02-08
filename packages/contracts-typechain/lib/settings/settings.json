@@ -18,11 +18,12 @@
     "vesting_sepolia": "0xDE7FB67295b40a46Db6F82e56382aC90f36385BF",
     "atomicSwapStateLogic_sepolia": "0xDF967D562E165d9fCccf7A984eB222AAeEa58D5a",
     "AnteHandler_sepolia": "0x1D3D5F7C9d793f475AEeBe6F22e20986B6459FD9",
-    "atomicSwapStateLogic_bnb": "0xfB2ADA0a6826Ba709E7dDD1E534ebFD96F3E0A66",
-    "AnteHandler_bnb": "0x56eA6319cfEAD6a5321CdD0dB2DC1CB617058E81",
-    "vesting_bnb": "0x4Bb75469cAe4aB00baF45DAeac104E2125f932F6",
+    "atomicSwapStateLogic_bnb": "0x0eC9AadE647863E6566f33c527a84b8B16E67b32",
+    "AnteHandler_bnb": "0xa191e2C44156C8aD768Facc240bD8313e50ef592",
+    "vesting_bnb": "0x8707B6d15a540B6F3aC65D120d8c637AF6F656dC",
     "inChainAtomicSwap_bnb": "0x6d1d2754f3570Da7B8e25308840f36Fd344A0A9B",
     "mockUSDC_bnb": "0x5AFA9E267D6eA6763f94f1171ee5658CaC275d89",
     "mockUSDT_bnb": "0x2FbAB5B4f6af53a5425299bE47592abD6563285e",
-    "vault_sepolia": "0x5754Fb089a9D0657ce55cc9066775888592D4B1A"
+    "vault_sepolia": "0x5754Fb089a9D0657ce55cc9066775888592D4B1A",
+    "vault_bnb": "0x7247965a1Df75446bC957A70e9dA090765ee781A"
 }

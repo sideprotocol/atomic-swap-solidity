@@ -293,6 +293,7 @@ describe("AtomicSwap: Gasless Swap", () => {
             expect(isERC721).to.equal(true);
             expect(tokenUrl).to.contain(vestingId);
             await time.increase(3600);
+
             await vestingManager.connect(buyer).release(vestingId);
             // 1 hour later, release second release from vesting contract.
             await time.increase(3600);
@@ -764,7 +765,6 @@ describe("AtomicSwap: Gasless Swap", () => {
 
           // Apply specific setup for each test case
           mallet(swapPermitPayload);
-
           // Execute the test and check for expected revert error
           await expect(
             atomicSwap.executeSwapWithPermit(swapPermitPayload, []),

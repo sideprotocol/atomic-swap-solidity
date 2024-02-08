@@ -84,6 +84,10 @@ const config: HardhatUserConfig = {
       url: `${process.env.BERA_TESTNET_URL || ""}`,
       accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
     },
+    evmos: {
+      url: `${process.env.EVMOS_TESTNET_URL || ""}`,
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+    },
   },
   gasReporter: {
     enabled: true,

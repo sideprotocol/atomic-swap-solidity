@@ -81,7 +81,7 @@ function _generateAgreement(swap: AtomicSwapBaseData.SwapWithPermitMsgStruct, si
       swap.withdrawToSellerAccount,
     ]
   );
-
+  
   return ethers.keccak256(encoded);
 }
 

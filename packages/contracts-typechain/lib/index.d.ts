@@ -28,5 +28,6 @@ export declare const Settings: {
     mockUSDC_bnb: string;
     mockUSDT_bnb: string;
     vault_sepolia: string;
+    vault_bnb: string;
 };
 export declare const CONSTANTS: typeof constants;
