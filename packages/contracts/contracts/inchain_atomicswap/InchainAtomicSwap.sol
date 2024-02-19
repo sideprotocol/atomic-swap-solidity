@@ -52,10 +52,8 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @notice Executes an atomic swap with permit, allowing for token transfer authorization.
     /// @dev Handles swap execution logic, including fee calculations and order events.
     /// @param swap The swap details including tokens, amounts, and participant signatures.
-    /// @param releases An array of release conditions for the swap.
     function executeSwapWithPermit(
-        SwapWithPermitMsg calldata swap,
-        Release[] calldata releases 
+        SwapWithPermitMsg calldata swap 
     ) external nonReentrant whenNotPaused {
         _validateSwapParams(swap);
         // Setting up fee parameters for the swap.
@@ -68,21 +66,17 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         // Executing the swap and retrieving order details.
         (bytes32 orderId, address maker, address taker) = swapOrder.executeSwapWithPermit(
             swap,
-            releases,
             vault,
             vestingManager,
             params
         );
         // Emitting relevant events based on the swap action.
         emit AtomicSwapOrderCreated(orderId);
-        if(swap.acceptBid) {
-            emit AcceptedBid(orderId, maker, swap.buyToken.amount);
+        if(swap.completeByBid) {
+            emit AcceptedBid(orderId, maker, taker);
+        } else {
+            emit AtomicSwapOrderTook(orderId, maker, taker);
         }
-        emit AtomicSwapOrderTook(
-                maker,
-                taker,
-                orderId
-        );
     }
 
     /// @dev Validates the parameters of a swap to ensure they adhere to the contract's logic and constraints.

@@ -24,17 +24,14 @@ library AtomicSwapStateLogic {
     /// @notice Executes a swap with the given parameters and permits, setting up the atomic swap.
     /// @param swapOrder The storage mapping of current swap orders.
     /// @param swap Details of the swap including the tokens, amounts, and participant signatures.
-    /// @param releases An array of release conditions for the swap, dictating how and when funds are released.
     /// @param vault The address of the vault where tokens are held during the swap.
     /// @param vestingManager The address of the vesting manager, handling any vesting requirements.
     /// @param feeParams Fee parameters including rates for both sellers and buyers.
     /// @return id The unique identifier of the newly created swap order.
     /// @dev Validates and processes the swap, handles permits, and updates the state with a new order.
     function executeSwapWithPermit(
-        mapping( bytes32 => IAtomicSwapBase.AtomicSwapOrder
-    ) storage swapOrder,
+        mapping( bytes32 => IAtomicSwapBase.AtomicSwapOrder ) storage swapOrder,
         IAtomicSwapBase.SwapWithPermitMsg calldata swap,
-        IAtomicSwapBase.Release[] calldata releases,  
         address vault,
         IVesting vestingManager, 
         IAtomicSwapBase.FeeParams memory feeParams
@@ -57,7 +54,7 @@ library AtomicSwapStateLogic {
         }
 
         // Handling the permit and transfer of tokens as part of the swap execution.
-        _permitAndTransfer(id,vault,vestingManager, swap,releases,feeParams);
+        _permitAndTransfer(id,vault,vestingManager,swap,feeParams);
         // Adding the new swap order to the mapping of current orders.
         _addNewSwapOrder(
             swapOrder,
@@ -72,7 +69,6 @@ library AtomicSwapStateLogic {
     /// @param vault The address of the vault where tokens are held.
     /// @param vestingManager The vesting manager address for handling any vesting requirements.
     /// @param swap Details of the swap including the tokens and amounts.
-    /// @param releases Release conditions for the swap.
     /// @param feeParams Fee parameters for the transaction.
     /// @dev Processes token transfers with fees, utilizing permits for secure token movements.
     function _permitAndTransfer(
@@ -80,7 +76,6 @@ library AtomicSwapStateLogic {
         address vault,
         IVesting vestingManager, 
         IAtomicSwapBase.SwapWithPermitMsg calldata swap,
-        IAtomicSwapBase.Release[] calldata releases,
         IAtomicSwapBase.FeeParams memory feeParams
     ) internal {
         // Generating agreements based on the swap details for both seller and buyer.
@@ -120,7 +115,7 @@ library AtomicSwapStateLogic {
         AnteHandler.transferFromSellTokenToBuyerAtVault(
             orderId,
             swap.sellToken,
-            releases,
+            swap.releases,
             address(vault),
             vestingManager,
             swap.sellerSignature.owner,
@@ -175,6 +170,8 @@ library AtomicSwapStateLogic {
                 swap.desiredTaker,
                 swap.minBidAmount,
                 swap.acceptBid,
+                swap.completeByBid,
+                swap.releases,
                 swap.withdrawToSellerAccount
             )
         );
@@ -188,6 +185,8 @@ library AtomicSwapStateLogic {
                 swap.desiredTaker,
                 swap.minBidAmount,
                 swap.acceptBid,
+                swap.completeByBid,
+                swap.releases,
                 swap.withdrawToSellerAccount
             )
         );
