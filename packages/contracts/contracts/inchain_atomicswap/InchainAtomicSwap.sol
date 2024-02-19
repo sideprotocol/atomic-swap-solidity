@@ -77,13 +77,12 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
         emit AtomicSwapOrderCreated(orderId);
         if(swap.acceptBid) {
             emit AcceptedBid(orderId, maker, swap.buyToken.amount);
-        }else{
-            emit AtomicSwapOrderTook(
+        }
+        emit AtomicSwapOrderTook(
                 maker,
                 taker,
                 orderId
-            );
-        }
+        );
     }
 
     /// @dev Validates the parameters of a swap to ensure they adhere to the contract's logic and constraints.
