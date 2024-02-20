@@ -6,7 +6,6 @@ import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
 import {IVaultPermit} from "../../vault/interfaces/IVaultPermit.sol";
 import {IVesting} from "../../vesting/interfaces/IVesting.sol";
 import {AnteHandler} from "../../abstracts/libs/AnteHandler.sol";
-import "hardhat/console.sol";
 
 /// @title Atomic Swap State Logic
 /// @notice This library provides the core functionalities for managing the state of atomic swap orders and bids.
