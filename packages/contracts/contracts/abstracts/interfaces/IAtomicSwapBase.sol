@@ -74,8 +74,10 @@ interface IAtomicSwapBase {
         address desiredTaker; // Specific address of the desired taker, if applicable.
         uint256 minBidAmount; // Minimum amount for bids on this swap.
         bool acceptBid; // Flag indicating if bids are accepted.
+        bool completeByBid; // Flag indicating if order is completed by bid mode.
         bool withdrawToSellerAccount; // Flag for direct withdrawal to seller's account.
         bool withdrawToBuyerAccount; // Flag for direct withdrawal to buyer's account.
+        Release[] releases; // Releases data for vesting mode.
         PermitSignature sellerSignature; // Seller's signature for permit authorization.
         PermitSignature buyerSignature; // Buyer's signature for permit authorization.
     }
