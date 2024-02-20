@@ -103,6 +103,6 @@ interface IAtomicSwapBase {
 
     // Events to be emitted for different stages and activities in atomic swaps.
     event AtomicSwapOrderCreated(bytes32 indexed id);
-    event AtomicSwapOrderTook(address indexed maker, address indexed taker, bytes32 indexed id);
+    event AtomicSwapOrderTook(bytes32 indexed id,address indexed maker, address indexed taker);
     event AcceptedBid(bytes32 indexed orderID, address indexed bidder, uint256 indexed amount);
 }

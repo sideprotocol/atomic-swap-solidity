@@ -9,6 +9,17 @@ export declare namespace IAtomicSwapBase {
         token: string;
         amount: bigint;
     };
+    type ReleaseStruct = {
+        durationInHours: BigNumberish;
+        percentage: BigNumberish;
+    };
+    type ReleaseStructOutput = [
+        durationInHours: bigint,
+        percentage: bigint
+    ] & {
+        durationInHours: bigint;
+        percentage: bigint;
+    };
     type PermitSignatureStruct = {
         v: BigNumberish;
         r: BytesLike;
@@ -36,8 +47,10 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: AddressLike;
         minBidAmount: BigNumberish;
         acceptBid: boolean;
+        completeByBid: boolean;
         withdrawToSellerAccount: boolean;
         withdrawToBuyerAccount: boolean;
+        releases: IAtomicSwapBase.ReleaseStruct[];
         sellerSignature: IAtomicSwapBase.PermitSignatureStruct;
         buyerSignature: IAtomicSwapBase.PermitSignatureStruct;
     };
@@ -48,8 +61,10 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: string,
         minBidAmount: bigint,
         acceptBid: boolean,
+        completeByBid: boolean,
         withdrawToSellerAccount: boolean,
         withdrawToBuyerAccount: boolean,
+        releases: IAtomicSwapBase.ReleaseStructOutput[],
         sellerSignature: IAtomicSwapBase.PermitSignatureStructOutput,
         buyerSignature: IAtomicSwapBase.PermitSignatureStructOutput
     ] & {
@@ -59,21 +74,12 @@ export declare namespace IAtomicSwapBase {
         desiredTaker: string;
         minBidAmount: bigint;
         acceptBid: boolean;
+        completeByBid: boolean;
         withdrawToSellerAccount: boolean;
         withdrawToBuyerAccount: boolean;
+        releases: IAtomicSwapBase.ReleaseStructOutput[];
         sellerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
         buyerSignature: IAtomicSwapBase.PermitSignatureStructOutput;
-    };
-    type ReleaseStruct = {
-        durationInHours: BigNumberish;
-        percentage: BigNumberish;
-    };
-    type ReleaseStructOutput = [
-        durationInHours: bigint,
-        percentage: bigint
-    ] & {
-        durationInHours: bigint;
-        percentage: bigint;
     };
 }
 export interface InchainAtomicSwapInterface extends Interface {
@@ -84,10 +90,7 @@ export interface InchainAtomicSwapInterface extends Interface {
     encodeFunctionData(functionFragment: "addAdmin", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "addPauser", values: [AddressLike]): string;
     encodeFunctionData(functionFragment: "buyerFeeRate", values?: undefined): string;
-    encodeFunctionData(functionFragment: "executeSwapWithPermit", values: [
-        IAtomicSwapBase.SwapWithPermitMsgStruct,
-        IAtomicSwapBase.ReleaseStruct[]
-    ]): string;
+    encodeFunctionData(functionFragment: "executeSwapWithPermit", values: [IAtomicSwapBase.SwapWithPermitMsgStruct]): string;
     encodeFunctionData(functionFragment: "getRoleAdmin", values: [BytesLike]): string;
     encodeFunctionData(functionFragment: "grantRole", values: [BytesLike, AddressLike]): string;
     encodeFunctionData(functionFragment: "hasRole", values: [BytesLike, AddressLike]): string;
@@ -170,15 +173,15 @@ export declare namespace AtomicSwapOrderCreatedEvent {
 }
 export declare namespace AtomicSwapOrderTookEvent {
     type InputTuple = [
+        id: BytesLike,
         maker: AddressLike,
-        taker: AddressLike,
-        id: BytesLike
+        taker: AddressLike
     ];
-    type OutputTuple = [maker: string, taker: string, id: string];
+    type OutputTuple = [id: string, maker: string, taker: string];
     interface OutputObject {
+        id: string;
         maker: string;
         taker: string;
-        id: string;
     }
     type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
     type Filter = TypedDeferredTopicFilter<Event>;
@@ -292,8 +295,7 @@ export interface InchainAtomicSwap extends BaseContract {
     addPauser: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
     buyerFeeRate: TypedContractMethod<[], [bigint], "view">;
     executeSwapWithPermit: TypedContractMethod<[
-        swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
-        releases: IAtomicSwapBase.ReleaseStruct[]
+        swap: IAtomicSwapBase.SwapWithPermitMsgStruct
     ], [
         void
     ], "nonpayable">;
@@ -406,8 +408,7 @@ export interface InchainAtomicSwap extends BaseContract {
     getFunction(nameOrSignature: "addPauser"): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
     getFunction(nameOrSignature: "buyerFeeRate"): TypedContractMethod<[], [bigint], "view">;
     getFunction(nameOrSignature: "executeSwapWithPermit"): TypedContractMethod<[
-        swap: IAtomicSwapBase.SwapWithPermitMsgStruct,
-        releases: IAtomicSwapBase.ReleaseStruct[]
+        swap: IAtomicSwapBase.SwapWithPermitMsgStruct
     ], [
         void
     ], "nonpayable">;
@@ -511,7 +512,7 @@ export interface InchainAtomicSwap extends BaseContract {
         AcceptedBid: TypedContractEvent<AcceptedBidEvent.InputTuple, AcceptedBidEvent.OutputTuple, AcceptedBidEvent.OutputObject>;
         "AtomicSwapOrderCreated(bytes32)": TypedContractEvent<AtomicSwapOrderCreatedEvent.InputTuple, AtomicSwapOrderCreatedEvent.OutputTuple, AtomicSwapOrderCreatedEvent.OutputObject>;
         AtomicSwapOrderCreated: TypedContractEvent<AtomicSwapOrderCreatedEvent.InputTuple, AtomicSwapOrderCreatedEvent.OutputTuple, AtomicSwapOrderCreatedEvent.OutputObject>;
-        "AtomicSwapOrderTook(address,address,bytes32)": TypedContractEvent<AtomicSwapOrderTookEvent.InputTuple, AtomicSwapOrderTookEvent.OutputTuple, AtomicSwapOrderTookEvent.OutputObject>;
+        "AtomicSwapOrderTook(bytes32,address,address)": TypedContractEvent<AtomicSwapOrderTookEvent.InputTuple, AtomicSwapOrderTookEvent.OutputTuple, AtomicSwapOrderTookEvent.OutputObject>;
         AtomicSwapOrderTook: TypedContractEvent<AtomicSwapOrderTookEvent.InputTuple, AtomicSwapOrderTookEvent.OutputTuple, AtomicSwapOrderTookEvent.OutputObject>;
         "Initialized(uint64)": TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;
         Initialized: TypedContractEvent<InitializedEvent.InputTuple, InitializedEvent.OutputTuple, InitializedEvent.OutputObject>;

@@ -170,6 +170,12 @@
       "inputs": [
         {
           "indexed": true,
+          "internalType": "bytes32",
+          "name": "id",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
           "internalType": "address",
           "name": "maker",
           "type": "address"
@@ -179,12 +185,6 @@
           "internalType": "address",
           "name": "taker",
           "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "id",
-          "type": "bytes32"
         }
       ],
       "name": "AtomicSwapOrderTook",
@@ -250,6 +250,11 @@
             },
             {
               "internalType": "bool",
+              "name": "completeByBid",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
               "name": "withdrawToSellerAccount",
               "type": "bool"
             },
@@ -257,6 +262,23 @@
               "internalType": "bool",
               "name": "withdrawToBuyerAccount",
               "type": "bool"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "durationInHours",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "percentage",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct IAtomicSwapBase.Release[]",
+              "name": "releases",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -326,23 +348,6 @@
           "internalType": "struct IAtomicSwapBase.SwapWithPermitMsg",
           "name": "swap",
           "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "durationInHours",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "percentage",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct IAtomicSwapBase.Release[]",
-          "name": "releases",
-          "type": "tuple[]"
         }
       ],
       "name": "executeSwapWithPermit",

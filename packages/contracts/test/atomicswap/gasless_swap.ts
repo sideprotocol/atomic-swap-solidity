@@ -123,6 +123,20 @@ describe("AtomicSwap: Gasless Swap", () => {
           buyer.address,
         );
         test.mallet(swapPermitPayload);
+
+        const release = test.isVesting
+          ? [
+              {
+                durationInHours: 1,
+                percentage: 5000,
+              },
+              {
+                durationInHours: 1,
+                percentage: 5000,
+              },
+            ]
+          : [];
+        swapPermitPayload.releases = release;
         // Approve
         await usdc
           .connect(seller)
@@ -164,7 +178,6 @@ describe("AtomicSwap: Gasless Swap", () => {
           seller.address,
           buyer.address,
         );
-
         const { signature: sellerSignature } =
           await ecdsa.createPermitSignature({
             tokenName: vaultName,
@@ -207,19 +220,6 @@ describe("AtomicSwap: Gasless Swap", () => {
           owner: buyer.address,
         };
 
-        const release = test.isVesting
-          ? [
-              {
-                durationInHours: BigInt(1),
-                percentage: BigInt(5000),
-              },
-              {
-                durationInHours: BigInt(1),
-                percentage: BigInt(5000),
-              },
-            ]
-          : [];
-
         const buyerOriginalBalance = await ethers.provider.getBalance(
           buyer.address,
         );
@@ -228,13 +228,13 @@ describe("AtomicSwap: Gasless Swap", () => {
           await expect(
             atomicSwap
               .connect(executor)
-              .executeSwapWithPermit(swapPermitPayload, release),
+              .executeSwapWithPermit(swapPermitPayload),
           ).to.reverted;
         } else {
           await expect(
             await atomicSwap
               .connect(executor)
-              .executeSwapWithPermit(swapPermitPayload, release),
+              .executeSwapWithPermit(swapPermitPayload),
           ).not.to.reverted;
 
           const sellerSwapAmount = calcSwapAmount(
@@ -251,7 +251,7 @@ describe("AtomicSwap: Gasless Swap", () => {
             swapPermitPayload.sellToken.token == ZeroAddress
               ? await ethers.provider.getBalance(treasury)
               : await MockToken__factory.connect(
-                  swapPermitPayload.sellToken.token,
+                  swapPermitPayload.sellToken.token.toString(),
                   ethers.provider,
                 ).balanceOf(treasury);
 
@@ -259,7 +259,7 @@ describe("AtomicSwap: Gasless Swap", () => {
             swapPermitPayload.buyToken.token == ZeroAddress
               ? await ethers.provider.getBalance(treasury)
               : await MockToken__factory.connect(
-                  swapPermitPayload.buyToken.token,
+                  swapPermitPayload.buyToken.token.toString(),
                   ethers.provider,
                 ).balanceOf(treasury);
 
@@ -268,7 +268,7 @@ describe("AtomicSwap: Gasless Swap", () => {
               ? (await ethers.provider.getBalance(seller.address)) -
                 buyerOriginalBalance
               : await MockToken__factory.connect(
-                  swapPermitPayload.buyToken.token,
+                  swapPermitPayload.buyToken.token.toString(),
                   ethers.provider,
                 ).balanceOf(seller.address);
 
@@ -282,7 +282,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           if (test.isVesting) {
             const id = newAtomicSwapOrderID(
               atomicSwapAddress,
-              swapPermitPayload.uuid,
+              swapPermitPayload.uuid.toString(),
             );
 
             // 1 hour later, release first release from vesting contract.
@@ -305,7 +305,7 @@ describe("AtomicSwap: Gasless Swap", () => {
               ? (await ethers.provider.getBalance(buyer.address)) -
                 buyerOriginalBalance
               : await MockToken__factory.connect(
-                  swapPermitPayload.sellToken.token,
+                  swapPermitPayload.sellToken.token.toString(),
                   ethers.provider,
                 ).balanceOf(buyer.address);
 
@@ -618,16 +618,16 @@ describe("AtomicSwap: Gasless Swap", () => {
 
           // Execute the test and check for expected revert error
           if (reExecuteSwap) {
-            await atomicSwap.executeSwapWithPermit(swapPermitPayload, []);
+            await atomicSwap.executeSwapWithPermit(swapPermitPayload);
             await expect(
-              atomicSwap.executeSwapWithPermit(swapPermitPayload, []),
+              atomicSwap.executeSwapWithPermit(swapPermitPayload),
             ).to.revertedWithCustomError(
               from === "vault" ? vault : atomicSwap,
               expectedRevertError,
             );
           } else {
             await expect(
-              atomicSwap.executeSwapWithPermit(swapPermitPayload, []),
+              atomicSwap.executeSwapWithPermit(swapPermitPayload),
             ).to.revertedWithCustomError(
               from === "vault" ? vault : atomicSwap,
               expectedRevertError,
@@ -767,7 +767,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           mallet(swapPermitPayload);
           // Execute the test and check for expected revert error
           await expect(
-            atomicSwap.executeSwapWithPermit(swapPermitPayload, []),
+            atomicSwap.executeSwapWithPermit(swapPermitPayload),
           ).to.revertedWithCustomError(
             from === "vault" ? vault : atomicSwap,
             expectedRevertError,

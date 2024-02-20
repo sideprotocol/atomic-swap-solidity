@@ -53,7 +53,7 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
     /// @dev Handles swap execution logic, including fee calculations and order events.
     /// @param swap The swap details including tokens, amounts, and participant signatures.
     function executeSwapWithPermit(
-        SwapWithPermitMsg calldata swap 
+        SwapWithPermitMsg calldata swap
     ) external nonReentrant whenNotPaused {
         _validateSwapParams(swap);
         // Setting up fee parameters for the swap.
@@ -64,16 +64,12 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
             treasury
         );
         // Executing the swap and retrieving order details.
-        (bytes32 orderId, address maker, address taker) = swapOrder.executeSwapWithPermit(
-            swap,
-            vault,
-            vestingManager,
-            params
-        );
+        (bytes32 orderId, address maker, address taker) = swapOrder
+            .executeSwapWithPermit(swap, vault, vestingManager, params);
         // Emitting relevant events based on the swap action.
         emit AtomicSwapOrderCreated(orderId);
-        if(swap.completeByBid) {
-            emit AcceptedBid(orderId, maker, taker);
+        if (swap.completeByBid) {
+            emit AcceptedBid(orderId, taker, swap.buyToken.amount);
         } else {
             emit AtomicSwapOrderTook(orderId, maker, taker);
         }
@@ -81,17 +77,19 @@ contract InchainAtomicSwap is AtomicSwapBase, IInchainAtomicSwap {
 
     /// @dev Validates the parameters of a swap to ensure they adhere to the contract's logic and constraints.
     /// @param swap The swap details to be validated.
-    function _validateSwapParams(SwapWithPermitMsg calldata swap) internal pure {
+    function _validateSwapParams(
+        SwapWithPermitMsg calldata swap
+    ) internal pure {
         // Ensuring the swap does not involve the same token for both selling and buying.
-        if(swap.sellToken.token == swap.buyToken.token) {
+        if (swap.sellToken.token == swap.buyToken.token) {
             revert UnsupportedTokenPair();
         }
         // Checking for distinct signers for the seller and buyer to prevent fraudulent swaps.
-        if(swap.sellerSignature.owner == swap.buyerSignature.owner ) {
+        if (swap.sellerSignature.owner == swap.buyerSignature.owner) {
             revert InvalidSigners();
         }
         // Ensuring the minimum bid amount is not greater than the sell token amount.
-        if(swap.minBidAmount > swap.sellToken.amount) {
+        if (swap.minBidAmount > swap.sellToken.amount) {
             revert InvalidMinBidAmount(swap.minBidAmount);
         }
     }

@@ -167,6 +167,11 @@ export declare class AtomicSwapBase__factory {
         readonly anonymous: false;
         readonly inputs: readonly [{
             readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "id";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
             readonly internalType: "address";
             readonly name: "maker";
             readonly type: "address";
@@ -175,11 +180,6 @@ export declare class AtomicSwapBase__factory {
             readonly internalType: "address";
             readonly name: "taker";
             readonly type: "address";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "bytes32";
-            readonly name: "id";
-            readonly type: "bytes32";
         }];
         readonly name: "AtomicSwapOrderTook";
         readonly type: "event";

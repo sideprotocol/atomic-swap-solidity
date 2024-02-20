@@ -280,6 +280,10 @@ function _generateAgreement(
   signer: string,
 ): string {
   const abiCoder = new ethers.AbiCoder();
+
+  const releases = swap.releases.map((release) => {
+    return [release.durationInHours, release.percentage];
+  });
   const encoded = abiCoder.encode(
     [
       "address",
@@ -290,6 +294,8 @@ function _generateAgreement(
       "uint256",
       "bool",
       "bool",
+      "bool",
+      "tuple(uint256, uint256)[]",
     ],
     [
       signer,
@@ -300,9 +306,10 @@ function _generateAgreement(
       swap.minBidAmount,
       swap.acceptBid,
       swap.withdrawToSellerAccount,
+      swap.completeByBid,
+      releases,
     ],
   );
-
   return ethers.keccak256(encoded);
 }
 
@@ -327,6 +334,8 @@ export function setupSwapPermitPayload(
     acceptBid: true,
     withdrawToSellerAccount: false,
     withdrawToBuyerAccount: false,
+    completeByBid: false,
+    releases: [],
     sellerSignature: {
       v: 27 | 28,
       r: "",

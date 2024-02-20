@@ -62,15 +62,15 @@ export namespace AtomicSwapOrderCreatedEvent {
 
 export namespace AtomicSwapOrderTookEvent {
   export type InputTuple = [
+    id: BytesLike,
     maker: AddressLike,
-    taker: AddressLike,
-    id: BytesLike
+    taker: AddressLike
   ];
-  export type OutputTuple = [maker: string, taker: string, id: string];
+  export type OutputTuple = [id: string, maker: string, taker: string];
   export interface OutputObject {
+    id: string;
     maker: string;
     taker: string;
-    id: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -170,7 +170,7 @@ export interface IAtomicSwapBase extends BaseContract {
       AtomicSwapOrderCreatedEvent.OutputObject
     >;
 
-    "AtomicSwapOrderTook(address,address,bytes32)": TypedContractEvent<
+    "AtomicSwapOrderTook(bytes32,address,address)": TypedContractEvent<
       AtomicSwapOrderTookEvent.InputTuple,
       AtomicSwapOrderTookEvent.OutputTuple,
       AtomicSwapOrderTookEvent.OutputObject

@@ -5,7 +5,6 @@ import {IAtomicSwapBase} from "../../abstracts/interfaces/IAtomicSwapBase.sol";
 
 interface IInchainAtomicSwap is IAtomicSwapBase {
     function executeSwapWithPermit(
-        SwapWithPermitMsg calldata swap,
-        Release[] calldata releases 
+        SwapWithPermitMsg calldata swap
     ) external;
 }

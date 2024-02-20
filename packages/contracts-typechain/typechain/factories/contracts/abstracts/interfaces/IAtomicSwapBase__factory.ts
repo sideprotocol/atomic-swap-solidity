@@ -176,6 +176,12 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "bytes32",
+        name: "id",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
         internalType: "address",
         name: "maker",
         type: "address",
@@ -185,12 +191,6 @@ const _abi = [
         internalType: "address",
         name: "taker",
         type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "id",
-        type: "bytes32",
       },
     ],
     name: "AtomicSwapOrderTook",

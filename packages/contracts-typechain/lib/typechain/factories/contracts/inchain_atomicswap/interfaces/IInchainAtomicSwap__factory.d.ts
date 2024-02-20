@@ -131,6 +131,11 @@ export declare class IInchainAtomicSwap__factory {
         readonly anonymous: false;
         readonly inputs: readonly [{
             readonly indexed: true;
+            readonly internalType: "bytes32";
+            readonly name: "id";
+            readonly type: "bytes32";
+        }, {
+            readonly indexed: true;
             readonly internalType: "address";
             readonly name: "maker";
             readonly type: "address";
@@ -139,11 +144,6 @@ export declare class IInchainAtomicSwap__factory {
             readonly internalType: "address";
             readonly name: "taker";
             readonly type: "address";
-        }, {
-            readonly indexed: true;
-            readonly internalType: "bytes32";
-            readonly name: "id";
-            readonly type: "bytes32";
         }];
         readonly name: "AtomicSwapOrderTook";
         readonly type: "event";
@@ -193,12 +193,29 @@ export declare class IInchainAtomicSwap__factory {
                 readonly type: "bool";
             }, {
                 readonly internalType: "bool";
+                readonly name: "completeByBid";
+                readonly type: "bool";
+            }, {
+                readonly internalType: "bool";
                 readonly name: "withdrawToSellerAccount";
                 readonly type: "bool";
             }, {
                 readonly internalType: "bool";
                 readonly name: "withdrawToBuyerAccount";
                 readonly type: "bool";
+            }, {
+                readonly components: readonly [{
+                    readonly internalType: "uint256";
+                    readonly name: "durationInHours";
+                    readonly type: "uint256";
+                }, {
+                    readonly internalType: "uint256";
+                    readonly name: "percentage";
+                    readonly type: "uint256";
+                }];
+                readonly internalType: "struct IAtomicSwapBase.Release[]";
+                readonly name: "releases";
+                readonly type: "tuple[]";
             }, {
                 readonly components: readonly [{
                     readonly internalType: "uint8";
@@ -253,19 +270,6 @@ export declare class IInchainAtomicSwap__factory {
             readonly internalType: "struct IAtomicSwapBase.SwapWithPermitMsg";
             readonly name: "swap";
             readonly type: "tuple";
-        }, {
-            readonly components: readonly [{
-                readonly internalType: "uint256";
-                readonly name: "durationInHours";
-                readonly type: "uint256";
-            }, {
-                readonly internalType: "uint256";
-                readonly name: "percentage";
-                readonly type: "uint256";
-            }];
-            readonly internalType: "struct IAtomicSwapBase.Release[]";
-            readonly name: "releases";
-            readonly type: "tuple[]";
         }];
         readonly name: "executeSwapWithPermit";
         readonly outputs: readonly [];

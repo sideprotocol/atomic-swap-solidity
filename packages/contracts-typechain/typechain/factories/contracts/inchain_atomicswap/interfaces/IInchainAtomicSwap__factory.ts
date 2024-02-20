@@ -176,6 +176,12 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "bytes32",
+        name: "id",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
         internalType: "address",
         name: "maker",
         type: "address",
@@ -185,12 +191,6 @@ const _abi = [
         internalType: "address",
         name: "taker",
         type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "id",
-        type: "bytes32",
       },
     ],
     name: "AtomicSwapOrderTook",
@@ -256,6 +256,11 @@ const _abi = [
           },
           {
             internalType: "bool",
+            name: "completeByBid",
+            type: "bool",
+          },
+          {
+            internalType: "bool",
             name: "withdrawToSellerAccount",
             type: "bool",
           },
@@ -263,6 +268,23 @@ const _abi = [
             internalType: "bool",
             name: "withdrawToBuyerAccount",
             type: "bool",
+          },
+          {
+            components: [
+              {
+                internalType: "uint256",
+                name: "durationInHours",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "percentage",
+                type: "uint256",
+              },
+            ],
+            internalType: "struct IAtomicSwapBase.Release[]",
+            name: "releases",
+            type: "tuple[]",
           },
           {
             components: [
@@ -332,23 +354,6 @@ const _abi = [
         internalType: "struct IAtomicSwapBase.SwapWithPermitMsg",
         name: "swap",
         type: "tuple",
-      },
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "durationInHours",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "percentage",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct IAtomicSwapBase.Release[]",
-        name: "releases",
-        type: "tuple[]",
       },
     ],
     name: "executeSwapWithPermit",
