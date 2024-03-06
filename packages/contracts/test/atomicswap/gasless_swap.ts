@@ -99,6 +99,13 @@ describe("AtomicSwap: Gasless Swap", () => {
         },
         isVesting: true,
       },
+      {
+        name: "Swap ERC20 tokens with vesting by Bid",
+        mallet(swapPermitPayload: IAtomicSwapBase.SwapWithPermitMsgStruct) {
+          swapPermitPayload.completeByBid = true;
+        },
+        isVesting: true,
+      },
     ];
     swapCases.forEach(async (test) => {
       it(test.name, async () => {
@@ -232,7 +239,7 @@ describe("AtomicSwap: Gasless Swap", () => {
           ).to.reverted;
         } else {
           await expect(
-            await atomicSwap
+            atomicSwap
               .connect(executor)
               .executeSwapWithPermit(swapPermitPayload),
           ).not.to.reverted;

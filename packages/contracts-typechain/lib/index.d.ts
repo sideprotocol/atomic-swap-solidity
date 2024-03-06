@@ -2,6 +2,13 @@ export * from "./typechain";
 import * as constants from "./constants/constants";
 export * as ecdsa from "./util/ecdsa";
 export declare const Settings: {
+    vault_sepolia: string;
+    vesting_sepolia: string;
+    AnteHandler_sepolia: string;
+    atomicSwapStateLogic_sepolia: string;
+    inChainAtomicSwap_sepolia: string;
+    mockUSDC_sepolia: string;
+    mockUSDT_sepolia: string;
     atomicSwapStateLogic_bnb: string;
     AnteHandler_bnb: string;
     vault_bnb: string;

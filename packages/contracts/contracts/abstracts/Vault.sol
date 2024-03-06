@@ -218,8 +218,8 @@ abstract contract Vault is ContextUpgradeable,IVault  {
         } else {
             // Withdrawal is for ERC20 tokens
             TransferHelper.safeTransfer(token, to, amount);
-            emit Withdrawal(token, to, amount);
         } 
+        emit Withdrawal(token, to, amount);
     }
 
     // Function to receive Ether when 'send' or 'transfer' is used
